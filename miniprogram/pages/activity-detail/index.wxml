@@ -49,19 +49,21 @@
 
         <view class="activity-meta-row">
           <image class="activity-meta-icon" src="/assets/activity/icon_location.png" mode="aspectFit" />
-          <view class="activity-meta-text">{{activity.location}}</view>
+          <view class="activity-meta-text activity-meta-text--inline">{{activity.location}}</view>
+          <image class="activity-meta-icon activity-meta-icon--right" src="/assets/activity/icon_seat.png" mode="aspectFit" />
         </view>
 
         <view class="activity-meta-row">
-          <image class="activity-meta-icon" src="/assets/activity/icon_seat.png" mode="aspectFit" />
+          <image class="activity-meta-icon" src="/assets/activity/icon_highlight.png" mode="aspectFit" />
           <view class="activity-seat activity-seat--{{activity.seatType}}">{{activity.seatText}}</view>
         </view>
 
         <view class="activity-highlights">
+          <image class="activity-highlights__bg" src="/assets/activity/bg_light.png" mode="scaleToFill" />
           <view class="activity-section-title activity-section-title--inner">活动亮点：</view>
           <block wx:for="{{activity.highlights}}" wx:key="*this" wx:for-item="highlight">
             <view class="activity-highlight-row">
-              <image class="activity-highlight-icon" src="/assets/activity/icon_highlight.png" mode="aspectFit" />
+              <image class="activity-highlight-icon" src="/assets/activity/icon-check.png" mode="aspectFit" />
               <view class="activity-highlight-text">{{highlight}}</view>
             </view>
           </block>
@@ -73,12 +75,13 @@
             <text class="activity-price__num">{{activity.price}}</text>
           </view>
           <view
-            class="activity-btn activity-btn--{{activity.open ? 'open' : 'coming'}}"
+            class="activity-btn activity-btn--{{activity.btnType}}"
             data-id="{{activity.id}}"
             data-open="{{activity.open}}"
             bindtap="onActionTap"
           >
-            {{activity.actionText}}
+            <image class="activity-btn__bg" src="{{activity.btnBg}}" mode="scaleToFill" />
+            <text class="activity-btn__text">{{activity.actionText}}</text>
           </view>
         </view>
       </view>

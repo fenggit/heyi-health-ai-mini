@@ -15,7 +15,7 @@ const ACTIVITY_LIST = [
     statusText: "报名中",
     name: "春季养生沙龙",
     dateTime: "2026年3月23日 14:00 ~ 17:00",
-    location: "合一食养体验中心（徐汇店）",
+    location: "合一食养体验中心",
     seatText: "仅剩8席",
     seatType: "hot",
     highlights: ["中医专家讲座：春季养肝护脾", "免费AI体质测评", "养生茶饮品鉴体验", "定制食养方案咨询"],
@@ -30,7 +30,7 @@ const ACTIVITY_LIST = [
     statusText: "即将开放",
     name: "茶道与食养文化体验",
     dateTime: "2026年4月6日 10:00 ~ 12:00",
-    location: "合一茶室（静安店）",
+    location: "合一茶室",
     seatText: "限20人",
     seatType: "normal",
     highlights: ["茶道基础知识讲解", "不同体质适宜茶品推荐", "现场品茶体验", "茶具礼盒优惠购买"],
@@ -91,7 +91,11 @@ Page({
   },
   loadPageData(options) {
     const activityId = options.id || ""
-    const list = [...ACTIVITY_LIST]
+    const list = ACTIVITY_LIST.map((item) => ({
+      ...item,
+      btnType: item.open ? "open" : "coming",
+      btnBg: item.open ? "/assets/activity/bg_must2.png" : "/assets/activity/bg_must.png"
+    }))
     const hitIndex = list.findIndex((item) => item.id === activityId)
     if (hitIndex > 0) {
       const target = list.splice(hitIndex, 1)[0]

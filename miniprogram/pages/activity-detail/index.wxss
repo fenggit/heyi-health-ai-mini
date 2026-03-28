@@ -59,22 +59,23 @@
 }
 
 .booking-guide-trigger {
+  width: 216rpx;
   height: 64rpx;
-  padding: 0 18rpx;
+  padding: 0;
   border-radius: 12rpx;
   border: 2rpx solid rgba(0, 132, 53, 1);
   background: rgba(255, 255, 255, 0.1);
   color: #1e293b;
-  font-size: 24rpx;
+  font-size: 28rpx;
   font-weight: 500;
-  line-height: 60rpx;
-  white-space: nowrap;
+  line-height: 62rpx;
+  text-align: center;
   box-sizing: border-box;
 }
 
 .activity-card {
   margin-top: 16rpx;
-  padding: 22rpx 24rpx 20rpx;
+  padding: 32rpx;
   background: rgba(255, 255, 255, 0.72);
 }
 
@@ -85,24 +86,24 @@
 }
 
 .activity-tag {
-  min-width: 72rpx;
+  min-width: 80rpx;
   height: 40rpx;
-  padding: 0 14rpx;
+  padding: 0 16rpx;
   border-radius: 12rpx;
   background: #131313;
   color: #cdff71;
-  font-size: 20rpx;
+  font-size: 24rpx;
   line-height: 40rpx;
   text-align: center;
   box-sizing: border-box;
 }
 
 .activity-status {
-  min-width: 96rpx;
+  min-width: 104rpx;
   height: 40rpx;
-  padding: 0 14rpx;
+  padding: 0 12rpx;
   border-radius: 12rpx;
-  font-size: 20rpx;
+  font-size: 24rpx;
   line-height: 40rpx;
   text-align: center;
   box-sizing: border-box;
@@ -121,22 +122,22 @@
   margin-top: 14rpx;
   display: inline-flex;
   position: relative;
-  padding-bottom: 4rpx;
+  padding-bottom: 6rpx;
 }
 
 .activity-name-icon {
   position: absolute;
   left: 8rpx;
-  bottom: 2rpx;
-  width: 88rpx;
+  bottom: 0;
+  width: 178rpx;
   height: auto;
   z-index: 1;
 }
 
 .activity-name {
   color: #1e293b;
-  font-size: 32rpx;
-  line-height: 1.35;
+  font-size: 36rpx;
+  line-height: 1.32;
   font-weight: 700;
   position: relative;
   z-index: 2;
@@ -147,66 +148,91 @@
   color: #1e293b;
   font-size: 28rpx;
   line-height: 1.35;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .activity-meta-row {
-  margin-top: 8rpx;
+  margin-top: 32rpx;
   display: flex;
   align-items: center;
 }
 
 .activity-meta-icon {
-  width: 28rpx;
-  height: 28rpx;
+  width: 32rpx;
+  height: 32rpx;
   margin-right: 10rpx;
   flex-shrink: 0;
+}
+
+.activity-meta-icon--right {
+  margin-right: 0;
+  margin-left: 10rpx;
 }
 
 .activity-meta-text {
   flex: 1;
   min-width: 0;
   color: #475569;
-  font-size: 24rpx;
+  font-size: 28rpx;
   line-height: 1.5;
 }
 
+.activity-meta-text--inline {
+  flex: none;
+  min-width: auto;
+}
+
 .activity-seat {
-  color: #334155;
-  font-size: 24rpx;
-  line-height: 1.4;
-  font-weight: 700;
+  color: #475569;
+  font-size: 28rpx;
+  line-height: 1.5;
+  font-weight: 400;
 }
 
 .activity-seat--hot {
-  color: #f97316;
+  color: #475569;
 }
 
 .activity-seat--normal {
-  color: #008435;
+  color: #475569;
 }
 
 .activity-highlights {
-  margin-top: 14rpx;
-  padding: 12rpx 16rpx;
+  margin-top: 32rpx;
+  margin-bottom: 32rpx;
+  padding: 24rpx 16rpx 16rpx 32rpx;
   border-radius: 16rpx;
-  border: 2rpx solid rgba(255, 255, 255, 0.86);
-  background: rgba(255, 255, 255, 0.54);
+  border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.activity-highlights__bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
 }
 
 .activity-section-title--inner {
   margin-top: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .activity-highlight-row {
-  margin-top: 8rpx;
+  margin-top: 24rpx;
   display: flex;
   align-items: center;
+  position: relative;
+  z-index: 1;
 }
 
 .activity-highlight-icon {
-  width: 20rpx;
-  height: 20rpx;
+  width: 24rpx;
+  height: 24rpx;
   margin-right: 10rpx;
   flex-shrink: 0;
 }
@@ -214,17 +240,22 @@
 .activity-highlight-text {
   color: #475569;
   font-size: 24rpx;
-  line-height: 1.5;
+  line-height: 1.45;
 }
 
 .activity-footer {
-  margin-top: 18rpx;
+  margin-top: 0;
+  height: 80rpx;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-radius: 12rpx;
+  background: linear-gradient(131deg, #e9fbf1 0%, #ecfdf8 54.4%, #defefd 100%);
+  overflow: hidden;
 }
 
 .activity-price {
+  padding-left: 24rpx;
   display: flex;
   align-items: baseline;
   color: #1e293b;
@@ -238,31 +269,47 @@
 
 .activity-price__num {
   margin-left: 4rpx;
-  font-size: 44rpx;
+  font-size: 36rpx;
   line-height: 1;
   font-weight: 700;
 }
 
 .activity-btn {
-  min-width: 180rpx;
-  height: 64rpx;
-  padding: 0 24rpx;
-  border-radius: 14rpx;
-  text-align: center;
-  line-height: 64rpx;
-  font-size: 28rpx;
-  font-weight: 700;
+  min-width: 224rpx;
+  height: 80rpx;
+  padding: 0;
+  border-radius: 12rpx;
   box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+}
+
+.activity-btn__bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.activity-btn__text {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  text-align: center;
+  line-height: 80rpx;
+  font-size: 32rpx;
+  font-weight: 700;
 }
 
 .activity-btn--open {
-  background: linear-gradient(90deg, #45e7cf 0%, #c7ec49 100%);
   color: #1e293b;
 }
 
 .activity-btn--coming {
-  border: 2rpx solid rgba(0, 132, 53, 0.4);
-  background: rgba(255, 255, 255, 0.75);
+  border: none;
   color: rgba(0, 132, 53, 0.5);
 }
 
