@@ -20,7 +20,7 @@
       >
         <block wx:for="{{activityBanners}}" wx:key="id">
           <swiper-item>
-            <view class="activity-slide">
+            <view class="activity-slide" data-id="{{item.id}}" bindtap="openActivityDetail">
               <image class="activity-banner-image" src="{{item.image}}" mode="aspectFill" />
             </view>
           </swiper-item>

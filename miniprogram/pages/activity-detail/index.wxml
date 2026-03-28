@@ -1,0 +1,87 @@
+<view class="activity-page design-page">
+  <image class="activity-page-bg" src="/assets/bg_img.png" mode="widthFix" />
+
+  <view class="mini-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="mini-nav__inner" style="height: {{navBarHeight}}px;">
+      <view class="mini-nav__back" bindtap="handleBack">
+        <image class="mini-nav__back-icon" src="/assets/analysis/nav_back.png" mode="aspectFit" />
+      </view>
+    </view>
+    <view
+      class="mini-nav__capsule-space"
+      style="width: {{menuWidth}}px; height: {{menuHeight}}px; right: {{menuRight}}px; top: {{menuTop}}px;"
+    ></view>
+  </view>
+
+  <view class="page-top-gap" style="height: {{topInset}}px;"></view>
+
+  <view class="activity-wrap">
+    <view class="activity-head">
+      <view class="activity-head__main">
+        <view class="activity-head__title">{{title}}</view>
+        <view class="activity-head__subtitle">{{subTitle}}</view>
+      </view>
+      <view class="booking-guide-trigger" bindtap="showGuideTips">活动预约说明</view>
+    </view>
+
+    <block wx:for="{{activities}}" wx:key="id" wx:for-item="activity">
+      <view class="card-panel activity-card">
+        <view class="activity-card__row">
+          <view class="activity-tag">{{activity.tag}}</view>
+          <view class="activity-status activity-status--{{activity.statusType}}">{{activity.statusText}}</view>
+        </view>
+
+        <view class="activity-name-row">
+          <view class="activity-name">{{activity.name}}</view>
+          <image class="activity-name-icon" src="/assets/activity/title_icon.png" mode="widthFix" />
+        </view>
+
+        <view class="activity-image-wrap">
+          <image class="activity-image" src="/assets/test/activity-img.jpg" mode="aspectFill" />
+        </view>
+
+        <view class="activity-section-title">活动介绍：</view>
+
+        <view class="activity-meta-row">
+          <image class="activity-meta-icon" src="/assets/activity/icon_time.png" mode="aspectFit" />
+          <view class="activity-meta-text">{{activity.dateTime}}</view>
+        </view>
+
+        <view class="activity-meta-row">
+          <image class="activity-meta-icon" src="/assets/activity/icon_location.png" mode="aspectFit" />
+          <view class="activity-meta-text">{{activity.location}}</view>
+        </view>
+
+        <view class="activity-meta-row">
+          <image class="activity-meta-icon" src="/assets/activity/icon_seat.png" mode="aspectFit" />
+          <view class="activity-seat activity-seat--{{activity.seatType}}">{{activity.seatText}}</view>
+        </view>
+
+        <view class="activity-highlights">
+          <view class="activity-section-title activity-section-title--inner">活动亮点：</view>
+          <block wx:for="{{activity.highlights}}" wx:key="*this" wx:for-item="highlight">
+            <view class="activity-highlight-row">
+              <image class="activity-highlight-icon" src="/assets/activity/icon_highlight.png" mode="aspectFit" />
+              <view class="activity-highlight-text">{{highlight}}</view>
+            </view>
+          </block>
+        </view>
+
+        <view class="activity-footer">
+          <view class="activity-price">
+            <text class="activity-price__currency">￥</text>
+            <text class="activity-price__num">{{activity.price}}</text>
+          </view>
+          <view
+            class="activity-btn activity-btn--{{activity.open ? 'open' : 'coming'}}"
+            data-id="{{activity.id}}"
+            data-open="{{activity.open}}"
+            bindtap="onActionTap"
+          >
+            {{activity.actionText}}
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+</view>

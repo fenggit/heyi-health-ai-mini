@@ -133,6 +133,12 @@ Page({
       bannerCurrent: e.detail.current
     })
   },
+  openActivityDetail(e) {
+    const { id } = e.currentTarget.dataset
+    wx.navigateTo({
+      url: `/pages/activity-detail/index?id=${id || ""}`
+    })
+  },
   openShortcut(e) {
     const { path } = e.currentTarget.dataset
     if (!path) return

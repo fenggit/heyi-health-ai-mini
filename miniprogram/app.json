@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/home/index",
+    "pages/activity-detail/index",
     "pages/mall/index",
     "pages/diet/index",
     "pages/profile/index",

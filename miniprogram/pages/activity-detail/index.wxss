@@ -1,0 +1,279 @@
+.activity-page {
+  background: transparent;
+}
+
+.activity-page-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 750rpx;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.page-top-gap,
+.activity-wrap {
+  position: relative;
+  z-index: 1;
+}
+
+.activity-page .card-panel {
+  border-radius: 24rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.96);
+  box-sizing: border-box;
+  box-shadow: none;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.activity-wrap {
+  width: 702rpx;
+  margin: 6rpx auto 0;
+  padding-bottom: 36rpx;
+}
+
+.activity-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16rpx;
+}
+
+.activity-head__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-head__title {
+  color: #1e293b;
+  font-size: 48rpx;
+  line-height: 1.24;
+  font-weight: 700;
+}
+
+.activity-head__subtitle {
+  margin-top: 10rpx;
+  color: #334155;
+  font-size: 24rpx;
+  line-height: 1.45;
+}
+
+.booking-guide-trigger {
+  height: 64rpx;
+  padding: 0 18rpx;
+  border-radius: 12rpx;
+  border: 2rpx solid rgba(0, 132, 53, 1);
+  background: rgba(255, 255, 255, 0.1);
+  color: #1e293b;
+  font-size: 24rpx;
+  font-weight: 500;
+  line-height: 60rpx;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.activity-card {
+  margin-top: 16rpx;
+  padding: 22rpx 24rpx 20rpx;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.activity-card__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.activity-tag {
+  min-width: 72rpx;
+  height: 40rpx;
+  padding: 0 14rpx;
+  border-radius: 12rpx;
+  background: #131313;
+  color: #cdff71;
+  font-size: 20rpx;
+  line-height: 40rpx;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.activity-status {
+  min-width: 96rpx;
+  height: 40rpx;
+  padding: 0 14rpx;
+  border-radius: 12rpx;
+  font-size: 20rpx;
+  line-height: 40rpx;
+  text-align: center;
+  box-sizing: border-box;
+  color: #1e293b;
+}
+
+.activity-status--open {
+  background: linear-gradient(90deg, #74f2c6 0%, #c7ec49 100%);
+}
+
+.activity-status--coming {
+  background: #ffde00;
+}
+
+.activity-name-row {
+  margin-top: 14rpx;
+  display: inline-flex;
+  position: relative;
+  padding-bottom: 4rpx;
+}
+
+.activity-name-icon {
+  position: absolute;
+  left: 8rpx;
+  bottom: 2rpx;
+  width: 88rpx;
+  height: auto;
+  z-index: 1;
+}
+
+.activity-name {
+  color: #1e293b;
+  font-size: 32rpx;
+  line-height: 1.35;
+  font-weight: 700;
+  position: relative;
+  z-index: 2;
+}
+
+.activity-section-title {
+  margin-top: 14rpx;
+  color: #1e293b;
+  font-size: 28rpx;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.activity-meta-row {
+  margin-top: 8rpx;
+  display: flex;
+  align-items: center;
+}
+
+.activity-meta-icon {
+  width: 28rpx;
+  height: 28rpx;
+  margin-right: 10rpx;
+  flex-shrink: 0;
+}
+
+.activity-meta-text {
+  flex: 1;
+  min-width: 0;
+  color: #475569;
+  font-size: 24rpx;
+  line-height: 1.5;
+}
+
+.activity-seat {
+  color: #334155;
+  font-size: 24rpx;
+  line-height: 1.4;
+  font-weight: 700;
+}
+
+.activity-seat--hot {
+  color: #f97316;
+}
+
+.activity-seat--normal {
+  color: #008435;
+}
+
+.activity-highlights {
+  margin-top: 14rpx;
+  padding: 12rpx 16rpx;
+  border-radius: 16rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.86);
+  background: rgba(255, 255, 255, 0.54);
+}
+
+.activity-section-title--inner {
+  margin-top: 0;
+}
+
+.activity-highlight-row {
+  margin-top: 8rpx;
+  display: flex;
+  align-items: center;
+}
+
+.activity-highlight-icon {
+  width: 20rpx;
+  height: 20rpx;
+  margin-right: 10rpx;
+  flex-shrink: 0;
+}
+
+.activity-highlight-text {
+  color: #475569;
+  font-size: 24rpx;
+  line-height: 1.5;
+}
+
+.activity-footer {
+  margin-top: 18rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.activity-price {
+  display: flex;
+  align-items: baseline;
+  color: #1e293b;
+}
+
+.activity-price__currency {
+  font-size: 24rpx;
+  font-weight: 700;
+  opacity: 0.55;
+}
+
+.activity-price__num {
+  margin-left: 4rpx;
+  font-size: 44rpx;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.activity-btn {
+  min-width: 180rpx;
+  height: 64rpx;
+  padding: 0 24rpx;
+  border-radius: 14rpx;
+  text-align: center;
+  line-height: 64rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  box-sizing: border-box;
+}
+
+.activity-btn--open {
+  background: linear-gradient(90deg, #45e7cf 0%, #c7ec49 100%);
+  color: #1e293b;
+}
+
+.activity-btn--coming {
+  border: 2rpx solid rgba(0, 132, 53, 0.4);
+  background: rgba(255, 255, 255, 0.75);
+  color: rgba(0, 132, 53, 0.5);
+}
+
+.activity-image-wrap {
+  margin: 24rpx 0;
+  border-radius: 24rpx;
+  overflow: hidden;
+}
+
+.activity-image {
+  width: 100%;
+  height: 356rpx;
+  border-radius: 24rpx;
+}
