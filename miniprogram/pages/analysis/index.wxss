@@ -1,0 +1,99 @@
+.analysis-wrap {
+  width: 718rpx;
+  margin: 8rpx auto 0;
+  padding-bottom: 30rpx;
+}
+
+.analysis-head {
+  padding: 22rpx;
+}
+
+.analysis-head__title {
+  color: #273847;
+  font-size: 30rpx;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.analysis-head__subtitle {
+  margin-top: 8rpx;
+  color: #768696;
+  font-size: 23rpx;
+}
+
+.analysis-panel {
+  margin-top: 14rpx;
+  padding: 20rpx;
+}
+
+.analysis-label {
+  color: #2a3d4e;
+  font-size: 26rpx;
+  font-weight: 700;
+}
+
+.analysis-content {
+  margin-top: 10rpx;
+  color: #546577;
+  font-size: 23rpx;
+  line-height: 1.6;
+}
+
+.analysis-bullet {
+  margin-top: 8rpx;
+  color: #546577;
+  font-size: 23rpx;
+  line-height: 1.6;
+}
+
+.analysis-agree {
+  margin-top: 16rpx;
+  display: flex;
+  align-items: flex-start;
+}
+
+.analysis-check {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 10rpx;
+  border: 2rpx solid #b5c0cb;
+  background: #ffffff;
+  flex-shrink: 0;
+  margin-top: 4rpx;
+}
+
+.analysis-check--active {
+  border-color: #24c861;
+  background: linear-gradient(135deg, #2bdd6f 0%, #18c657 100%);
+}
+
+.analysis-agree__text {
+  margin-left: 12rpx;
+  color: #6d7d8d;
+  font-size: 22rpx;
+  line-height: 1.55;
+}
+
+.analysis-actions {
+  margin-top: 20rpx;
+}
+
+.analysis-btn {
+  height: 84rpx;
+  border-radius: 20rpx;
+  text-align: center;
+  line-height: 84rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.analysis-btn--primary {
+  background: linear-gradient(135deg, #22d963 0%, #83e95a 100%);
+  color: #173d24;
+}
+
+.analysis-btn--ghost {
+  margin-top: 12rpx;
+  background: #ffffff;
+  color: #4f6071;
+}

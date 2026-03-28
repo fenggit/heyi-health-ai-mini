@@ -1,0 +1,41 @@
+<view class="dock-wrap">
+  <view class="dock-base"></view>
+  <view class="dock-content">
+    <view class="dock-side dock-side--left">
+      <block wx:for="{{tabs}}" wx:key="path" wx:for-item="tab" wx:for-index="index">
+        <view
+          wx:if="{{index < 2}}"
+          class="dock-tab {{selected === index ? 'dock-tab--active' : ''}}"
+          data-path="{{tab.path}}"
+          data-index="{{index}}"
+          bindtap="switchTab"
+        >
+          <view class="dock-tab__badge" wx:if="{{selected === index}}"></view>
+          <text class="dock-tab__text">{{tab.text}}</text>
+        </view>
+      </block>
+    </view>
+
+    <view class="dock-center" bindtap="openAnalysis">
+      <view class="dock-center__cap"></view>
+      <view class="dock-center__button">
+        <image class="dock-center__icon" src="/assets/icons/ai.png" mode="aspectFit" />
+      </view>
+    </view>
+
+    <view class="dock-side dock-side--right">
+      <block wx:for="{{tabs}}" wx:key="path" wx:for-item="tab" wx:for-index="index">
+        <view
+          wx:if="{{index >= 2}}"
+          class="dock-tab {{selected === index ? 'dock-tab--active' : ''}}"
+          data-path="{{tab.path}}"
+          data-index="{{index}}"
+          bindtap="switchTab"
+        >
+          <view class="dock-tab__badge" wx:if="{{selected === index}}"></view>
+          <text class="dock-tab__text">{{tab.text}}</text>
+        </view>
+      </block>
+    </view>
+  </view>
+</view>

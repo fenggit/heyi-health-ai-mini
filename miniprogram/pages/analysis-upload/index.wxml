@@ -1,0 +1,42 @@
+<view class="design-page">
+  <view class="page-top-gap" style="height: {{topInset}}px;"></view>
+
+  <view class="upload-wrap">
+    <view class="upload-head card-panel">
+      <view class="upload-title">{{title}}</view>
+      <view class="upload-subtitle">{{subTitle}}</view>
+      <view class="upload-intro">{{intro}}</view>
+    </view>
+
+    <view class="upload-grid">
+      <view class="card-panel upload-card">
+        <view class="upload-card__title">舌苔拍照</view>
+        <view class="upload-photo">
+          <image wx:if="{{tongueImage}}" class="upload-photo__img" src="{{tongueImage}}" mode="aspectFill" />
+          <view wx:else class="upload-photo__placeholder">舌苔样本</view>
+        </view>
+        <view class="upload-actions">
+          <view class="upload-action" bindtap="chooseTongueCamera">拍摄舌苔照片</view>
+          <view class="upload-action upload-action--ghost" bindtap="chooseTongueAlbum">从相册获取</view>
+        </view>
+        <view class="upload-tip">拍摄提示：{{tongueTip}}</view>
+      </view>
+
+      <view class="card-panel upload-card">
+        <view class="upload-card__title">面色拍照</view>
+        <view class="upload-photo">
+          <image wx:if="{{faceImage}}" class="upload-photo__img" src="{{faceImage}}" mode="aspectFill" />
+          <view wx:else class="upload-photo__placeholder">面部样本</view>
+        </view>
+        <view class="upload-actions">
+          <view class="upload-action" bindtap="chooseFaceCamera">拍摄面部照片</view>
+          <view class="upload-action upload-action--ghost" bindtap="chooseFaceAlbum">从相册获取</view>
+        </view>
+        <view class="upload-tip">拍摄提示：{{faceTip}}</view>
+      </view>
+    </view>
+
+    <view class="upload-skip" bindtap="skipAndFinish">跳过拍照，直接生成报告</view>
+    <view class="upload-submit" bindtap="finish">完成分析</view>
+  </view>
+</view>

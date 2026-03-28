@@ -1,0 +1,55 @@
+<view class="design-page design-page--with-tab">
+  <view class="mall-top-gap page-top-gap" style="height: {{topInset}}px;"></view>
+
+  <view class="mall-header">
+    <view class="mall-search">
+      <input
+        class="mall-search__input"
+        type="text"
+        value="{{searchKeyword}}"
+        placeholder="{{searchPlaceholder}}"
+        bindinput="onInputSearch"
+      />
+    </view>
+    <view class="mall-city">{{city}}</view>
+  </view>
+
+  <view class="mall-content">
+    <view class="card-panel mall-notice">{{notice}}</view>
+
+    <view class="mall-tabs">
+      <block wx:for="{{categories}}" wx:key="*this">
+        <view
+          class="mall-tab {{index === activeCategory ? 'mall-tab--active' : ''}}"
+          data-index="{{index}}"
+          bindtap="selectCategory"
+        >
+          {{item}}
+        </view>
+      </block>
+    </view>
+
+    <view class="mall-banner card-panel">
+      <view class="mall-banner__mark">新人专享</view>
+      <view class="mall-banner__title">合一商城</view>
+      <view class="mall-banner__subtitle">有机果蔬 · 每日新鲜到家</view>
+    </view>
+
+    <view class="mall-grid">
+      <block wx:for="{{products}}" wx:key="id">
+        <view class="card-panel mall-product">
+          <view class="mall-product__thumb">{{item.label}}</view>
+          <view class="mall-product__name">{{item.name}}</view>
+          <view class="mall-product__meta">评分 {{item.score}} · 库存 {{item.stock}}</view>
+          <view class="mall-product__foot">
+            <view class="mall-product__price">
+              <text class="mall-product__price-main">￥{{item.price}}</text>
+              <text class="mall-product__price-unit">{{item.unit}}</text>
+            </view>
+            <view class="mall-product__add" data-id="{{item.id}}" bindtap="addToCart">+</view>
+          </view>
+        </view>
+      </block>
+    </view>
+  </view>
+</view>

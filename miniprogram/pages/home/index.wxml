@@ -1,0 +1,111 @@
+<view class="home-page design-page design-page--with-tab">
+  <image class="home-page-bg" src="/assets/bg_img.png" mode="widthFix" />
+
+  <view class="home-hero" style="padding-top: {{topInset}}px;">
+    <view class="hero-main-wrap">
+      <image class="hero-main" src="/assets/home_hero.png" mode="aspectFill" />
+    </view>
+  </view>
+
+  <view class="home-content">
+    <view class="card-panel activity-card">
+      <swiper
+        class="activity-swiper"
+        current="{{bannerCurrent}}"
+        circular
+        autoplay
+        interval="4200"
+        duration="420"
+        bindchange="onBannerChange"
+      >
+        <block wx:for="{{activityBanners}}" wx:key="id">
+          <swiper-item>
+            <view class="activity-slide">
+              <image class="activity-banner-image" src="{{item.image}}" mode="aspectFill" />
+            </view>
+          </swiper-item>
+        </block>
+      </swiper>
+      <view class="activity-dots" wx:if="{{activityBanners.length > 1}}">
+        <block wx:for="{{activityBanners}}" wx:key="id">
+          <view class="activity-dot {{index === bannerCurrent ? 'activity-dot--active' : ''}}"></view>
+        </block>
+      </view>
+    </view>
+
+    <view class="card-panel health-card">
+      <view class="health-head">
+        <view class="health-title-block">
+          <text class="section-title">{{healthStatus.title}}</text>
+          <image class="health-title-dec" src="/assets/title_dec.png" mode="widthFix" />
+        </view>
+        <text class="health-status-pill">{{healthStatus.level}}</text>
+      </view>
+      <view class="health-metrics">
+        <block wx:for="{{healthMetrics}}" wx:key="id">
+          <view class="health-metric">
+            <view class="health-label">
+              <image class="health-icon" src="{{item.icon}}" mode="aspectFit" />
+              <text>{{item.label}}</text>
+            </view>
+            <text class="health-value">{{item.value}}</text>
+          </view>
+        </block>
+      </view>
+      <view class="hydration">
+        <view class="hydration-head">
+          <text class="section-subtitle">{{hydration.title}}</text>
+          <text class="hydration-value">{{hydration.value}}</text>
+        </view>
+        <view class="hydration-track">
+          <block wx:for="{{hydration.segments}}" wx:key="id">
+            <view class="hydration-segment {{item.active ? 'hydration-segment--active' : ''}}"></view>
+          </block>
+        </view>
+      </view>
+    </view>
+
+    <view class="shortcut-grid">
+      <block wx:for="{{shortcuts}}" wx:key="id">
+        <view class="shortcut-card shortcut-card--{{item.styleType}}" data-path="{{item.path}}" bindtap="openShortcut">
+          <view class="shortcut-copy">
+            <text class="shortcut-title">{{item.title}}</text>
+            <text class="shortcut-description">{{item.description}}</text>
+          </view>
+          <image wx:if="{{item.icon}}" class="shortcut-icon" src="{{item.icon}}" mode="aspectFit" />
+          <view wx:else class="shortcut-bubbles">
+            <view class="shortcut-bubble shortcut-bubble--lg"></view>
+            <view class="shortcut-bubble shortcut-bubble--md"></view>
+            <view class="shortcut-bubble shortcut-bubble--sm"></view>
+          </view>
+        </view>
+      </block>
+    </view>
+
+    <view class="section-block">
+      <view class="section-head">
+        <text class="section-title">{{recommendation.title}}</text>
+        <text class="section-action">{{recommendation.actionText}} ></text>
+      </view>
+      <view class="card-panel recommendation-card">
+        <view class="recommendation-header">
+          <text class="recommendation-name">{{recommendation.name}}</text>
+          <view class="recommendation-tags">
+            <block wx:for="{{recommendation.tags}}" wx:key="*this">
+              <text class="recommendation-tag">{{item}}</text>
+            </block>
+          </view>
+        </view>
+        <text class="recommendation-description">{{recommendation.description}}</text>
+      </view>
+    </view>
+
+    <view class="card-panel tips-card">
+      <view class="tips-head">
+        <image class="tips-icon" src="/assets/icons/today_star.png" mode="aspectFit" />
+        <text class="tips-title">{{tip.title}}</text>
+      </view>
+      <text class="tips-content">{{tip.content}}</text>
+    </view>
+  </view>
+</view>

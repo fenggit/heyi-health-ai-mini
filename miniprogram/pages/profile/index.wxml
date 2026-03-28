@@ -1,0 +1,58 @@
+<view class="design-page design-page--with-tab">
+  <view class="page-top-gap" style="height: {{topInset}}px;"></view>
+
+  <view class="profile-content">
+    <view class="card-panel profile-user">
+      <view class="profile-avatar">合</view>
+      <view class="profile-user__meta">
+        <view class="profile-name">{{user.nickname}}</view>
+        <view class="profile-id">ID：{{user.userId}}</view>
+      </view>
+    </view>
+
+    <view class="card-panel profile-member">
+      <view class="profile-member__info">
+        <text>{{user.memberLevel}}：{{user.points}} 积分</text>
+      </view>
+      <view class="profile-member__action" data-name="会员升级" bindtap="openItem">会员升级</view>
+    </view>
+
+    <view class="card-panel profile-stats">
+      <block wx:for="{{stats}}" wx:key="label">
+        <view class="profile-stat">
+          <text class="profile-stat__value">{{item.value}}</text>
+          <text class="profile-stat__label">{{item.label}}</text>
+        </view>
+      </block>
+    </view>
+
+    <view class="card-panel profile-section">
+      <view class="section-title">我的数据</view>
+      <block wx:for="{{dataMenus}}" wx:key="*this">
+        <view class="profile-item" data-name="{{item}}" bindtap="openItem">
+          <text>{{item}}</text>
+          <text class="profile-item__arrow">></text>
+        </view>
+      </block>
+    </view>
+
+    <view class="card-panel profile-section">
+      <view class="section-title">全部功能</view>
+      <block wx:for="{{allMenus}}" wx:key="*this">
+        <view class="profile-item" data-name="{{item}}" bindtap="openItem">
+          <text>{{item}}</text>
+          <text class="profile-item__arrow">></text>
+        </view>
+      </block>
+    </view>
+
+    <view class="card-panel profile-section profile-section--last">
+      <block wx:for="{{settingsMenus}}" wx:key="*this">
+        <view class="profile-item" data-name="{{item}}" bindtap="openItem">
+          <text>{{item}}</text>
+          <text class="profile-item__arrow">></text>
+        </view>
+      </block>
+    </view>
+  </view>
+</view>

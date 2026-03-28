@@ -1,0 +1,41 @@
+<view class="design-page">
+  <view class="page-top-gap" style="height: {{topInset}}px;"></view>
+
+  <view class="analysis-wrap">
+    <view class="analysis-head card-panel">
+      <view class="analysis-head__title">{{introTitle}}</view>
+      <view class="analysis-head__subtitle">{{introSubTitle}}</view>
+    </view>
+
+    <view class="analysis-panel card-panel">
+      <view class="analysis-label">重要声明</view>
+      <view class="analysis-content">{{declaration}}</view>
+    </view>
+
+    <view class="analysis-panel card-panel">
+      <view class="analysis-label">使用限制</view>
+      <block wx:for="{{bullets}}" wx:key="*this">
+        <view class="analysis-bullet">· {{item}}</view>
+      </block>
+    </view>
+
+    <view class="analysis-panel card-panel">
+      <view class="analysis-label">我们提供的服务</view>
+      <block wx:for="{{extras}}" wx:key="*this">
+        <view class="analysis-bullet">· {{item}}</view>
+      </block>
+    </view>
+
+    <view class="analysis-agree" bindtap="toggleAgree">
+      <view class="analysis-check {{agreed ? 'analysis-check--active' : ''}}"></view>
+      <view class="analysis-agree__text">
+        我已仔细阅读并理解上述内容，同意本服务仅作为趣味参考工具使用，不作为医疗诊断依据。
+      </view>
+    </view>
+
+    <view class="analysis-actions">
+      <view class="analysis-btn analysis-btn--primary" bindtap="startQuiz">开始测评</view>
+      <view class="analysis-btn analysis-btn--ghost" bindtap="backHome">返回首页</view>
+    </view>
+  </view>
+</view>

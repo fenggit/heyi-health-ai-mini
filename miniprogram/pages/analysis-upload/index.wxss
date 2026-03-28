@@ -1,0 +1,122 @@
+.upload-wrap {
+  width: 718rpx;
+  margin: 8rpx auto 0;
+  padding-bottom: 22rpx;
+}
+
+.upload-head {
+  padding: 20rpx;
+}
+
+.upload-title {
+  color: #273a4d;
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+.upload-subtitle {
+  margin-top: 8rpx;
+  color: #678094;
+  font-size: 23rpx;
+}
+
+.upload-intro {
+  margin-top: 10rpx;
+  color: #5f7285;
+  font-size: 22rpx;
+  line-height: 1.58;
+}
+
+.upload-grid {
+  margin-top: 14rpx;
+}
+
+.upload-card {
+  padding: 20rpx;
+}
+
+.upload-card + .upload-card {
+  margin-top: 12rpx;
+}
+
+.upload-card__title {
+  color: #2a3d4f;
+  font-size: 27rpx;
+  font-weight: 700;
+}
+
+.upload-photo {
+  margin-top: 12rpx;
+  width: 100%;
+  height: 240rpx;
+  border-radius: 18rpx;
+  overflow: hidden;
+  background: #f3f6fa;
+}
+
+.upload-photo__img {
+  width: 100%;
+  height: 100%;
+}
+
+.upload-photo__placeholder {
+  width: 100%;
+  height: 100%;
+  color: #9aa7b6;
+  font-size: 26rpx;
+  line-height: 240rpx;
+  text-align: center;
+}
+
+.upload-actions {
+  display: flex;
+  margin-top: 12rpx;
+}
+
+.upload-action {
+  flex: 1;
+  height: 64rpx;
+  border-radius: 14rpx;
+  background: linear-gradient(135deg, #28db67 0%, #7ee95d 100%);
+  color: #183f27;
+  text-align: center;
+  line-height: 64rpx;
+  font-size: 23rpx;
+  font-weight: 700;
+}
+
+.upload-action + .upload-action {
+  margin-left: 10rpx;
+}
+
+.upload-action--ghost {
+  background: #f2f5f8;
+  color: #596d80;
+  font-weight: 600;
+}
+
+.upload-tip {
+  margin-top: 10rpx;
+  color: #7a8b9a;
+  font-size: 21rpx;
+  line-height: 1.52;
+}
+
+.upload-skip {
+  margin-top: 16rpx;
+  color: #6c7f91;
+  font-size: 23rpx;
+  text-align: center;
+}
+
+.upload-submit {
+  margin-top: 12rpx;
+  height: 84rpx;
+  border-radius: 18rpx;
+  background: linear-gradient(135deg, #21d964 0%, #84e95d 100%);
+  color: #173f26;
+  font-size: 28rpx;
+  text-align: center;
+  line-height: 84rpx;
+  font-weight: 700;
+}

@@ -1,0 +1,39 @@
+{
+  "pages": [
+    "pages/home/index",
+    "pages/mall/index",
+    "pages/diet/index",
+    "pages/profile/index",
+    "pages/analysis/index",
+    "pages/analysis-quiz/index",
+    "pages/analysis-upload/index"
+  ],
+  "window": {
+    "backgroundColor": "#F4F5F8",
+    "backgroundTextStyle": "light",
+    "navigationStyle": "custom"
+  },
+  "tabBar": {
+    "custom": true,
+    "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/mall/index",
+        "text": "商城"
+      },
+      {
+        "pagePath": "pages/diet/index",
+        "text": "食养"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "我的"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

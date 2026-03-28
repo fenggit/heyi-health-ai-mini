@@ -1,0 +1,65 @@
+<view class="design-page design-page--with-tab diet-page">
+  <view class="page-top-gap" style="height: {{topInset}}px;"></view>
+
+  <view class="diet-head">
+    <view class="diet-search">关键词搜索</view>
+    <view class="diet-mode" bindtap="switchMode">{{configured ? "切换未定制" : "开始定制"}}</view>
+  </view>
+
+  <view class="diet-content">
+    <view class="diet-tabs">
+      <block wx:for="{{categories}}" wx:key="*this">
+        <view
+          class="diet-tab {{index === activeCategory ? 'diet-tab--active' : ''}}"
+          data-index="{{index}}"
+          bindtap="selectCategory"
+        >
+          {{item}}
+        </view>
+      </block>
+    </view>
+
+    <view class="card-panel diet-plan">
+      <view class="section-title">{{planIntro.title}}</view>
+      <view class="section-subtitle">{{planIntro.desc}}</view>
+      <view class="diet-plan__note">{{planIntro.note}}</view>
+      <view wx:if="{{!configured}}" class="diet-plan__action" bindtap="switchMode">开始定制</view>
+
+      <view wx:if="{{configured}}" class="diet-week">
+        <view class="diet-week__head">
+          <text class="diet-week__title">周计划</text>
+          <text class="diet-week__status">{{weeklyPlan.progressText}}</text>
+        </view>
+        <view class="diet-week__meta">第 {{weeklyPlan.day}} / {{weeklyPlan.totalDays}} 天</view>
+        <view class="diet-week__list">
+          <block wx:for="{{weeklyPlan.meals}}" wx:key="id">
+            <view class="diet-week__item">
+              <text>{{item.title}}</text>
+              <text>{{item.time}}</text>
+            </view>
+          </block>
+        </view>
+      </view>
+    </view>
+
+    <view class="diet-recipes">
+      <block wx:for="{{recipes}}" wx:key="id">
+        <view class="card-panel diet-recipe" data-id="{{item.id}}" bindtap="openRecipe">
+          <view class="diet-recipe__head">
+            <text class="diet-recipe__name">{{item.name}}</text>
+            <view class="diet-recipe__price">
+              <text class="diet-recipe__price-main">￥{{item.price}}</text>
+              <text class="diet-recipe__price-unit">{{item.unit}}</text>
+            </view>
+          </view>
+          <view class="diet-recipe__tags">
+            <block wx:for="{{item.tags}}" wx:key="*this">
+              <text class="diet-recipe__tag">{{item}}</text>
+            </block>
+          </view>
+          <text class="diet-recipe__type">{{item.type}}</text>
+        </view>
+      </block>
+    </view>
+  </view>
+</view>

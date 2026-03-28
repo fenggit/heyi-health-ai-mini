@@ -1,0 +1,23 @@
+{
+  "description": "合一食养小程序本地配置",
+  "setting": {
+    "compileHotReLoad": true,
+    "useApiHook": true,
+    "urlCheck": true,
+    "coverView": false,
+    "lazyloadPlaceholderEnable": false,
+    "skylineRenderEnable": false,
+    "preloadBackgroundData": false,
+    "autoAudits": false,
+    "showShadowRootInWxmlPanel": true,
+    "useStaticServer": false,
+    "useLanDebug": false,
+    "showES6CompileOption": false,
+    "checkInvalidKey": true,
+    "ignoreDevUnusedFiles": true,
+    "bigPackageSizeSupport": false
+  },
+  "libVersion": "3.15.1",
+  "projectname": "heyi-health-ai-mini2",
+  "condition": {}
+}
