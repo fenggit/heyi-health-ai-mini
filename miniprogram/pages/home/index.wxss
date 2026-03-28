@@ -150,14 +150,14 @@
 .health-metrics {
   display: flex;
   margin-top: 18rpx;
-  padding-top: 14rpx;
-  border-top: 2rpx solid #e4ebea;
+  padding-top: 13rpx;
+  border-top: 2rpx dashed rgba(0, 201, 80, 0.5);
 }
 
 .health-metric {
   flex: 1;
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
   align-items: center;
   text-align: center;
 }
@@ -189,7 +189,7 @@
 
 .health-value {
   display: block;
-  margin-bottom: 14rpx;
+  margin-top: 14rpx;
   color: #1e293b;
   font-size: 36rpx;
   line-height: 1;
@@ -197,7 +197,7 @@
 }
 
 .hydration {
-  margin-top: 14rpx;
+  margin-top: 18rpx;
   padding: 14rpx 12rpx 12rpx;
   border-radius: 12rpx;
   background: rgba(0, 201, 80, 0.08);
@@ -221,23 +221,31 @@
 }
 
 .hydration-track {
-  display: flex;
+  position: relative;
+  width: 100%;
+  height: 16rpx;
   margin-top: 12rpx;
+  border-radius: 16rpx;
+  background: rgba(255, 255, 255, 0.45);
 }
 
-.hydration-segment {
-  flex: 1;
-  height: 12rpx;
-  border-radius: 999rpx;
-  background: rgba(255, 255, 255, 0.5);
+.hydration-fill {
+  height: 16rpx;
+  background: linear-gradient(90deg, #87fb9b 0%, #1efad5 34.03%, #2cebff 70.86%, #b0ff2f 100%);
+  border-radius: 16rpx;
 }
 
-.hydration-segment + .hydration-segment {
-  margin-left: 2rpx;
-}
-
-.hydration-segment--active {
-  background: linear-gradient(90deg, #74eb9b 0%, #cbe95a 100%);
+.hydration-thumb {
+  position: absolute;
+  top: 50%;
+  width: 20rpx;
+  height: 20rpx;
+  background: linear-gradient(180deg, #4effe2 0%, #cef94c 100%);
+  box-shadow: 0rpx 0rpx 20rpx 2rpx rgba(0, 132, 53, 0.15);
+  border: 4rpx solid #ffffff;
+  border-radius: 50%;
+  box-sizing: border-box;
+  transform: translate(-50%, -50%);
 }
 
 .shortcut-grid {

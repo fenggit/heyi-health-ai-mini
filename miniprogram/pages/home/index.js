@@ -95,6 +95,7 @@ Page({
   data: {
     topInset: 32,
     bannerCurrent: 0,
+    hydrationProgress: 0,
     greetingTitle: "",
     greetingText: "",
     activityBanners: [],
@@ -122,7 +123,10 @@ Page({
   },
   async loadPageData() {
     const payload = await fetchHomeData()
-    this.setData(payload)
+    this.setData({
+      ...payload,
+      hydrationProgress: 70
+    })
   },
   onBannerChange(e) {
     this.setData({

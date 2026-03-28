@@ -58,9 +58,8 @@
           <text class="hydration-value">{{hydration.value}}</text>
         </view>
         <view class="hydration-track">
-          <block wx:for="{{hydration.segments}}" wx:key="id">
-            <view class="hydration-segment {{item.active ? 'hydration-segment--active' : ''}}"></view>
-          </block>
+          <view class="hydration-fill" style="width: {{hydrationProgress}}%;"></view>
+          <view class="hydration-thumb" style="left: {{hydrationProgress}}%;"></view>
         </view>
       </view>
     </view>
