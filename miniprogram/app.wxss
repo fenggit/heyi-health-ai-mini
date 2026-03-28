@@ -23,6 +23,41 @@ page {
   width: 100%;
 }
 
+.mini-nav {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.mini-nav__inner {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  padding-left: 24rpx;
+}
+
+.mini-nav__back {
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  pointer-events: auto;
+}
+
+.mini-nav__back-icon {
+  width: 12rpx;
+  height: 20rpx;
+}
+
+.mini-nav__capsule-space {
+  position: absolute;
+  pointer-events: none;
+}
+
 .card-panel {
   border-radius: 24rpx;
   background: rgba(255, 255, 255, 0.96);

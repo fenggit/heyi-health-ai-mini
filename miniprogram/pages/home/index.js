@@ -56,6 +56,9 @@ const MOCK_HOME_DATA = {
       description: "3分钟分析生活趋势",
       icon: "/assets/icons/ai.png",
       styleType: "robot",
+      bgImage: "/assets/home/shortcut_bg_left.png",
+      checkCircle: "/assets/home/shortcut_icon_circle_left.png",
+      checkTick: "/assets/home/shortcut_icon_tick_left.png",
       path: "/pages/analysis/index"
     },
     {
@@ -63,6 +66,9 @@ const MOCK_HOME_DATA = {
       title: "AI体质测评",
       description: "个性化推荐食养方案",
       styleType: "bubble",
+      bgImage: "/assets/home/shortcut_bg_right.png",
+      checkCircle: "/assets/home/shortcut_icon_circle_right.png",
+      checkTick: "/assets/home/shortcut_icon_tick_right.png",
       path: "/pages/analysis-quiz/index"
     }
   ],

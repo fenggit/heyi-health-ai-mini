@@ -1,63 +1,87 @@
 <view class="design-page design-page--with-tab diet-page">
+  <image class="diet-page-bg" src="/assets/bg_img.png" mode="widthFix" />
   <view class="page-top-gap" style="height: {{topInset}}px;"></view>
 
-  <view class="diet-head">
-    <view class="diet-search">关键词搜索</view>
-    <view class="diet-mode" bindtap="switchMode">{{configured ? "切换未定制" : "开始定制"}}</view>
-  </view>
-
-  <view class="diet-content">
-    <view class="diet-tabs">
-      <block wx:for="{{categories}}" wx:key="*this">
-        <view
-          class="diet-tab {{index === activeCategory ? 'diet-tab--active' : ''}}"
-          data-index="{{index}}"
-          bindtap="selectCategory"
-        >
-          {{item}}
-        </view>
-      </block>
+  <view class="diet-wrap">
+    <view class="diet-search-row">
+      <view class="diet-search">
+        <image class="diet-search__icon" src="/assets/mall/icon-search.png" mode="aspectFit" />
+        <text class="diet-search__placeholder">关键词搜索</text>
+      </view>
+      <view class="diet-cart">
+        <image class="diet-cart__icon" src="/assets/mall/icon-cart.png" mode="aspectFit" />
+        <view class="diet-cart__badge">{{cartCount}}</view>
+      </view>
     </view>
 
-    <view class="card-panel diet-plan">
-      <view class="section-title">{{planIntro.title}}</view>
-      <view class="section-subtitle">{{planIntro.desc}}</view>
-      <view class="diet-plan__note">{{planIntro.note}}</view>
-      <view wx:if="{{!configured}}" class="diet-plan__action" bindtap="switchMode">开始定制</view>
-
-      <view wx:if="{{configured}}" class="diet-week">
-        <view class="diet-week__head">
-          <text class="diet-week__title">周计划</text>
-          <text class="diet-week__status">{{weeklyPlan.progressText}}</text>
-        </view>
-        <view class="diet-week__meta">第 {{weeklyPlan.day}} / {{weeklyPlan.totalDays}} 天</view>
-        <view class="diet-week__list">
-          <block wx:for="{{weeklyPlan.meals}}" wx:key="id">
-            <view class="diet-week__item">
-              <text>{{item.title}}</text>
-              <text>{{item.time}}</text>
-            </view>
-          </block>
-        </view>
+    <view wx:if="{{!configured}}" class="card-panel diet-custom-card">
+      <view class="diet-custom__title-row">
+        <text class="diet-custom__title">{{planIntro.title}}</text>
+        <text class="diet-custom__desc">{{planIntro.desc}}</text>
       </view>
+      <view class="diet-custom__note">{{planIntro.note}}</view>
+      <view class="diet-custom__cta" bindtap="switchMode">开始定制</view>
+      <image class="diet-custom__illus" src="/assets/home-body-heath.png" mode="aspectFill" />
+    </view>
+
+    <view wx:if="{{configured}}" class="card-panel diet-week-card">
+      <view class="diet-week__head">
+        <text class="diet-week__title">周计划：</text>
+        <text class="diet-week__status">{{weeklyPlan.progressText}}</text>
+      </view>
+      <view class="diet-week__meta">
+        第 <text class="diet-week__meta-num">{{weeklyPlan.day}}</text> / {{weeklyPlan.totalDays}} 天
+      </view>
+
+      <view class="diet-week__progress-track">
+        <view class="diet-week__progress-fill" style="width: {{weeklyPercent}}%;"></view>
+        <view class="diet-week__progress-dot" style="left: {{weeklyPercent}}%;"></view>
+      </view>
+
+      <view class="diet-week__list">
+        <block wx:for="{{weeklyPlan.meals}}" wx:key="id">
+          <view class="diet-week__item">
+            <view class="diet-week__item-left">
+              <view class="diet-week__item-dot"></view>
+              <text>{{item.title}}</text>
+            </view>
+            <text class="diet-week__item-time">{{item.time}}</text>
+          </view>
+        </block>
+      </view>
+
+      <view class="diet-week__retune" bindtap="switchMode">重新定制</view>
+    </view>
+
+    <view class="diet-tabs">
+      <block wx:for="{{categories}}" wx:key="*this">
+        <view class="diet-tab {{index === activeCategory ? 'diet-tab--active' : ''}}" data-index="{{index}}" bindtap="selectCategory">
+          <text>{{item}}</text>
+          <image wx:if="{{index === activeCategory}}" class="diet-tab__dec" src="/assets/analysis/title_dec.png" mode="widthFix" />
+        </view>
+      </block>
     </view>
 
     <view class="diet-recipes">
       <block wx:for="{{recipes}}" wx:key="id">
         <view class="card-panel diet-recipe" data-id="{{item.id}}" bindtap="openRecipe">
-          <view class="diet-recipe__head">
-            <text class="diet-recipe__name">{{item.name}}</text>
-            <view class="diet-recipe__price">
-              <text class="diet-recipe__price-main">￥{{item.price}}</text>
-              <text class="diet-recipe__price-unit">{{item.unit}}</text>
+          <image class="diet-recipe__cover" src="{{item.cover}}" mode="aspectFill" />
+          <view class="diet-recipe__body">
+            <view class="diet-recipe__head">
+              <text class="diet-recipe__name">{{item.name}}</text>
+              <view class="diet-recipe__price">
+                <text class="diet-recipe__price-currency">￥</text>
+                <text class="diet-recipe__price-main">{{item.price}}</text>
+                <text class="diet-recipe__price-unit">{{item.unit}}</text>
+              </view>
             </view>
+            <view class="diet-recipe__tags">
+              <block wx:for="{{item.tags}}" wx:key="*this">
+                <text class="diet-recipe__tag">{{item}}</text>
+              </block>
+            </view>
+            <text class="diet-recipe__type">{{item.type}}</text>
           </view>
-          <view class="diet-recipe__tags">
-            <block wx:for="{{item.tags}}" wx:key="*this">
-              <text class="diet-recipe__tag">{{item}}</text>
-            </block>
-          </view>
-          <text class="diet-recipe__type">{{item.type}}</text>
         </view>
       </block>
     </view>

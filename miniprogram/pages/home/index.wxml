@@ -68,8 +68,15 @@
     <view class="shortcut-grid">
       <block wx:for="{{shortcuts}}" wx:key="id">
         <view class="shortcut-card shortcut-card--{{item.styleType}}" data-path="{{item.path}}" bindtap="openShortcut">
+          <image class="shortcut-bg" src="{{item.bgImage}}" mode="scaleToFill" />
           <view class="shortcut-copy">
-            <text class="shortcut-title">{{item.title}}</text>
+            <view class="shortcut-head">
+              <text class="shortcut-title">{{item.title}}</text>
+              <view class="shortcut-check">
+                <image class="shortcut-check__circle" src="{{item.checkCircle}}" mode="aspectFit" />
+                <image class="shortcut-check__tick" src="{{item.checkTick}}" mode="aspectFit" />
+              </view>
+            </view>
             <text class="shortcut-description">{{item.description}}</text>
           </view>
           <image wx:if="{{item.icon}}" class="shortcut-icon" src="{{item.icon}}" mode="aspectFit" />

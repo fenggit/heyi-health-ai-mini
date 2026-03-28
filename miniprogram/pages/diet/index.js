@@ -1,7 +1,15 @@
 const { getLayoutMetrics } = require("../../utils/layout")
 
+const RECIPE_COVERS = [
+  "/assets/mall/product-jujube.png",
+  "/assets/mall/product-goji.png",
+  "/assets/mall/product-apple.png",
+  "/assets/mall/product-carrot.png"
+]
+
 const MOCK_DIET_DATA = {
   categories: ["有机果蔬", "超级食物", "便捷配方包"],
+  cartCount: 32,
   planIntro: {
     title: "定制食养计划：",
     desc: "周计划 · 月计划 · 定时提醒",
@@ -61,6 +69,8 @@ Page({
   data: {
     topInset: 32,
     configured: false,
+    cartCount: 0,
+    weeklyPercent: 0,
     categories: [],
     activeCategory: 0,
     planIntro: {},
@@ -84,7 +94,18 @@ Page({
   },
   async loadPageData() {
     const payload = await fetchDietData()
-    this.setData(payload)
+    const recipes = (payload.recipes || []).map((item, idx) => ({
+      ...item,
+      cover: item.cover || RECIPE_COVERS[idx % RECIPE_COVERS.length]
+    }))
+    const weeklyPercent = payload.weeklyPlan
+      ? Math.max(0, Math.min(100, Math.round((payload.weeklyPlan.day * 100) / payload.weeklyPlan.totalDays)))
+      : 0
+    this.setData({
+      ...payload,
+      recipes,
+      weeklyPercent
+    })
   },
   selectCategory(e) {
     const { index } = e.currentTarget.dataset

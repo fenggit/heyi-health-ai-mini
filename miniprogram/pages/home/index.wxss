@@ -112,16 +112,15 @@
 
 .home-content .health-card {
   margin-top: 16rpx;
-  padding: 30rpx 24rpx 24rpx;
-  background: url("../../assets/home-body-heath.png") no-repeat center;
-  background-size: 100% 100%;
+  padding: 26rpx 20rpx 22rpx;
+  background: rgba(255, 255, 255, 0.7);
   overflow: hidden;
 }
 
 .health-head {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .health-title-block {
@@ -131,17 +130,17 @@
 }
 
 .health-title-dec {
-  width: 88rpx;
-  margin-top: 8rpx;
+  width: 90rpx;
+  margin-top: 4rpx;
   margin-left: 0;
 }
 
 .health-status-pill {
   width: 116rpx;
   height: 48rpx;
-  border-radius: 24rpx 0rpx 0rpx 24rpx;
+  border-radius: 24rpx 0 0 24rpx;
   background: linear-gradient(152deg, #4effe2 0%, #cef94c 100%);
-  color: #1e5540;
+  color: #1e293b;
   font-size: 24rpx;
   line-height: 48rpx;
   text-align: center;
@@ -150,8 +149,8 @@
 
 .health-metrics {
   display: flex;
-  margin-top: 20rpx;
-  padding-top: 18rpx;
+  margin-top: 18rpx;
+  padding-top: 14rpx;
   border-top: 2rpx solid #e4ebea;
 }
 
@@ -164,7 +163,7 @@
 }
 
 .health-metric + .health-metric {
-  margin-left: 10rpx;
+  margin-left: 8rpx;
 }
 
 .health-label {
@@ -190,17 +189,18 @@
 
 .health-value {
   display: block;
-  margin-bottom: 18rpx;
+  margin-bottom: 14rpx;
   color: #1e293b;
   font-size: 36rpx;
-  line-height: 44rpx;
+  line-height: 1;
   font-weight: 700;
 }
 
 .hydration {
-  margin-top: 18rpx;
-  padding: 0;
-  background: transparent;
+  margin-top: 14rpx;
+  padding: 14rpx 12rpx 12rpx;
+  border-radius: 12rpx;
+  background: rgba(0, 201, 80, 0.08);
 }
 
 .hydration-head {
@@ -209,8 +209,13 @@
   align-items: center;
 }
 
+.hydration .section-subtitle {
+  color: #1e293b;
+  font-size: 24rpx;
+}
+
 .hydration-value {
-  color: #475569;
+  color: #1e293b;
   font-size: 24rpx;
   font-weight: 700;
 }
@@ -222,13 +227,13 @@
 
 .hydration-segment {
   flex: 1;
-  height: 8rpx;
+  height: 12rpx;
   border-radius: 999rpx;
-  background: rgba(0, 201, 80, 0.16);
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .hydration-segment + .hydration-segment {
-  margin-left: 4rpx;
+  margin-left: 2rpx;
 }
 
 .hydration-segment--active {
@@ -245,10 +250,20 @@
   flex: 1;
   min-height: 148rpx;
   border-radius: 24rpx;
-  padding: 22rpx 20rpx;
+  padding: 20rpx 18rpx;
   border: 2rpx solid rgba(255, 255, 255, 0.88);
   overflow: hidden;
   box-sizing: border-box;
+}
+
+.shortcut-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .shortcut-card + .shortcut-card {
@@ -256,29 +271,58 @@
 }
 
 .shortcut-card--robot {
-  background: linear-gradient(180deg, #ebf9f0 0%, #e7f4eb 100%);
+  background: rgba(255, 255, 255, 0.62);
 }
 
 .shortcut-card--bubble {
-  background: linear-gradient(180deg, #eef6fb 0%, #eff4f7 100%);
+  background: rgba(255, 255, 255, 0.62);
 }
 
 .shortcut-copy {
   position: relative;
-  z-index: 2;
+  z-index: 3;
+}
+
+.shortcut-head {
+  display: inline-flex;
+  align-items: center;
+  height: 32rpx;
 }
 
 .shortcut-title {
   display: block;
   color: #1e293b;
   font-size: 28rpx;
-  line-height: 1.3;
+  line-height: 32rpx;
   font-weight: 700;
+}
+
+.shortcut-check {
+  position: relative;
+  width: 20rpx;
+  height: 32rpx;
+  margin-left: 8rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shortcut-check__circle {
+  width: 20rpx;
+  height: 20rpx;
+}
+
+.shortcut-check__tick {
+  position: absolute;
+  left: 6rpx;
+  top: 10rpx;
+  width: 8rpx;
+  height: 12rpx;
 }
 
 .shortcut-description {
   display: block;
-  margin-top: 8rpx;
+  margin-top: 10rpx;
   color: #64748b;
   font-size: 24rpx;
   line-height: 1.4;
@@ -286,16 +330,19 @@
 
 .shortcut-icon {
   position: absolute;
-  right: 18rpx;
-  bottom: 14rpx;
-  width: 56rpx;
-  height: 56rpx;
+  right: 16rpx;
+  bottom: 12rpx;
+  width: 52rpx;
+  height: 52rpx;
+  opacity: 0.96;
+  z-index: 3;
 }
 
 .shortcut-bubbles {
   position: absolute;
   right: 16rpx;
   bottom: 16rpx;
+  z-index: 3;
 }
 
 .shortcut-bubble {

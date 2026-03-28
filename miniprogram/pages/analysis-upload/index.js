@@ -17,6 +17,13 @@ function fetchUploadData() {
 Page({
   data: {
     topInset: 32,
+    statusBarHeight: 20,
+    navBarHeight: 44,
+    headerHeight: 64,
+    menuWidth: 88,
+    menuHeight: 32,
+    menuTop: 26,
+    menuRight: 12,
     title: "",
     subTitle: "",
     intro: "",
@@ -30,9 +37,32 @@ Page({
     this.loadPageData()
   },
   syncLayout() {
-    const { statusBarHeight } = getLayoutMetrics()
+    const { statusBarHeight, navBarHeight, headerHeight } = getLayoutMetrics()
+    const windowInfo = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()
+    const windowWidth = (windowInfo && (windowInfo.windowWidth || windowInfo.screenWidth)) || 375
+
+    let menuWidth = 88
+    let menuHeight = 32
+    let menuTop = statusBarHeight + (navBarHeight - menuHeight) / 2
+    let menuRight = 12
+    if (wx.getMenuButtonBoundingClientRect) {
+      const menu = wx.getMenuButtonBoundingClientRect()
+      if (menu && menu.width && menu.height) {
+        menuWidth = menu.width
+        menuHeight = menu.height
+        menuTop = menu.top || menuTop
+        menuRight = Math.max(10, windowWidth - menu.right)
+      }
+    }
     this.setData({
-      topInset: Math.max(statusBarHeight + 12, 32)
+      topInset: Math.max(headerHeight + 8, 72),
+      statusBarHeight,
+      navBarHeight,
+      headerHeight,
+      menuWidth,
+      menuHeight,
+      menuTop,
+      menuRight
     })
   },
   async loadPageData() {
@@ -66,6 +96,14 @@ Page({
   },
   chooseFaceAlbum() {
     this.chooseImage("face", ["album"])
+  },
+  handleBack() {
+    const pages = getCurrentPages()
+    if (pages.length > 1) {
+      wx.navigateBack()
+      return
+    }
+    wx.switchTab({ url: "/pages/home/index" })
   },
   skipAndFinish() {
     wx.showToast({
