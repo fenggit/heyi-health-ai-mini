@@ -1,41 +1,60 @@
-<view class="design-page">
+<view class="analysis-page design-page">
+  <image class="analysis-page-bg" src="/assets/bg_img.png" mode="widthFix" />
+
   <view class="page-top-gap" style="height: {{topInset}}px;"></view>
 
   <view class="analysis-wrap">
-    <view class="analysis-head card-panel">
-      <view class="analysis-head__title">{{introTitle}}</view>
-      <view class="analysis-head__subtitle">{{introSubTitle}}</view>
+    <view class="analysis-head">
+      <view class="analysis-head__title">{{introSubTitle}}</view>
+      <view class="analysis-head__subtitle">{{introTitle}}</view>
     </view>
 
-    <view class="analysis-panel card-panel">
-      <view class="analysis-label">重要声明</view>
+    <view class="card-panel analysis-declaration-card">
+      <view class="analysis-label-pill">
+        <image class="analysis-label-pill__icon" src="/assets/analysis/star.png" mode="aspectFit" />
+        <text class="analysis-label-pill__text">重要声明</text>
+      </view>
       <view class="analysis-content">{{declaration}}</view>
-    </view>
 
-    <view class="analysis-panel card-panel">
-      <view class="analysis-label">使用限制</view>
-      <block wx:for="{{bullets}}" wx:key="*this">
-        <view class="analysis-bullet">· {{item}}</view>
-      </block>
-    </view>
-
-    <view class="analysis-panel card-panel">
-      <view class="analysis-label">我们提供的服务</view>
-      <block wx:for="{{extras}}" wx:key="*this">
-        <view class="analysis-bullet">· {{item}}</view>
-      </block>
-    </view>
-
-    <view class="analysis-agree" bindtap="toggleAgree">
-      <view class="analysis-check {{agreed ? 'analysis-check--active' : ''}}"></view>
-      <view class="analysis-agree__text">
-        我已仔细阅读并理解上述内容，同意本服务仅作为趣味参考工具使用，不作为医疗诊断依据。
+      <view class="card-panel analysis-ai-card">
+        <view class="analysis-ai-card__title">{{aiContentTitle}}</view>
+        <view class="analysis-ai-card__text">{{aiContent}}</view>
       </view>
     </view>
 
-    <view class="analysis-actions">
+    <view class="card-panel analysis-main-card">
+      <view class="analysis-section-head">
+        <text class="analysis-section-title">我们提供的服务</text>
+        <image class="analysis-section-title__dec" src="/assets/analysis/title_dec.png" mode="widthFix" />
+      </view>
+
+      <block wx:for="{{extras}}" wx:key="*this">
+        <view class="analysis-service-item">
+          <image class="analysis-service-item__icon" src="/assets/analysis/check_green.png" mode="aspectFit" />
+          <text>{{item}}</text>
+        </view>
+      </block>
+
+      <view class="analysis-section-head analysis-section-head--limit">
+        <text class="analysis-section-title">使用限制</text>
+        <image class="analysis-section-title__dec" src="/assets/analysis/title_dec.png" mode="widthFix" />
+      </view>
+
+      <block wx:for="{{bullets}}" wx:key="*this">
+        <view class="analysis-limit-item">· {{item}}</view>
+      </block>
+
+      <view class="analysis-divider"></view>
+
+      <view class="analysis-agree" bindtap="toggleAgree">
+        <view class="analysis-check {{agreed ? 'analysis-check--active' : ''}}">
+          <text wx:if="{{agreed}}" class="analysis-check__tick">✓</text>
+        </view>
+        <view class="analysis-agree__text">{{agreementText}}</view>
+      </view>
+
       <view class="analysis-btn analysis-btn--primary" bindtap="startQuiz">开始测评</view>
-      <view class="analysis-btn analysis-btn--ghost" bindtap="backHome">返回首页</view>
+      <view class="analysis-btn-link" bindtap="backHome">返回首页</view>
     </view>
   </view>
 </view>

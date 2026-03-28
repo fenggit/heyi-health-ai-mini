@@ -1,15 +1,57 @@
 const { getLayoutMetrics } = require("../../utils/layout")
 
 const MOCK_MALL_DATA = {
+  mallTitle: "合一商城",
   city: "成都市",
   searchPlaceholder: "关键词搜索",
-  notice: "全场满99元包邮 · 新人专享",
   categories: ["有机果蔬", "超级食物", "便捷配方包"],
+  activityBanners: [
+    {
+      id: "tea-experience",
+      image: "/assets/test/home-banner1.png"
+    },
+    {
+      id: "food-market",
+      image: "/assets/test/home-banner2.png"
+    }
+  ],
   products: [
-    { id: "jujube", name: "有机红枣", score: "4.8", stock: 156, price: "28.8", unit: "/500g", label: "鲜" },
-    { id: "carrot", name: "有机胡萝卜", score: "4.8", stock: 236, price: "12.8", unit: "/1kg", label: "鲜" },
-    { id: "goji", name: "宁夏枸杞", score: "4.9", stock: 19, price: "35", unit: "/250g", label: "鲜" },
-    { id: "apple", name: "新鲜苹果", score: "4.6", stock: 178, price: "19.9", unit: "/500g", label: "鲜" }
+    {
+      id: "jujube",
+      name: "有机红枣",
+      score: "4.8",
+      stock: 156,
+      price: "28.8",
+      unit: "/500g",
+      image: "/assets/mall/product-jujube.png"
+    },
+    {
+      id: "goji",
+      name: "宁夏枸杞",
+      score: "4.9",
+      stock: 19,
+      price: "35",
+      unit: "/250g",
+      image: "/assets/mall/product-goji.png"
+    },
+    {
+      id: "carrot",
+      name: "有机胡萝卜",
+      score: "4.8",
+      stock: 236,
+      price: "12.8",
+      unit: "/1kg",
+      image: "/assets/mall/product-carrot.png"
+    },
+    {
+      id: "apple",
+      name: "新鲜苹果",
+      score: "4.6",
+      stock: 178,
+      price: "19.9",
+      unit: "/500g",
+      image: "/assets/mall/product-apple.png"
+    }
   ]
 }
 
@@ -21,12 +63,14 @@ function fetchMallData() {
 Page({
   data: {
     topInset: 32,
+    mallTitle: "",
     city: "",
     searchPlaceholder: "",
     searchKeyword: "",
-    notice: "",
     categories: [],
     activeCategory: 0,
+    bannerCurrent: 0,
+    activityBanners: [],
     products: [],
     cartCount: 0
   },
@@ -58,6 +102,11 @@ Page({
     const { index } = e.currentTarget.dataset
     this.setData({
       activeCategory: Number(index)
+    })
+  },
+  onBannerChange(e) {
+    this.setData({
+      bannerCurrent: e.detail.current
     })
   },
   addToCart(e) {

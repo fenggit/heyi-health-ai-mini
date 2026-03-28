@@ -1,8 +1,17 @@
-<view class="design-page design-page--with-tab">
+<view class="mall-page design-page design-page--with-tab">
+  <image class="mall-page-bg" src="/assets/bg_img.png" mode="widthFix" />
+
   <view class="mall-top-gap page-top-gap" style="height: {{topInset}}px;"></view>
 
+  <view class="mall-title">{{mallTitle}}</view>
+
   <view class="mall-header">
-    <view class="mall-search">
+    <view class="mall-location">
+      <image class="mall-location__icon" src="/assets/mall/icon-location.png" mode="aspectFit" />
+      <text class="mall-location__text">{{city}}</text>
+    </view>
+    <view class="mall-search card-panel">
+      <image class="mall-search__icon" src="/assets/mall/icon-search.png" mode="aspectFit" />
       <input
         class="mall-search__input"
         type="text"
@@ -11,12 +20,12 @@
         bindinput="onInputSearch"
       />
     </view>
-    <view class="mall-city">{{city}}</view>
+    <view class="mall-cart card-panel">
+      <image class="mall-cart__icon" src="/assets/mall/icon-cart.png" mode="aspectFit" />
+    </view>
   </view>
 
   <view class="mall-content">
-    <view class="card-panel mall-notice">{{notice}}</view>
-
     <view class="mall-tabs">
       <block wx:for="{{categories}}" wx:key="*this">
         <view
@@ -24,26 +33,55 @@
           data-index="{{index}}"
           bindtap="selectCategory"
         >
-          {{item}}
+          <text>{{item}}</text>
+          <view wx:if="{{index === activeCategory}}" class="mall-tab__dec"></view>
         </view>
       </block>
     </view>
 
     <view class="mall-banner card-panel">
-      <view class="mall-banner__mark">新人专享</view>
-      <view class="mall-banner__title">合一商城</view>
-      <view class="mall-banner__subtitle">有机果蔬 · 每日新鲜到家</view>
+      <swiper
+        class="mall-banner-swiper"
+        current="{{bannerCurrent}}"
+        circular
+        autoplay
+        interval="4200"
+        duration="420"
+        bindchange="onBannerChange"
+      >
+        <block wx:for="{{activityBanners}}" wx:key="id">
+          <swiper-item>
+            <view class="mall-banner-slide">
+              <image class="mall-banner-image" src="{{item.image}}" mode="aspectFill" />
+            </view>
+          </swiper-item>
+        </block>
+      </swiper>
+      <view class="mall-banner-dots" wx:if="{{activityBanners.length > 1}}">
+        <block wx:for="{{activityBanners}}" wx:key="id">
+          <view class="mall-banner-dot {{index === bannerCurrent ? 'mall-banner-dot--active' : ''}}"></view>
+        </block>
+      </view>
     </view>
 
     <view class="mall-grid">
       <block wx:for="{{products}}" wx:key="id">
         <view class="card-panel mall-product">
-          <view class="mall-product__thumb">{{item.label}}</view>
+          <view class="mall-product__thumb-wrap">
+            <image class="mall-product__thumb" src="{{item.image}}" mode="aspectFit" />
+          </view>
           <view class="mall-product__name">{{item.name}}</view>
-          <view class="mall-product__meta">评分 {{item.score}} · 库存 {{item.stock}}</view>
+          <view class="mall-product__meta">
+            <view class="mall-product__score">
+              <text class="mall-product__star">★</text>
+              <text>{{item.score}}</text>
+            </view>
+            <text class="mall-product__stock">库存 {{item.stock}}</text>
+          </view>
           <view class="mall-product__foot">
             <view class="mall-product__price">
-              <text class="mall-product__price-main">￥{{item.price}}</text>
+              <text class="mall-product__price-symbol">￥</text>
+              <text class="mall-product__price-main">{{item.price}}</text>
               <text class="mall-product__price-unit">{{item.unit}}</text>
             </view>
             <view class="mall-product__add" data-id="{{item.id}}" bindtap="addToCart">+</view>

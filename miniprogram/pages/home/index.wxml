@@ -82,12 +82,13 @@
       </block>
     </view>
 
-    <view class="section-block">
+    <view class="card-panel section-block">
       <view class="section-head">
         <text class="section-title">{{recommendation.title}}</text>
-        <text class="section-action">{{recommendation.actionText}} ></text>
+        <text class="section-action">{{recommendation.actionText}} →</text>
       </view>
-      <view class="card-panel recommendation-card">
+      <image wx:if="{{recommendation.image}}" class="recommendation-image" src="{{recommendation.image}}" mode="aspectFill" />
+      <view class="recommendation-card">
         <view class="recommendation-header">
           <text class="recommendation-name">{{recommendation.name}}</text>
           <view class="recommendation-tags">

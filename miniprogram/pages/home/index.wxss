@@ -33,10 +33,33 @@
 }
 
 .home-content {
-  width: 718rpx;
+  width: 702rpx;
   margin: 0 auto;
   position: relative;
   z-index: 1;
+}
+
+.home-content .card-panel {
+  border-radius: 24rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.96);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: none;
+  box-sizing: border-box;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.home-content .section-title {
+  color: #1e293b;
+  font-size: 28rpx;
+  line-height: 40rpx;
+  font-weight: 700;
+}
+
+.home-content .section-subtitle {
+  color: #334155;
+  font-size: 24rpx;
+  line-height: 34rpx;
 }
 
 .activity-card {
@@ -46,7 +69,7 @@
 }
 
 .activity-swiper {
-  height: 188rpx;
+  height: 240rpx;
 }
 
 .activity-slide {
@@ -64,31 +87,32 @@
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 12rpx;
+  bottom: 10rpx;
   z-index: 2;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .activity-dot {
-  width: 12rpx;
-  height: 12rpx;
+  width: 8rpx;
+  height: 8rpx;
   border-radius: 999rpx;
   background: rgba(255, 255, 255, 0.45);
 }
 
 .activity-dot + .activity-dot {
-  margin-left: 10rpx;
+  margin-left: 8rpx;
 }
 
 .activity-dot--active {
-  width: 28rpx;
+  width: 20rpx;
   background: #ffffff;
 }
 
-.health-card {
-  margin-top: 18rpx;
-  padding: 24rpx;
+.home-content .health-card {
+  margin-top: 16rpx;
+  padding: 30rpx 24rpx 24rpx;
   background: url("../../assets/home-body-heath.png") no-repeat center;
   background-size: 100% 100%;
   overflow: hidden;
@@ -109,7 +133,7 @@
 .health-title-dec {
   width: 88rpx;
   margin-top: 8rpx;
-  margin-left: 2rpx;
+  margin-left: 0;
 }
 
 .health-status-pill {
@@ -127,48 +151,56 @@
 .health-metrics {
   display: flex;
   margin-top: 20rpx;
+  padding-top: 18rpx;
+  border-top: 2rpx solid #e4ebea;
 }
 
 .health-metric {
   flex: 1;
-  border-radius: 18rpx;
-  background: #f4f8f6;
-  padding: 16rpx 10rpx 12rpx;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
   text-align: center;
 }
 
 .health-metric + .health-metric {
-  margin-left: 12rpx;
+  margin-left: 10rpx;
 }
 
 .health-label {
   display: inline-flex;
+  justify-content: center;
   align-items: center;
-  color: #659277;
-  font-size: 20rpx;
-  font-weight: 600;
+  min-width: 112rpx;
+  height: 44rpx;
+  border-radius: 12rpx;
+  padding: 0 12rpx;
+  box-sizing: border-box;
+  color: #008435;
+  font-size: 24rpx;
+  font-weight: 500;
+  background: rgba(0, 201, 80, 0.08);
 }
 
 .health-icon {
-  width: 28rpx;
-  height: 28rpx;
+  width: 22rpx;
+  height: 22rpx;
   margin-right: 6rpx;
 }
 
 .health-value {
   display: block;
-  margin-top: 12rpx;
-  color: #2c3d4f;
+  margin-bottom: 18rpx;
+  color: #1e293b;
   font-size: 36rpx;
-  line-height: 1.2;
+  line-height: 44rpx;
   font-weight: 700;
 }
 
 .hydration {
-  margin-top: 16rpx;
-  border-radius: 18rpx;
-  background: #f1f6f2;
-  padding: 18rpx 20rpx;
+  margin-top: 18rpx;
+  padding: 0;
+  background: transparent;
 }
 
 .hydration-head {
@@ -178,25 +210,25 @@
 }
 
 .hydration-value {
-  color: #4e6157;
+  color: #475569;
   font-size: 24rpx;
   font-weight: 700;
 }
 
 .hydration-track {
   display: flex;
-  margin-top: 14rpx;
+  margin-top: 12rpx;
 }
 
 .hydration-segment {
   flex: 1;
-  height: 10rpx;
+  height: 8rpx;
   border-radius: 999rpx;
-  background: rgba(132, 217, 154, 0.22);
+  background: rgba(0, 201, 80, 0.16);
 }
 
 .hydration-segment + .hydration-segment {
-  margin-left: 6rpx;
+  margin-left: 4rpx;
 }
 
 .hydration-segment--active {
@@ -205,20 +237,22 @@
 
 .shortcut-grid {
   display: flex;
-  margin-top: 18rpx;
+  margin-top: 16rpx;
 }
 
 .shortcut-card {
   position: relative;
   flex: 1;
-  min-height: 146rpx;
+  min-height: 148rpx;
   border-radius: 24rpx;
-  padding: 20rpx;
+  padding: 22rpx 20rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.88);
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .shortcut-card + .shortcut-card {
-  margin-left: 14rpx;
+  margin-left: 18rpx;
 }
 
 .shortcut-card--robot {
@@ -236,8 +270,8 @@
 
 .shortcut-title {
   display: block;
-  color: #2d4155;
-  font-size: 31rpx;
+  color: #1e293b;
+  font-size: 28rpx;
   line-height: 1.3;
   font-weight: 700;
 }
@@ -245,17 +279,17 @@
 .shortcut-description {
   display: block;
   margin-top: 8rpx;
-  color: #8a97a3;
-  font-size: 21rpx;
+  color: #64748b;
+  font-size: 24rpx;
   line-height: 1.4;
 }
 
 .shortcut-icon {
   position: absolute;
-  right: 20rpx;
+  right: 18rpx;
   bottom: 14rpx;
   width: 56rpx;
-  height: 48rpx;
+  height: 56rpx;
 }
 
 .shortcut-bubbles {
@@ -287,36 +321,48 @@
 }
 
 .section-block {
-  margin-top: 20rpx;
+  margin-top: 16rpx;
+  padding: 20rpx 16rpx 18rpx;
+  overflow: hidden;
 }
 
 .section-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0 8rpx;
 }
 
 .section-action {
-  color: #2aa65f;
+  color: #94a3b8;
   font-size: 24rpx;
-  font-weight: 600;
+  font-weight: 400;
+}
+
+.recommendation-image {
+  display: block;
+  width: 100%;
+  height: 190rpx;
+  margin-top: 16rpx;
+  border-radius: 16rpx;
 }
 
 .recommendation-card {
   margin-top: 14rpx;
-  padding: 22rpx;
+  padding: 0 8rpx 6rpx;
 }
 
 .recommendation-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .recommendation-name {
-  color: #263548;
-  font-size: 30rpx;
+  color: #1e293b;
+  font-size: 28rpx;
   font-weight: 700;
+  line-height: 40rpx;
 }
 
 .recommendation-tags {
@@ -326,10 +372,10 @@
 .recommendation-tag {
   height: 40rpx;
   padding: 0 12rpx;
-  border-radius: 999rpx;
-  background: rgba(102, 216, 145, 0.16);
-  color: #1f8b56;
-  font-size: 20rpx;
+  border-radius: 12rpx;
+  background: rgba(0, 201, 80, 0.1);
+  color: #008435;
+  font-size: 24rpx;
   line-height: 40rpx;
 }
 
@@ -339,16 +385,21 @@
 
 .recommendation-description {
   display: block;
-  margin-top: 12rpx;
-  color: #5f6f80;
-  font-size: 23rpx;
-  line-height: 1.55;
+  margin-top: 10rpx;
+  color: #334155;
+  font-size: 28rpx;
+  line-height: 42rpx;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.tips-card {
-  margin-top: 18rpx;
-  margin-bottom: 10rpx;
-  padding: 22rpx;
+.home-content .tips-card {
+  margin-top: 16rpx;
+  margin-bottom: 0;
+  padding: 2rpx 16rpx 22rpx 2rpx;
+  background: rgba(223, 249, 232, 0.7);
 }
 
 .tips-head {
@@ -369,16 +420,17 @@
 }
 
 .tips-title {
-  color: #2a3c35;
-  font-size: 30rpx;
+  color: #1e293b;
+  font-size: 28rpx;
   font-weight: 700;
   line-height: 1;
 }
 
 .tips-content {
   display: block;
-  margin-top: 10rpx;
-  color: #5b6a79;
-  font-size: 23rpx;
-  line-height: 1.55;
+  margin-top: 14rpx;
+  padding-left: 30rpx;
+  color: #334155;
+  font-size: 28rpx;
+  line-height: 42rpx;
 }

@@ -1,11 +1,16 @@
 const { getLayoutMetrics } = require("../../utils/layout")
 
 const MOCK_PROFILE_DATA = {
+  pageTitle: "个人中心",
   user: {
     nickname: "西兰花护体专员",
     userId: "20260327",
     memberLevel: "普通会员",
     points: 1280
+  },
+  quickEntry: {
+    name: "我的主页",
+    icon: "/assets/profile/home.png"
   },
   stats: [
     { label: "收藏配方", value: 12 },
@@ -13,9 +18,17 @@ const MOCK_PROFILE_DATA = {
     { label: "优惠券", value: 5 },
     { label: "推荐好友", value: 3 }
   ],
-  dataMenus: ["我的食养计划", "我的体质报告"],
-  allMenus: ["我的订单", "我的收藏", "积分兑换", "邀请好友"],
-  settingsMenus: ["设置", "帮助中心", "关于我们"]
+  featureMenus: [
+    { name: "我的食养计划", icon: "/assets/profile/plan.png" },
+    { name: "我的体质报告", icon: "/assets/profile/report.png" },
+    { name: "我的订单", icon: "/assets/profile/order.png" },
+    { name: "我的收藏", icon: "/assets/profile/collection.png" },
+    { name: "积分兑换", icon: "/assets/profile/points.png" },
+    { name: "邀请好友", icon: "/assets/profile/share.png" },
+    { name: "设置", icon: "/assets/profile/settings.png" },
+    { name: "帮助中心", icon: "/assets/profile/help.png" },
+    { name: "关于我们", icon: "/assets/profile/about.png" }
+  ]
 }
 
 function fetchProfileData() {
@@ -26,11 +39,11 @@ function fetchProfileData() {
 Page({
   data: {
     topInset: 32,
+    pageTitle: "",
     user: {},
+    quickEntry: {},
     stats: [],
-    dataMenus: [],
-    allMenus: [],
-    settingsMenus: []
+    featureMenus: []
   },
   onLoad() {
     this.syncLayout()

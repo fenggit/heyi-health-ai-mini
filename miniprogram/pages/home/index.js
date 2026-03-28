@@ -69,6 +69,7 @@ const MOCK_HOME_DATA = {
   recommendation: {
     title: "AI推荐：今日专属果蔬汁",
     actionText: "查看详情",
+    image: "/assets/test/home-banner2.png",
     name: "养胃气血汁",
     description: "根据您的体质特点，推荐富含铁质和维生素C的配方，有助于补血养气，改善春季疲乏。",
     tags: ["补气血", "养脾胃"]

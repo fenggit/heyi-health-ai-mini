@@ -1,17 +1,54 @@
-<view class="design-page">
+<view class="quiz-page design-page">
+  <image class="quiz-page-bg" src="/assets/bg_img.png" mode="widthFix" />
   <view class="page-top-gap" style="height: {{topInset}}px;"></view>
 
   <view class="quiz-wrap">
-    <view class="quiz-head card-panel">
-      <view class="quiz-head__title">{{title}}</view>
-      <view class="quiz-head__subtitle">{{subTitle}}</view>
-      <view class="quiz-progress">步骤一：问卷分析</view>
-      <view class="quiz-progress__count">{{currentIndex + 1}} / {{questions.length}} 题</view>
+    <view class="quiz-head">
+      <view class="quiz-head__subtitle">{{title}}</view>
+      <view class="quiz-head__title">{{subTitle}}</view>
+      <view class="quiz-head__tag">趣味分析</view>
+    </view>
+
+    <view class="card-panel quiz-step-card">
+      <view class="quiz-step-row">
+        <view class="quiz-step-left">
+          <text class="quiz-step-label">步骤一：</text>
+          <view class="quiz-step-title-wrap">
+            <text class="quiz-step-title">完成答题</text>
+            <image class="quiz-step-title__dec" src="/assets/analysis/title_dec.png" mode="widthFix" />
+          </view>
+        </view>
+        <view class="quiz-step-count">
+          <text class="quiz-step-count__num">{{questions.length ? (currentIndex + 1) : 0}}</text>
+          <text class="quiz-step-count__rest"> / {{questions.length || 0}} 题</text>
+        </view>
+      </view>
+
+      <view class="quiz-progress-track">
+        <view
+          class="quiz-progress-fill"
+          style="width: {{questions.length ? ((currentIndex + 1) * 100 / questions.length) : 0}}%;"
+        ></view>
+        <view
+          class="quiz-progress-dot"
+          style="left: {{questions.length ? ((currentIndex + 1) * 100 / questions.length) : 0}}%;"
+        ></view>
+      </view>
     </view>
 
     <view class="quiz-card card-panel" wx:if="{{questions.length}}">
-      <view class="quiz-question">{{questions[currentIndex].title}}</view>
-      <view class="quiz-tip">小提示：{{tips}}</view>
+      <view class="quiz-question-head">
+        <view class="quiz-question-badge">问</view>
+        <view class="quiz-question-title-wrap">
+          <view class="quiz-question">{{questions[currentIndex].title}}</view>
+          <image class="quiz-question__dec" src="/assets/analysis/title_dec.png" mode="widthFix" />
+        </view>
+      </view>
+
+      <view class="quiz-tip">
+        <text class="quiz-tip__label">小提示：</text>
+        <text class="quiz-tip__text">{{tips}}</text>
+      </view>
 
       <view class="quiz-options">
         <block wx:for="{{questions[currentIndex].options}}" wx:key="*this">
@@ -20,22 +57,21 @@
             data-index="{{index}}"
             bindtap="chooseOption"
           >
-            {{item}}
+            <text class="quiz-option__text">{{item}}</text>
+            <view class="quiz-option__indicator {{answers[currentIndex] === index ? 'quiz-option__indicator--active' : ''}}">
+              <text wx:if="{{answers[currentIndex] === index}}" class="quiz-option__check">✓</text>
+            </view>
           </view>
         </block>
       </view>
-    </view>
 
-    <view class="quiz-footer card-panel">
-      <view class="quiz-disclaimer">本结果由AI生成，仅供娱乐与生活参考，不能替代医疗建议。</view>
-      <view class="quiz-actions">
-        <view
-          class="quiz-btn quiz-btn--ghost {{currentIndex === 0 ? 'quiz-btn--disabled' : ''}}"
-          bindtap="prevQuestion"
-        >
-          上一题
-        </view>
-        <view class="quiz-btn quiz-btn--primary" bindtap="nextQuestion">
+      <view class="quiz-disclaimer-wrap">
+        <view class="quiz-disclaimer">本结果由AI生成，仅供娱乐与生活参考，不能替代医疗建议。</view>
+      </view>
+
+      <view class="quiz-actions {{currentIndex === 0 ? 'quiz-actions--single' : ''}}">
+        <view wx:if="{{currentIndex > 0}}" class="quiz-btn quiz-btn--ghost" bindtap="prevQuestion">上一题</view>
+        <view class="quiz-btn quiz-btn--primary {{answers[currentIndex] < 0 ? 'quiz-btn--disabled' : ''}}" bindtap="nextQuestion">
           {{currentIndex === questions.length - 1 ? "下一步" : "下一题"}}
         </view>
       </view>
