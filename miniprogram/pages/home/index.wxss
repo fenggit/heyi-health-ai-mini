@@ -257,9 +257,10 @@
   position: relative;
   flex: 1;
   min-height: 148rpx;
-  border-radius: 24rpx;
+  border-radius: 24rpx 24rpx 24rpx 24rpx;
   padding: 20rpx 18rpx;
-  border: 2rpx solid rgba(255, 255, 255, 0.88);
+  border: 2rpx solid #ffffff;
+  background: linear-gradient(134deg, #e2fbee 0%, #d8f8f9 100%);
   overflow: hidden;
   box-sizing: border-box;
 }
@@ -279,11 +280,11 @@
 }
 
 .shortcut-card--robot {
-  background: rgba(255, 255, 255, 0.62);
+  background: linear-gradient(134deg, #e2fbee 0%, #d8f8f9 100%);
 }
 
 .shortcut-card--bubble {
-  background: rgba(255, 255, 255, 0.62);
+  background: linear-gradient(134deg, #e2fbee 0%, #d8f8f9 100%);
 }
 
 .shortcut-copy {
@@ -334,45 +335,6 @@
   color: #64748b;
   font-size: 24rpx;
   line-height: 1.4;
-}
-
-.shortcut-icon {
-  position: absolute;
-  right: 16rpx;
-  bottom: 12rpx;
-  width: 52rpx;
-  height: 52rpx;
-  opacity: 0.96;
-  z-index: 3;
-}
-
-.shortcut-bubbles {
-  position: absolute;
-  right: 16rpx;
-  bottom: 16rpx;
-  z-index: 3;
-}
-
-.shortcut-bubble {
-  border-radius: 50%;
-  background: rgba(141, 212, 237, 0.35);
-}
-
-.shortcut-bubble--lg {
-  width: 52rpx;
-  height: 52rpx;
-}
-
-.shortcut-bubble--md {
-  width: 34rpx;
-  height: 34rpx;
-  margin: 6rpx 0 0 8rpx;
-}
-
-.shortcut-bubble--sm {
-  width: 20rpx;
-  height: 20rpx;
-  margin: 6rpx 0 0 22rpx;
 }
 
 .section-block {

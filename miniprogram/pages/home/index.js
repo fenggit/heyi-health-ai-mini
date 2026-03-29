@@ -54,9 +54,8 @@ const MOCK_HOME_DATA = {
       id: "analysis",
       title: "AI趣味分析",
       description: "3分钟分析生活趋势",
-      icon: "/assets/icons/ai.png",
       styleType: "robot",
-      bgImage: "/assets/home/shortcut_bg_left.png",
+      bgImage: "/assets/home/shortcut_bg_right.png",
       checkCircle: "/assets/home/shortcut_icon_circle_left.png",
       checkTick: "/assets/home/shortcut_icon_tick_left.png",
       path: "/pages/analysis/index"

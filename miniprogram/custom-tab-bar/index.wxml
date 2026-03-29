@@ -1,5 +1,8 @@
 <view class="dock-wrap">
-  <view class="dock-base"></view>
+  <view class="dock-base">
+    <image class="dock-base__bg" src="/assets/tabbar_bg.png" mode="scaleToFill" />
+    <view class="dock-base__safe"></view>
+  </view>
   <view class="dock-content">
     <view class="dock-side dock-side--left">
       <block wx:for="{{tabs}}" wx:key="path" wx:for-item="tab" wx:for-index="index">
@@ -17,7 +20,6 @@
     </view>
 
     <view class="dock-center" bindtap="openAnalysis">
-      <view class="dock-center__cap"></view>
       <view class="dock-center__button">
         <image class="dock-center__icon" src="/assets/icons/ai.png" mode="aspectFit" />
       </view>

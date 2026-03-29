@@ -14,10 +14,18 @@
   transform: translateX(-50%);
   width: 750rpx;
   height: calc(118rpx + env(safe-area-inset-bottom));
+}
+
+.dock-base__bg {
+  width: 750rpx;
+  height: 118rpx;
+  display: block;
+}
+
+.dock-base__safe {
+  width: 750rpx;
+  height: env(safe-area-inset-bottom);
   background: #ffffff;
-  border-top-left-radius: 36rpx;
-  border-top-right-radius: 36rpx;
-  box-shadow: 0 -8rpx 30rpx rgba(145, 156, 172, 0.08);
 }
 
 .dock-content {
@@ -26,19 +34,18 @@
   bottom: env(safe-area-inset-bottom);
   transform: translateX(-50%);
   width: 750rpx;
-  height: 146rpx;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  padding: 10rpx 24rpx 0;
+  padding: 16rpx 24rpx 0;
   box-sizing: border-box;
 }
 
 .dock-side {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
-  width: 262rpx;
+  justify-content: space-evenly;
+  flex: 1;
   padding-top: 22rpx;
 }
 
@@ -64,37 +71,24 @@
 .dock-tab__text {
   position: relative;
   z-index: 1;
-  color: #a9b6c8;
-  font-size: 24rpx;
+  color: #94a3b8;
+  font-size: 15px;
   line-height: 1.2;
   font-weight: 500;
 }
 
 .dock-tab--active .dock-tab__text {
-  color: #1d2d49;
-  font-size: 28rpx;
+  color: #1e293b;
+  font-size: 15px;
   font-weight: 700;
 }
 
 .dock-center {
   position: relative;
   width: 150rpx;
-  height: 118rpx;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-}
-
-.dock-center__cap {
-  position: absolute;
-  top: 12rpx;
-  left: 50%;
-  width: 108rpx;
-  height: 28rpx;
-  transform: translateX(-50%);
-  border-top-left-radius: 54rpx;
-  border-top-right-radius: 54rpx;
-  background: #ffffff;
 }
 
 .dock-center__button {

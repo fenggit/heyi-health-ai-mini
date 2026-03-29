@@ -78,12 +78,6 @@
             </view>
             <text class="shortcut-description">{{item.description}}</text>
           </view>
-          <image wx:if="{{item.icon}}" class="shortcut-icon" src="{{item.icon}}" mode="aspectFit" />
-          <view wx:else class="shortcut-bubbles">
-            <view class="shortcut-bubble shortcut-bubble--lg"></view>
-            <view class="shortcut-bubble shortcut-bubble--md"></view>
-            <view class="shortcut-bubble shortcut-bubble--sm"></view>
-          </view>
         </view>
       </block>
     </view>
