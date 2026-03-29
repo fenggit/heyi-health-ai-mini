@@ -261,6 +261,8 @@
   padding: 20rpx 18rpx;
   border: 2rpx solid #ffffff;
   background: linear-gradient(134deg, #e2fbee 0%, #d8f8f9 100%);
+  display: flex;
+  align-items: center;
   overflow: hidden;
   box-sizing: border-box;
 }
@@ -290,6 +292,9 @@
 .shortcut-copy {
   position: relative;
   z-index: 3;
+  width: 100%;
+  padding-left: 12rpx;
+  box-sizing: border-box;
 }
 
 .shortcut-head {
