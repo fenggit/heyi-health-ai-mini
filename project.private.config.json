@@ -17,7 +17,7 @@
     "ignoreDevUnusedFiles": true,
     "bigPackageSizeSupport": false
   },
-  "libVersion": "3.15.1",
-  "projectname": "heyi-health-ai-mini2",
+  "libVersion": "3.14.2",
+  "projectname": "heyi-health-ai-mini",
   "condition": {}
 }

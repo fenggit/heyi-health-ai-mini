@@ -19,7 +19,7 @@
       </block>
     </view>
 
-    <view class="dock-center" bindtap="openAnalysis">
+    <view class="dock-center" bindtap="openAiChat">
       <view class="dock-center__button">
         <image class="dock-center__icon" src="/assets/icons/ai.png" mode="aspectFit" />
       </view>

@@ -1,0 +1,129 @@
+<view class="design-page my-plan-screen">
+  <image class="my-plan-screen__bg" src="/assets/diet-plan/bg_my_plan.png" mode="widthFix" />
+
+  <view class="mini-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="mini-nav__inner" style="height: {{navBarHeight}}px;">
+      <view class="mini-nav__back" bindtap="handleBack">
+        <image class="mini-nav__back-icon" src="/assets/analysis/nav_back.png" mode="aspectFit" />
+      </view>
+      <text class="my-plan-nav__title">定制计划</text>
+    </view>
+    <view
+      class="mini-nav__capsule-space"
+      style="width: {{menuWidth}}px; height: {{menuHeight}}px; right: {{menuRight}}px; top: {{menuTop}}px;"
+    ></view>
+  </view>
+
+  <view class="page-top-gap" style="height: {{topInset}}px;"></view>
+
+  <scroll-view
+    class="my-plan-scroll"
+    scroll-y="true"
+    style="height: calc(100vh - {{topInset}}px - {{safeBottom}}px); padding-bottom: {{safeBottom}}px;"
+  >
+    <view class="my-plan-wrap">
+      <view class="my-plan-hero">
+        <text class="my-plan-hero__title">{{title}}</text>
+        <text class="my-plan-hero__sub">{{cycleLabel}}</text>
+      </view>
+
+      <view class="progress-card">
+        <view class="progress-card__head">
+          <view>
+            <view class="progress-top-row">
+              <text class="progress-top-row__label">周计划：</text>
+              <text class="progress-top-row__meta">第 <text class="progress-top-row__num">{{progress.day}}</text> / {{progress.totalDays}} 天</text>
+            </view>
+            <view class="progress-status">{{progress.status}}</view>
+          </view>
+
+          <view class="progress-illustration">
+            <image class="progress-illustration__img" src="/assets/diet-plan/plan_bowl.png" mode="aspectFit" />
+            <image class="progress-illustration__shadow" src="/assets/diet-plan/plan_bowl_shadow.png" mode="aspectFit" />
+          </view>
+        </view>
+
+        <view class="progress-seekbar">
+          <view class="hydration-track">
+            <view class="hydration-fill" style="width: {{progressPercent}}%;"></view>
+            <view class="hydration-thumb" style="left: {{progressPercent}}%;"></view>
+          </view>
+        </view>
+
+        <view class="reminder-strip">{{reminder}}</view>
+      </view>
+
+      <view class="info-card">
+        <text class="info-card__title">计划信息</text>
+        <block wx:for="{{info}}" wx:key="label">
+          <view class="info-card__line">
+            <text class="info-card__line-label">{{item.label}}</text>
+            <text class="info-card__line-value">{{item.value}}</text>
+          </view>
+        </block>
+      </view>
+
+      <view class="day-card">
+        <view class="day-card__tag-row">
+          <view class="day-card__tag">✦ 7天食养方案</view>
+          <text class="day-card__link">右滑查看~</text>
+        </view>
+
+        <view class="day-card__head">
+          <text class="day-card__title">{{dayPlan.title}}</text>
+          <view class="day-card__status">{{dayPlan.status}}</view>
+        </view>
+
+        <view class="recipe-list">
+          <block wx:for="{{dayPlan.recipes}}" wx:key="id">
+            <view class="recipe-item" data-id="{{item.id}}" bindtap="openRecipe">
+              <image class="recipe-item__cover" src="/assets/diet-plan/recipe_img.png" mode="aspectFill" />
+
+              <view class="recipe-item__body">
+                <text class="recipe-item__name">{{item.name}}</text>
+
+                <view class="recipe-item__tags">
+                  <block wx:for="{{item.tags}}" wx:key="*this">
+                    <text class="recipe-item__tag">{{item}}</text>
+                  </block>
+                </view>
+
+                <view class="recipe-item__meta">
+                  <view class="recipe-item__meal">
+                    <image class="recipe-item__meal-icon" src="{{item.mealIcon}}" mode="aspectFit" />
+                    <text>{{item.meal}} {{item.mealTime}}</text>
+                  </view>
+
+                  <view class="recipe-item__price">
+                    <text>￥</text>
+                    <text class="recipe-item__price-num">{{item.price}}</text>
+                    <text>{{item.unit}}</text>
+                  </view>
+                </view>
+              </view>
+
+              <view class="recipe-item__side">
+                <view class="recipe-item__check {{item.done ? 'recipe-item__check--active' : ''}}">
+                  <text wx:if="{{item.done}}">✓</text>
+                </view>
+                <view class="recipe-item__plus">+</view>
+              </view>
+            </view>
+          </block>
+        </view>
+
+        <view class="finish-btn" bindtap="toggleAllDone">全部标记为已完成</view>
+        <view class="finish-indicator"></view>
+      </view>
+
+      <view class="scroll-spacer"></view>
+    </view>
+  </scroll-view>
+
+  <view class="my-plan-action-dock" style="padding-bottom: calc(16rpx + {{safeBottom}}px);">
+    <view class="my-plan-action-dock__inner">
+      <view class="btn-row__btn btn-row__btn--ghost" bindtap="adjustPlan">调整计划</view>
+      <view class="btn-row__btn btn-row__btn--primary" bindtap="buyAll">购买全部食材</view>
+    </view>
+  </view>
+</view>

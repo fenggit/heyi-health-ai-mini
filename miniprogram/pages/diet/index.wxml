@@ -20,7 +20,7 @@
         <text class="diet-custom__desc">{{planIntro.desc}}</text>
       </view>
       <view class="diet-custom__note">{{planIntro.note}}</view>
-      <view class="diet-custom__cta" bindtap="switchMode">开始定制</view>
+      <view class="diet-custom__cta" bindtap="openDietPlan">开始定制</view>
       <image class="diet-custom__illus" src="/assets/home-body-heath.png" mode="aspectFill" />
     </view>
 
@@ -50,7 +50,7 @@
         </block>
       </view>
 
-      <view class="diet-week__retune" bindtap="switchMode">重新定制</view>
+      <view class="diet-week__retune" bindtap="openDietPlan">重新定制</view>
     </view>
 
     <view class="diet-tabs">

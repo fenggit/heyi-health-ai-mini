@@ -35,8 +35,11 @@ Component({
         }
       })
     },
-    openAnalysis() {
-      wx.navigateTo({ url: "/pages/analysis/index" })
+    openAiChat() {
+      const pages = getCurrentPages()
+      const current = pages[pages.length - 1]
+      if (current && current.route === "pages/ai-chat/index") return
+      wx.navigateTo({ url: "/pages/ai-chat/index" })
     }
   }
 })

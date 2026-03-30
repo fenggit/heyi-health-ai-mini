@@ -4,7 +4,10 @@
     "pages/activity-detail/index",
     "pages/mall/index",
     "pages/diet/index",
+    "pages/diet-plan/index",
+    "pages/my-plan/index",
     "pages/profile/index",
+    "pages/ai-chat/index",
     "pages/analysis/index",
     "pages/analysis-quiz/index",
     "pages/analysis-upload/index"

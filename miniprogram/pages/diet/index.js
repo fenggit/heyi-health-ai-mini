@@ -113,9 +113,9 @@ Page({
       activeCategory: Number(index)
     })
   },
-  switchMode() {
-    this.setData({
-      configured: !this.data.configured
+  openDietPlan() {
+    wx.navigateTo({
+      url: "/pages/diet-plan/index"
     })
   },
   openRecipe(e) {
