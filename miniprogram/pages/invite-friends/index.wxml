@@ -1,0 +1,77 @@
+<view class="invite-page design-page page-with-nav">
+  <image class="page-bg" src="/assets/bg_img.png" mode="widthFix" />
+
+  <view class="mini-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="mini-nav__inner" style="height: {{navBarHeight}}px;">
+      <view class="mini-nav__back" bindtap="handleBack">
+        <image class="mini-nav__back-icon" src="/assets/analysis/nav_back.png" mode="aspectFit" />
+      </view>
+      <view class="mini-nav__title">{{navTitle}}</view>
+    </view>
+    <view
+      class="mini-nav__capsule-space"
+      style="width: {{menuWidth}}px; height: {{menuHeight}}px; right: {{menuRight}}px; top: {{menuTop}}px;"
+    ></view>
+  </view>
+
+  <view class="page-top-gap" style="height: {{topInset}}px;"></view>
+
+  <view class="page-wrap">
+    <view class="page-title">{{title}}</view>
+    <view class="page-subtitle">{{subTitle}}</view>
+
+    <view class="invite-reward-tag">邀请有奖</view>
+
+    <view class="glass-card invite-main-card">
+      <view class="invite-section-title">填写推荐码即可获得</view>
+      <view class="invite-summary-row">
+        <view class="invite-summary-item">
+          <view>推荐好友</view>
+          <view class="invite-summary-item__value">{{inviteCount}}</view>
+        </view>
+        <view class="invite-summary-item">
+          <view>获得积分</view>
+          <view class="invite-summary-item__value invite-summary-item__value--purple">{{totalPoints}}</view>
+        </view>
+      </view>
+
+      <view class="invite-reward-box">
+        <view class="invite-reward-box__title">✦ 邀请奖励</view>
+        <block wx:for="{{rewardSteps}}" wx:key="title">
+          <view class="invite-reward-row">
+            <view>{{item.title}}</view>
+            <view class="invite-reward-row__value">{{item.reward}}</view>
+          </view>
+        </block>
+      </view>
+
+      <view class="invite-code-title">您的推荐码</view>
+      <view class="invite-code-row">
+        <view class="invite-code">{{inviteCode}}</view>
+        <view class="invite-copy" bindtap="copyCode">⧉</view>
+      </view>
+
+      <view class="invite-share-list">
+        <block wx:for="{{channels}}" wx:key="id">
+          <view class="invite-share-item" data-name="{{item.name}}" bindtap="shareByChannel">
+            <view class="invite-share-item__icon-wrap">
+              <image class="invite-share-item__icon" src="{{item.icon}}" mode="aspectFit" />
+            </view>
+            <view class="invite-share-item__name">{{item.name}}</view>
+          </view>
+        </block>
+      </view>
+
+      <view class="invite-record-title">已邀请的好友</view>
+      <block wx:for="{{records}}" wx:key="id">
+        <view class="invite-record-row">
+          <view>
+            <view class="invite-record-row__user">用户 {{item.user}}</view>
+            <view class="invite-record-row__time">{{item.time}}</view>
+          </view>
+          <view class="invite-record-row__status">{{item.status}}</view>
+        </view>
+      </block>
+    </view>
+  </view>
+</view>

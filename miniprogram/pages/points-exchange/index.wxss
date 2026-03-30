@@ -1,0 +1,144 @@
+@import "../profile-sub/common.wxss";
+
+.points-page .page-title {
+  font-size: 48rpx;
+}
+
+.points-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.points-rule-btn {
+  min-width: 166rpx;
+  height: 56rpx;
+  border-radius: 28rpx;
+  border: 2rpx solid #7fd3af;
+  color: #334155;
+  font-size: 24rpx;
+  line-height: 56rpx;
+  text-align: center;
+}
+
+.points-summary {
+  margin-top: 14rpx;
+  border: none;
+  overflow: hidden;
+}
+
+.points-summary-top {
+  height: 92rpx;
+  background: linear-gradient(115deg, rgba(69, 231, 207, 0.72) 0%, rgba(199, 236, 73, 0.8) 100%);
+  padding: 0 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.points-summary-title {
+  color: #0f172a;
+  font-size: 32rpx;
+  font-weight: 700;
+}
+
+.points-summary-member {
+  min-width: 120rpx;
+  height: 52rpx;
+  border-radius: 22rpx;
+  background: #121212;
+  color: #cdff71;
+  font-size: 26rpx;
+  line-height: 52rpx;
+  text-align: center;
+  font-weight: 600;
+}
+
+.points-summary-bottom {
+  height: 82rpx;
+  padding: 0 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.points-summary-label {
+  color: #334155;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.points-summary-income {
+  color: #1e293b;
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+.points-list {
+  margin-top: 14rpx;
+  padding: 20rpx;
+}
+
+.points-list-title {
+  color: #334155;
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.points-item {
+  margin-top: 12rpx;
+  min-height: 108rpx;
+  border-radius: 20rpx;
+  background: #f5f2ef;
+  display: flex;
+  align-items: center;
+  padding: 10rpx 14rpx;
+}
+
+.points-item-left {
+  width: 140rpx;
+  text-align: center;
+  border-right: 2rpx dashed #f08a8a;
+}
+
+.points-item-left__title {
+  color: #d97706;
+  font-size: 34rpx;
+  font-weight: 700;
+}
+
+.points-item-left__sub {
+  margin-top: 4rpx;
+  color: #d97706;
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.points-item-main {
+  margin-left: 16rpx;
+  flex: 1;
+}
+
+.points-item-main__name {
+  color: #334155;
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.points-item-main__stock {
+  margin-top: 8rpx;
+  color: #94a3b8;
+  font-size: 24rpx;
+}
+
+.points-item-btn {
+  min-width: 124rpx;
+  height: 56rpx;
+  border-radius: 24rpx;
+  background: #d97706;
+  color: #ffffff;
+  font-size: 24rpx;
+  line-height: 56rpx;
+  text-align: center;
+  font-weight: 700;
+}

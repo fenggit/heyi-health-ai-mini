@@ -1,0 +1,57 @@
+@import "../profile-sub/common.wxss";
+
+.setting-main-card {
+  margin-top: 6rpx;
+  padding: 20rpx 24rpx 24rpx;
+}
+
+.setting-head {
+  color: #1e293b;
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.setting-switch-row {
+  min-height: 112rpx;
+  border-bottom: 2rpx solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.setting-switch-title {
+  color: #1e293b;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.setting-switch-desc {
+  margin-top: 6rpx;
+  color: #94a3b8;
+  font-size: 24rpx;
+}
+
+.setting-tip {
+  margin-top: 12rpx;
+  color: #475569;
+  font-size: 24rpx;
+  line-height: 1.5;
+}
+
+.setting-bottom {
+  position: fixed;
+  left: 24rpx;
+  right: 24rpx;
+  bottom: calc(46rpx + env(safe-area-inset-bottom));
+}
+
+.setting-logout {
+  height: 82rpx;
+  border-radius: 20rpx;
+  background: rgba(255, 255, 255, 0.7);
+  color: #ff3b30;
+  font-size: 28rpx;
+  line-height: 82rpx;
+  text-align: center;
+  font-weight: 600;
+}

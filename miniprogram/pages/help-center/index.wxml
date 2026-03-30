@@ -1,0 +1,59 @@
+<view class="help-page design-page page-with-nav">
+  <image class="page-bg" src="/assets/bg_img.png" mode="widthFix" />
+
+  <view class="mini-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="mini-nav__inner" style="height: {{navBarHeight}}px;">
+      <view class="mini-nav__back" bindtap="handleBack">
+        <image class="mini-nav__back-icon" src="/assets/analysis/nav_back.png" mode="aspectFit" />
+      </view>
+      <view class="mini-nav__title">{{navTitle}}</view>
+    </view>
+    <view
+      class="mini-nav__capsule-space"
+      style="width: {{menuWidth}}px; height: {{menuHeight}}px; right: {{menuRight}}px; top: {{menuTop}}px;"
+    ></view>
+  </view>
+
+  <view class="page-top-gap" style="height: {{topInset}}px;"></view>
+
+  <view class="page-wrap page-wrap--no-title">
+    <view class="glass-card help-search">
+      <text class="help-search__text">{{keywordPlaceholder}}</text>
+    </view>
+
+    <view class="help-group-list">
+      <block wx:for="{{groups}}" wx:key="key">
+        <view
+          class="tag-chip help-group-item {{activeGroup === item.key ? 'help-group-item--active' : ''}}"
+          data-group="{{item.key}}"
+          bindtap="switchGroup"
+        >
+          {{item.label}}
+        </view>
+      </block>
+    </view>
+
+    <view class="glass-card help-faq">
+      <view class="help-section-title">常见问题分类</view>
+      <block wx:for="{{filteredQuestions}}" wx:key="id">
+        <view class="help-faq-item">
+          <view class="help-faq-q"><text class="help-faq-label">问</text>{{item.question}}</view>
+          <view class="help-faq-a">{{item.answer}}</view>
+        </view>
+      </block>
+    </view>
+
+    <view class="glass-card help-contact">
+      <view class="help-section-title">找不到答案</view>
+      <view class="help-contact-intro">联系我们的客服团队，我们会尽快为您解答。</view>
+      <view class="help-contact-list">
+        <block wx:for="{{contactActions}}" wx:key="id">
+          <view class="help-contact-item" data-id="{{item.id}}" data-name="{{item.name}}" bindtap="openContact">
+            <view class="help-contact-item__name">{{item.name}}</view>
+            <text class="list-arrow">></text>
+          </view>
+        </block>
+      </view>
+    </view>
+  </view>
+</view>

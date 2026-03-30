@@ -1,0 +1,156 @@
+@import "../profile-sub/common.wxss";
+
+.about-brand-card {
+  margin-top: 6rpx;
+  padding: 30rpx 24rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.about-logo {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 20rpx;
+  background: linear-gradient(145deg, #50dd9a 0%, #53c97f 100%);
+  color: #ffffff;
+  font-size: 46rpx;
+  line-height: 96rpx;
+  text-align: center;
+  font-weight: 700;
+}
+
+.about-name {
+  margin-top: 14rpx;
+  color: #0f172a;
+  font-size: 32rpx;
+  font-weight: 700;
+}
+
+.about-copy {
+  margin-top: 6rpx;
+  color: #64748b;
+  font-size: 20rpx;
+}
+
+.about-content-card {
+  padding: 20rpx 24rpx 24rpx;
+}
+
+.about-section-title {
+  color: #1e293b;
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.about-section-title--gap {
+  margin-top: 20rpx;
+}
+
+.about-mission,
+.about-bullet {
+  margin-top: 12rpx;
+  color: #334155;
+  font-size: 24rpx;
+  line-height: 1.55;
+}
+
+.about-team-grid {
+  margin-top: 12rpx;
+  display: flex;
+  gap: 14rpx;
+}
+
+.about-team-item {
+  flex: 1;
+  min-height: 80rpx;
+  border-radius: 14rpx;
+  background: rgba(241, 245, 249, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14rpx;
+}
+
+.about-team-item__label {
+  color: #334155;
+  font-size: 22rpx;
+}
+
+.about-team-item__value {
+  min-width: 54rpx;
+  height: 30rpx;
+  border-radius: 10rpx;
+  background: linear-gradient(90deg, #45e7cf 0%, #c7ec49 100%);
+  color: #1e293b;
+  font-size: 20rpx;
+  line-height: 30rpx;
+  text-align: center;
+  font-weight: 700;
+}
+
+.about-result-grid {
+  margin-top: 12rpx;
+  display: flex;
+  gap: 12rpx;
+}
+
+.about-result-item {
+  flex: 1;
+  min-height: 88rpx;
+  border-radius: 14rpx;
+  background: rgba(241, 245, 249, 0.92);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.about-result-item__value {
+  color: #1e293b;
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+.about-result-item__label {
+  margin-top: 6rpx;
+  color: #64748b;
+  font-size: 20rpx;
+}
+
+.about-contact-row {
+  min-height: 58rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.about-contact-row__label {
+  color: #334155;
+  font-size: 24rpx;
+}
+
+.about-contact-row__value {
+  color: #64748b;
+  font-size: 24rpx;
+}
+
+.about-link {
+  margin-top: 10rpx;
+  height: 58rpx;
+  border-radius: 14rpx;
+  background: rgba(241, 245, 249, 0.92);
+  color: #334155;
+  font-size: 24rpx;
+  line-height: 58rpx;
+  text-align: center;
+}
+
+.about-tip {
+  margin-top: 16rpx;
+  padding-top: 12rpx;
+  border-top: 2rpx dashed #e2e8f0;
+  color: #64748b;
+  font-size: 22rpx;
+  line-height: 1.5;
+}

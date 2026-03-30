@@ -1,0 +1,81 @@
+@import "../profile-sub/common.wxss";
+
+.favorite-card {
+  margin-top: 14rpx;
+  padding: 18rpx;
+  display: flex;
+}
+
+.favorite-cover {
+  width: 150rpx;
+  height: 150rpx;
+  border-radius: 18rpx;
+  flex-shrink: 0;
+  background: #f1f5f9;
+}
+
+.favorite-main {
+  margin-left: 14rpx;
+  flex: 1;
+  min-width: 0;
+}
+
+.favorite-name {
+  color: #1e293b;
+  font-size: 32rpx;
+  line-height: 1.3;
+  font-weight: 700;
+}
+
+.favorite-tags {
+  margin-top: 10rpx;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+
+.favorite-tag {
+  height: 34rpx;
+  padding: 0 10rpx;
+  border-radius: 10rpx;
+  background: rgba(16, 185, 129, 0.2);
+  color: #1f915a;
+  font-size: 22rpx;
+  line-height: 34rpx;
+}
+
+.favorite-desc {
+  margin-top: 10rpx;
+  color: #475569;
+  font-size: 24rpx;
+  line-height: 1.45;
+}
+
+.favorite-divider {
+  margin-top: 12rpx;
+  border-top: 2rpx dashed #d9e2ec;
+}
+
+.favorite-foot {
+  margin-top: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.favorite-time {
+  color: #64748b;
+  font-size: 24rpx;
+  font-weight: 500;
+}
+
+.favorite-cancel {
+  min-width: 126rpx;
+  height: 52rpx;
+  border-radius: 24rpx;
+  border: 2rpx solid #d7dee8;
+  color: #64748b;
+  font-size: 24rpx;
+  line-height: 52rpx;
+  text-align: center;
+}

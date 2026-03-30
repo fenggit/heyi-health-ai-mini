@@ -231,3 +231,269 @@
   color: #a3b0bf;
   font-size: 24rpx;
 }
+
+.member-layer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 20000;
+  pointer-events: none;
+}
+
+.member-layer--show {
+  pointer-events: auto;
+}
+
+.member-mask {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(30, 41, 59, 0.5);
+  z-index: 1;
+}
+
+.member-sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(100vh - 178rpx);
+  border-radius: 24rpx 24rpx 0 0;
+  background: #f3f4f8;
+  z-index: 2;
+  transform: translate3d(0, 110%, 0);
+  transition: transform 0.24s ease-out;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+}
+
+.member-sheet--show {
+  transform: translate3d(0, 0, 0);
+  pointer-events: auto;
+}
+
+.member-sheet__top {
+  padding: 24rpx 0 24rpx;
+  background: linear-gradient(116deg, #4ae8cf 0%, #cdec4a 100%);
+  flex-shrink: 0;
+}
+
+.member-sheet__title {
+  text-align: center;
+  color: #1e293b;
+  font-size: 32rpx;
+  line-height: 36rpx;
+  font-weight: 700;
+}
+
+.member-sheet__plan-scroll {
+  margin-top: 12rpx;
+  white-space: nowrap;
+}
+
+.member-sheet__plan-list {
+  display: inline-flex;
+  gap: 16rpx;
+  padding: 48rpx 24rpx 4rpx;
+}
+
+.member-sheet__plan-item {
+  width: 310rpx;
+  height: 144rpx;
+  border-radius: 24rpx;
+  padding-top: 0;
+  box-sizing: border-box;
+  border: 2rpx solid rgba(255, 255, 255, 1);
+  background: rgba(255, 255, 255, 0.7);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.member-sheet__plan-item--active {
+  border-color: #00c950;
+  background: #ffffff;
+}
+
+.member-sheet__plan-chip {
+  position: absolute;
+  top: -48rpx;
+  left: 0;
+  width: 244rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;
+  border-radius: 24rpx;
+  background: #f6d800;
+  color: #1e293b;
+  font-size: 28rpx;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.member-sheet__plan-chip--dark {
+  background: #111827;
+  color: #cdff71;
+}
+
+.member-sheet__plan-chip--compact {
+  width: 160rpx;
+}
+
+.member-sheet__plan-price-wrap {
+  margin-top: 42rpx;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  color: #1e293b;
+  text-align: center;
+}
+
+.member-sheet__plan-currency {
+  font-size: 40rpx;
+  line-height: 56rpx;
+  color: rgba(30, 41, 59, 0.55);
+}
+
+.member-sheet__plan-price {
+  font-size: 64rpx;
+  line-height: 64rpx;
+  font-weight: 700;
+}
+
+.member-sheet__plan-unit {
+  margin-left: 6rpx;
+  font-size: 28rpx;
+  line-height: 44rpx;
+  color: rgba(30, 41, 59, 0.55);
+}
+
+.member-sheet__body {
+  margin: 8rpx 24rpx 0;
+  border-radius: 24rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.96);
+  background: rgba(255, 255, 255, 0.72);
+  padding: 20rpx 24rpx 24rpx;
+  box-sizing: border-box;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.member-sheet__section-title {
+  margin-top: 4rpx;
+  color: #1e293b;
+  font-size: 28rpx;
+  line-height: 30rpx;
+  font-weight: 700;
+}
+
+.member-sheet__section-title--gap {
+  margin-top: 24rpx;
+}
+
+.member-sheet__benefit-row {
+  margin-top: 16rpx;
+  display: flex;
+  align-items: center;
+  color: #1e293b;
+  font-size: 28rpx;
+  line-height: 30rpx;
+}
+
+.member-sheet__benefit-icon {
+  width: 24rpx;
+  height: 24rpx;
+  margin-right: 12rpx;
+  flex-shrink: 0;
+}
+
+.member-sheet__welfare-grid {
+  margin-top: 16rpx;
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 16rpx;
+  column-gap: 18rpx;
+}
+
+.member-sheet__welfare-item {
+  width: 318rpx;
+  height: 168rpx;
+  border-radius: 24rpx;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14rpx;
+  color: #1e293b;
+  font-size: 28rpx;
+  line-height: 30rpx;
+  font-weight: 500;
+  text-align: center;
+}
+
+.member-sheet__welfare-icon {
+  width: 48rpx;
+  height: 48rpx;
+}
+
+.member-sheet__welfare-text {
+  width: 100%;
+  text-align: center;
+}
+
+.member-sheet__faq-item {
+  margin-top: 12rpx;
+}
+
+.member-sheet__faq-q,
+.member-sheet__faq-a {
+  color: #1e293b;
+  font-size: 28rpx;
+  line-height: 42rpx;
+}
+
+.member-sheet__faq-a {
+  margin-top: 2rpx;
+}
+
+.member-sheet__action-bar {
+  margin-top: 12rpx;
+  padding: 10rpx 0 calc(10rpx + env(safe-area-inset-bottom));
+  background: #ffffff;
+  border-radius: 32rpx 32rpx 0 0;
+  flex-shrink: 0;
+}
+
+.member-sheet__action-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 18rpx;
+  padding: 0 56rpx;
+}
+
+.member-sheet__action {
+  width: 310rpx;
+  height: 80rpx;
+  border-radius: 24rpx;
+  text-align: center;
+  line-height: 80rpx;
+  font-size: 32rpx;
+  font-weight: 700;
+}
+
+.member-sheet__action--cancel {
+  color: #1e293b;
+  background: linear-gradient(90deg, #e2efec 0%, #dbeee8 100%);
+}
+
+.member-sheet__action--open {
+  color: #1e293b;
+  background: linear-gradient(90deg, #45e7cf 0%, #c7ec49 100%);
+}

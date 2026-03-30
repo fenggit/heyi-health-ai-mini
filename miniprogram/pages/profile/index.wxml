@@ -57,4 +57,70 @@
       </block>
     </view>
   </view>
+
+  <view class="member-layer {{showMemberSheet ? 'member-layer--show' : ''}}">
+    <view wx:if="{{showMemberSheet}}" class="member-mask" bindtap="closeMemberSheet"></view>
+    <view class="member-sheet {{showMemberSheet ? 'member-sheet--show' : ''}}" catchtap="noop" catchtouchmove="noop">
+      <view class="member-sheet__top">
+        <view class="member-sheet__title">会员升级</view>
+        <scroll-view class="member-sheet__plan-scroll" scroll-x="true" show-scrollbar="false">
+          <view class="member-sheet__plan-list">
+            <block wx:for="{{memberPlans}}" wx:key="id">
+              <view
+                class="member-sheet__plan-item {{selectedMemberPlanId === item.id ? 'member-sheet__plan-item--active' : ''}}"
+                data-id="{{item.id}}"
+                bindtap="selectMemberPlan"
+              >
+                <view
+                  class="member-sheet__plan-chip {{item.dark ? 'member-sheet__plan-chip--dark' : ''}} {{item.compact ? 'member-sheet__plan-chip--compact' : ''}}"
+                >
+                  {{item.title}}
+                </view>
+                <view class="member-sheet__plan-price-wrap">
+                  <text class="member-sheet__plan-currency">¥</text>
+                  <text class="member-sheet__plan-price">{{item.price}}</text>
+                  <text wx:if="{{item.unit}}" class="member-sheet__plan-unit">{{item.unit}}</text>
+                </view>
+              </view>
+            </block>
+          </view>
+        </scroll-view>
+      </view>
+
+      <view class="member-sheet__body">
+        <view class="member-sheet__section-title">会员权益</view>
+        <block wx:for="{{memberBenefits}}" wx:key="*this">
+          <view class="member-sheet__benefit-row">
+            <image class="member-sheet__benefit-icon" src="/assets/analysis/check_green.png" mode="aspectFit" />
+            <text>{{item}}</text>
+          </view>
+        </block>
+
+        <view class="member-sheet__section-title member-sheet__section-title--gap">会员专属福利</view>
+        <view class="member-sheet__welfare-grid">
+          <block wx:for="{{memberWelfares}}" wx:key="label">
+            <view class="member-sheet__welfare-item">
+              <image class="member-sheet__welfare-icon" src="{{item.icon}}" mode="aspectFit" />
+              <view class="member-sheet__welfare-text">{{item.label}}</view>
+            </view>
+          </block>
+        </view>
+
+        <view class="member-sheet__section-title member-sheet__section-title--gap">常见问题</view>
+        <block wx:for="{{memberFaqs}}" wx:key="id">
+          <view class="member-sheet__faq-item">
+            <view class="member-sheet__faq-q">{{item.q}}</view>
+            <view class="member-sheet__faq-a">{{item.a}}</view>
+          </view>
+        </block>
+      </view>
+
+      <view class="member-sheet__action-bar">
+        <view class="member-sheet__action-row">
+          <view class="member-sheet__action member-sheet__action--cancel" bindtap="closeMemberSheet">取消</view>
+          <view class="member-sheet__action member-sheet__action--open" bindtap="confirmMemberUpgrade">立即开通</view>
+        </view>
+      </view>
+    </view>
+  </view>
 </view>
