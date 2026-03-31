@@ -18,16 +18,17 @@
 
   <view class="analysis-main" style="height: calc(100vh - {{topInset}}px - {{inputDockHeight}}px);">
     <view class="analysis-head">
+      <image class="analysis-head__hello" src="/assets/analysis/chat/hash_tag.png" mode="widthFix" />
       <text class="analysis-head__title">{{title}}</text>
-      <view class="analysis-head__row">
+      <view class="analysis-head__sub-wrap">
         <text class="analysis-head__sub">{{subTitle}}</text>
-        <image class="analysis-head__hello" src="/assets/analysis/chat/hash_tag.png" mode="widthFix" />
+        <image class="analysis-head__sub-icon" src="/assets/icons/chat-ai-leaf.png" mode="aspectFit" />
       </view>
     </view>
 
     <view class="card-panel analysis-intro-card">
       <view class="analysis-intro-card__head">
-        <text class="analysis-intro-card__title">我可以帮你：</text>
+        <title-view text="我可以帮你：" />
       </view>
       <block wx:for="{{capabilities}}" wx:key="*this">
         <view class="analysis-intro-card__item">· {{item}}</view>
@@ -51,6 +52,7 @@
       <scroll-view
         class="analysis-chat-scroll"
         scroll-y="true"
+        show-scrollbar="false"
         scroll-with-animation="true"
         scroll-top="{{chatScrollTop}}"
       >

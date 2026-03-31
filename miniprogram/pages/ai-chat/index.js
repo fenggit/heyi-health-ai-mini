@@ -114,7 +114,6 @@ Page({
   },
   onReady() {
     this.measureInputDock()
-    this.scrollToLatest()
   },
   onShow() {
     this.measureInputDock()
@@ -158,9 +157,7 @@ Page({
   },
   async loadPageData() {
     const payload = await fetchPageData()
-    this.setData(payload, () => {
-      this.scrollToLatest()
-    })
+    this.setData(payload)
   },
   scrollToLatest() {
     const { messages } = this.data
@@ -177,14 +174,9 @@ Page({
       if (!rect || !rect.height) return
       const nextHeight = Math.ceil(rect.height)
       if (Math.abs(nextHeight - this.data.inputDockHeight) < 2) return
-      this.setData(
-        {
-          inputDockHeight: nextHeight
-        },
-        () => {
-          this.scrollToLatest()
-        }
-      )
+      this.setData({
+        inputDockHeight: nextHeight
+      })
     })
   },
   appendConversation(userText, userExtras = {}) {
