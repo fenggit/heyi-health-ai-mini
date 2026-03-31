@@ -82,12 +82,6 @@
   margin-top: 14rpx;
 }
 
-.member-section-title {
-  color: #1e293b;
-  font-size: 30rpx;
-  font-weight: 700;
-}
-
 .member-section-title--gap {
   margin-top: 20rpx;
 }

@@ -125,18 +125,6 @@
   margin-top: 22rpx;
 }
 
-.analysis-section-title {
-  color: #1e293b;
-  font-size: 30rpx;
-  line-height: 40rpx;
-  font-weight: 700;
-}
-
-.analysis-section-title__dec {
-  width: 90rpx;
-  margin-top: 4rpx;
-}
-
 .analysis-service-item {
   margin-top: 12rpx;
   display: flex;

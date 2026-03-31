@@ -40,12 +40,14 @@
     </view>
 
     <view class="glass-card member-right-card">
-      <view class="member-section-title">会员权益</view>
+      <title-view text="会员权益" />
       <block wx:for="{{benefits}}" wx:key="*this">
         <view class="member-benefit-row">✔ {{item}}</view>
       </block>
 
-      <view class="member-section-title member-section-title--gap">会员专属福利</view>
+      <view class="member-section-title--gap">
+        <title-view text="会员专属福利" />
+      </view>
       <view class="member-welfare-grid">
         <block wx:for="{{welfares}}" wx:key="label">
           <view class="member-welfare-item">
@@ -57,7 +59,7 @@
     </view>
 
     <view class="glass-card member-faq-card">
-      <view class="member-section-title">常见问题</view>
+      <title-view text="常见问题" />
       <block wx:for="{{faqs}}" wx:key="id">
         <view class="member-faq-item">
           <view class="member-faq-item__q">{{item.q}}</view>

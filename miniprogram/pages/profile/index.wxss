@@ -2,6 +2,11 @@
   background: transparent;
 }
 
+.profile-page--sheet-open {
+  height: 100vh;
+  overflow: hidden;
+}
+
 .profile-page-bg {
   position: absolute;
   left: 0;
@@ -278,13 +283,29 @@
   pointer-events: auto;
 }
 
+.member-sheet__bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  display: block;
+}
+
 .member-sheet__top {
+  position: relative;
   padding: 24rpx 0 24rpx;
-  background: linear-gradient(116deg, #4ae8cf 0%, #cdec4a 100%);
+  background: transparent;
   flex-shrink: 0;
+  overflow: hidden;
 }
 
 .member-sheet__title {
+  position: relative;
+  z-index: 2;
   text-align: center;
   color: #1e293b;
   font-size: 32rpx;
@@ -293,8 +314,11 @@
 }
 
 .member-sheet__plan-scroll {
+  position: relative;
+  z-index: 2;
   margin-top: 12rpx;
   white-space: nowrap;
+  scrollbar-width: none;
 }
 
 .member-sheet__plan-list {
@@ -330,20 +354,31 @@
   justify-content: center;
   height: 88rpx;
   border-radius: 24rpx;
-  background: #f6d800;
   color: #1e293b;
   font-size: 28rpx;
   line-height: 1;
   font-weight: 700;
+  overflow: hidden;
 }
 
 .member-sheet__plan-chip--dark {
-  background: #111827;
   color: #cdff71;
 }
 
-.member-sheet__plan-chip--compact {
-  width: 160rpx;
+.member-sheet__plan-chip-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 244rpx;
+  height: 88rpx;
+  display: block;
+}
+
+.member-sheet__plan-chip-text {
+  position: relative;
+  z-index: 1;
+  display: block;
+  padding-bottom: 24rpx;
 }
 
 .member-sheet__plan-price-wrap {
@@ -375,18 +410,24 @@
 }
 
 .member-sheet__body {
+  position: relative;
+  z-index: 2;
+  width: calc(100% - 48rpx);
   margin: 8rpx 24rpx 0;
-  border-radius: 24rpx;
-  border: 2rpx solid rgba(255, 255, 255, 0.96);
-  background: rgba(255, 255, 255, 0.72);
-  padding: 20rpx 24rpx 24rpx;
+  align-self: center;
+  border-radius: 24rpx 24rpx 24rpx 24rpx;
+  border: 2rpx solid #ffffff;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 15rpx 16rpx 15rpx;
   box-sizing: border-box;
   flex: 1;
-  overflow-y: auto;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .member-sheet__section-title {
   margin-top: 4rpx;
+  margin-bottom: 16rpx;
   color: #1e293b;
   font-size: 28rpx;
   line-height: 30rpx;
@@ -398,9 +439,16 @@
 }
 
 .member-sheet__benefit-row {
-  margin-top: 16rpx;
+  margin-top: 0;
+  padding: 12rpx 0;
   display: flex;
   align-items: center;
+  color: #1e293b;
+  font-size: 28rpx;
+  line-height: 30rpx;
+}
+
+.member-sheet__benefit-row text {
   color: #1e293b;
   font-size: 28rpx;
   line-height: 30rpx;
@@ -414,23 +462,24 @@
 }
 
 .member-sheet__welfare-grid {
-  margin-top: 16rpx;
+  margin-top: 0;
   display: flex;
   flex-wrap: wrap;
   row-gap: 16rpx;
-  column-gap: 18rpx;
+  column-gap: 16rpx;
 }
 
 .member-sheet__welfare-item {
-  width: 318rpx;
+  width: calc((100% - 16rpx) / 2);
   height: 168rpx;
-  border-radius: 24rpx;
+  border-radius: 24rpx 24rpx 24rpx 24rpx;
   background: #ffffff;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 14rpx;
+  gap: 7rpx;
   color: #1e293b;
   font-size: 28rpx;
   line-height: 30rpx;
@@ -446,9 +495,15 @@
 .member-sheet__welfare-text {
   width: 100%;
   text-align: center;
+  color: #1e293b;
+  font-size: 28rpx;
 }
 
 .member-sheet__faq-item {
+  margin-top: 0;
+}
+
+.member-sheet__faq-item + .member-sheet__faq-item {
   margin-top: 12rpx;
 }
 
@@ -464,10 +519,12 @@
 }
 
 .member-sheet__action-bar {
-  margin-top: 12rpx;
+  position: relative;
+  z-index: 2;
+  margin: 12rpx 0 0;
   padding: 10rpx 0 calc(10rpx + env(safe-area-inset-bottom));
-  background: #ffffff;
   border-radius: 32rpx 32rpx 0 0;
+  background: #ffffff;
   flex-shrink: 0;
 }
 
@@ -490,10 +547,19 @@
 
 .member-sheet__action--cancel {
   color: #1e293b;
-  background: linear-gradient(90deg, #e2efec 0%, #dbeee8 100%);
+  background: linear-gradient(129deg, #e9fbf1 0%, #ecfdf8 54.4%, #defefd 100%);
+  border-radius: 24rpx 24rpx 24rpx 24rpx;
 }
 
 .member-sheet__action--open {
   color: #1e293b;
-  background: linear-gradient(90deg, #45e7cf 0%, #c7ec49 100%);
+  background: linear-gradient(126deg, #4effe2 0%, #cef94c 100%);
+  border-radius: 24rpx 24rpx 24rpx 24rpx;
+}
+
+.member-sheet__plan-scroll::-webkit-scrollbar,
+.member-sheet__body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
 }

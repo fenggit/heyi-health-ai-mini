@@ -1,0 +1,4 @@
+<view class="title-view">
+  <text class="title-view__text">{{text}}</text>
+  <image class="title-view__dec" src="{{decSrc}}" mode="widthFix" />
+</view>

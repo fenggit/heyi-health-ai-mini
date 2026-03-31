@@ -46,6 +46,9 @@
       }
     ]
   },
+  "usingComponents": {
+    "title-view": "/components/title-view/index"
+  },
   "style": "v2",
   "sitemapLocation": "sitemap.json"
 }

@@ -1,4 +1,4 @@
-<view class="profile-page design-page design-page--with-tab">
+<view class="profile-page design-page design-page--with-tab {{showMemberSheet ? 'profile-page--sheet-open' : ''}}">
   <image class="profile-page-bg" src="/assets/bg_img.png" mode="widthFix" />
 
   <view class="page-top-gap" style="height: {{topInset}}px;"></view>
@@ -58,12 +58,13 @@
     </view>
   </view>
 
-  <view class="member-layer {{showMemberSheet ? 'member-layer--show' : ''}}">
-    <view wx:if="{{showMemberSheet}}" class="member-mask" bindtap="closeMemberSheet"></view>
-    <view class="member-sheet {{showMemberSheet ? 'member-sheet--show' : ''}}" catchtap="noop" catchtouchmove="noop">
-      <view class="member-sheet__top">
+  <view class="member-layer {{showMemberSheet ? 'member-layer--show' : ''}}" catchtouchmove="noop">
+    <view wx:if="{{showMemberSheet}}" class="member-mask" bindtap="closeMemberSheet" catchtouchmove="noop"></view>
+    <view class="member-sheet {{showMemberSheet ? 'member-sheet--show' : ''}}" catchtap="noop">
+      <image class="member-sheet__bg" src="/assets/profile-pages/bg_memebe.png" mode="widthFix" />
+      <view class="member-sheet__top" catchtouchmove="noop">
         <view class="member-sheet__title">会员升级</view>
-        <scroll-view class="member-sheet__plan-scroll" scroll-x="true" show-scrollbar="false">
+        <scroll-view class="member-sheet__plan-scroll" scroll-x="true" enhanced="true" show-scrollbar="{{false}}">
           <view class="member-sheet__plan-list">
             <block wx:for="{{memberPlans}}" wx:key="id">
               <view
@@ -71,11 +72,12 @@
                 data-id="{{item.id}}"
                 bindtap="selectMemberPlan"
               >
-                <view
-                  class="member-sheet__plan-chip {{item.dark ? 'member-sheet__plan-chip--dark' : ''}} {{item.compact ? 'member-sheet__plan-chip--compact' : ''}}"
-                >
-                  {{item.title}}
-                </view>
+              <view
+                class="member-sheet__plan-chip {{item.dark ? 'member-sheet__plan-chip--dark' : ''}}"
+              >
+                <image class="member-sheet__plan-chip-bg" src="{{item.chipBg}}" mode="scaleToFill" />
+                <text class="member-sheet__plan-chip-text">{{item.title}}</text>
+              </view>
                 <view class="member-sheet__plan-price-wrap">
                   <text class="member-sheet__plan-currency">¥</text>
                   <text class="member-sheet__plan-price">{{item.price}}</text>
@@ -87,7 +89,7 @@
         </scroll-view>
       </view>
 
-      <view class="member-sheet__body">
+      <scroll-view class="member-sheet__body" scroll-y="true" enhanced="true" show-scrollbar="{{false}}">
         <view class="member-sheet__section-title">会员权益</view>
         <block wx:for="{{memberBenefits}}" wx:key="*this">
           <view class="member-sheet__benefit-row">
@@ -113,9 +115,9 @@
             <view class="member-sheet__faq-a">{{item.a}}</view>
           </view>
         </block>
-      </view>
+      </scroll-view>
 
-      <view class="member-sheet__action-bar">
+      <view class="member-sheet__action-bar" catchtouchmove="noop">
         <view class="member-sheet__action-row">
           <view class="member-sheet__action member-sheet__action--cancel" bindtap="closeMemberSheet">取消</view>
           <view class="member-sheet__action member-sheet__action--open" bindtap="confirmMemberUpgrade">立即开通</view>

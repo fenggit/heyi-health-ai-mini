@@ -35,10 +35,7 @@
 
     <view class="card-panel health-card">
       <view class="health-head">
-        <view class="health-title-block">
-          <text class="section-title">{{healthStatus.title}}</text>
-          <image class="health-title-dec" src="/assets/title_dec.png" mode="widthFix" />
-        </view>
+        <title-view text="{{healthStatus.title}}" />
         <text class="health-status-pill">{{healthStatus.level}}</text>
       </view>
       <view class="health-metrics">

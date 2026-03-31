@@ -59,16 +59,37 @@ Page({
     showMemberSheet: false,
     selectedMemberPlanId: "normal",
     memberPlans: [
-      { id: "normal", title: "当前：普通会员", price: 0, unit: "", dark: false, compact: false },
-      { id: "gold", title: "推荐：黄金会员", price: 99, unit: "/月", dark: true },
-      { id: "diamond", title: "钻石会员", price: 999, unit: "/年", dark: true, compact: true }
+      {
+        id: "normal",
+        title: "当前：普通会员",
+        price: 0,
+        unit: "",
+        dark: false,
+        chipBg: "/assets/profile-pages/vip/current_img@2x.png"
+      },
+      {
+        id: "gold",
+        title: "推荐：黄金会员",
+        price: 99,
+        unit: "/月",
+        dark: true,
+        chipBg: "/assets/profile-pages/vip/recommend_img@2x.png"
+      },
+      {
+        id: "diamond",
+        title: "钻石会员",
+        price: 999,
+        unit: "/年",
+        dark: true,
+        chipBg: "/assets/profile-pages/vip/recommend_img@2x.png"
+      }
     ],
     memberBenefits: ["基础体质测评", "查看食养配方", "购物积分累积", "客服咨询"],
     memberWelfares: [
       { icon: "/assets/profile-pages/vip/gift_icon.png", label: "生日礼包" },
-      { icon: "/assets/profile-pages/vip/activity_icon.png", label: "节日优惠" },
+      { icon: "/assets/profile-pages/coupon_icon.png", label: "节日优惠" },
       { icon: "/assets/profile-pages/vip/new_icon.png", label: "新品试用" },
-      { icon: "/assets/profile-pages/vip/vip_icon.png", label: "专属活动" }
+      { icon: "/assets/profile-pages/vip/activity_icon.png", label: "专属活动" }
     ],
     memberFaqs: [
       {

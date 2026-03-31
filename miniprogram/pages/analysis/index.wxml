@@ -36,8 +36,7 @@
 
     <view class="card-panel analysis-main-card">
       <view class="analysis-section-head">
-        <text class="analysis-section-title">我们提供的服务</text>
-        <image class="analysis-section-title__dec" src="/assets/analysis/title_dec.png" mode="widthFix" />
+        <title-view text="我们提供的服务" dec-src="/assets/analysis/title_dec.png" />
       </view>
 
       <block wx:for="{{extras}}" wx:key="*this">
@@ -48,8 +47,7 @@
       </block>
 
       <view class="analysis-section-head analysis-section-head--limit">
-        <text class="analysis-section-title">使用限制</text>
-        <image class="analysis-section-title__dec" src="/assets/analysis/title_dec.png" mode="widthFix" />
+        <title-view text="使用限制" dec-src="/assets/analysis/title_dec.png" />
       </view>
 
       <block wx:for="{{bullets}}" wx:key="*this">
