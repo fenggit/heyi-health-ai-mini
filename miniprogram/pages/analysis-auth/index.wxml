@@ -1,0 +1,73 @@
+<view class="report-page analysis-auth-page design-page">
+  <image class="report-page-bg" src="/assets/bg_img.png" mode="widthFix" />
+
+  <view class="mini-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="mini-nav__inner" style="height: {{navBarHeight}}px;">
+      <view class="mini-nav__back" bindtap="handleBack">
+        <image class="mini-nav__back-icon" src="/assets/analysis/nav_back.png" mode="aspectFit" />
+      </view>
+      <view class="mini-nav__title">{{navTitle}}</view>
+    </view>
+    <view
+      class="mini-nav__capsule-space"
+      style="width: {{menuWidth}}px; height: {{menuHeight}}px; right: {{menuRight}}px; top: {{menuTop}}px;"
+    ></view>
+  </view>
+
+  <view class="page-top-gap" style="height: {{topInset}}px;"></view>
+
+  <view class="report-wrap">
+    <view class="report-complete-title">{{guestCompleteTitle}}</view>
+    <view class="report-complete-subtitle">{{guestCompleteSubTitle}}</view>
+    <view class="report-complete-tag">{{guestTag}}</view>
+
+    <view class="card-panel report-guest-summary">
+      <view class="report-main-row">
+        <view class="report-main-left">您的主要体质：<text class="report-main-type">{{mainType}}</text></view>
+        <view class="report-main-right">{{mainTypeHint}}</view>
+      </view>
+      <view class="report-progress">
+        <view class="report-progress__fill" style="width: {{mainScore}}%;"></view>
+        <view class="report-progress__dot" style="left: {{mainScore}}%;"></view>
+      </view>
+      <view class="report-main-score">
+        <text class="report-main-score__label">体质指数：</text>
+        <text class="report-main-score__value">{{mainScore}} 分</text>
+      </view>
+    </view>
+
+    <view class="card-panel report-guest-login-bar" bindtap="goLogin">
+      <view class="guest-login-icon">
+        <view class="guest-login-icon__tab"></view>
+        <view class="guest-login-icon__body"></view>
+        <view class="guest-login-icon__hole"></view>
+        <view class="guest-login-icon__stem"></view>
+      </view>
+      <view class="report-guest-login-bar__text">登录后查看完整报告</view>
+    </view>
+
+    <view class="card-panel report-guest-detail-card">
+      <view class="report-guest-detail-card__title-wrap">
+        <title-view text="{{guestUnlockTitle}}" dec-src="/assets/analysis/title_dec.png" />
+      </view>
+
+      <block wx:for="{{guestUnlockItems}}" wx:key="title" wx:for-item="unlock">
+        <view class="report-guest-benefit-row">
+          <image class="report-guest-benefit-row__icon" src="/assets/analysis/check_green.png" mode="aspectFit" />
+          <view class="report-guest-benefit-row__content">
+            <view class="report-guest-benefit-row__title">{{unlock.title}}</view>
+            <view class="report-guest-benefit-row__desc">{{unlock.desc}}</view>
+          </view>
+        </view>
+      </block>
+
+      <view class="report-guest-auth-title-wrap">
+        <title-view text="{{guestAuthTitle}}" dec-src="/assets/analysis/title_dec.png" />
+      </view>
+      <view class="report-guest-auth-desc">{{guestAuthDesc}}</view>
+    </view>
+
+    <view class="report-primary-btn report-primary-btn--guest" bindtap="goLogin">{{guestPrimaryButton}}</view>
+    <view class="report-link-btn report-link-btn--guest" bindtap="goHome">{{guestBackText}}</view>
+  </view>
+</view>

@@ -4,7 +4,10 @@ const MOCK_UPLOAD_DATA = {
   title: "视觉AI分析",
   subTitle: "通过舌苔和面色辅助判断体质",
   intro:
-    "通过舌苔颜色、厚薄、湿润度和面部气色，AI可辅助判断寒热虚实体质特征，结合问卷答题获得更精准的体质报告。",
+    "通过舌苔颜色、厚薄、湿润度和面部气色，AI可以辅助判断您的寒热虚实体质特征，结合问卷答题获得更精准的体质报告。",
+  introNotice: "本结果由A生成，仅供娱乐与生活参考，不能替代医疗建议。",
+  tongueDesc: "辅助判断内热或虚寒",
+  faceDesc: "分析气色和面部特征",
   tongueTip: "张嘴伸舌，舌头平展，自然光线下拍摄，确保舌苔清晰可见。",
   faceTip: "正面平视，表情自然，确保面部光线均匀，不要化浓妆。"
 }
@@ -27,14 +30,22 @@ Page({
     title: "",
     subTitle: "",
     intro: "",
+    introNotice: "",
+    tongueDesc: "",
+    faceDesc: "",
     tongueTip: "",
     faceTip: "",
     tongueImage: "",
     faceImage: ""
   },
+  _generateTimer: null,
+  _isGenerating: false,
   onLoad() {
     this.syncLayout()
     this.loadPageData()
+  },
+  onUnload() {
+    this.clearGenerateTimer()
   },
   syncLayout() {
     const { statusBarHeight, navBarHeight, headerHeight } = getLayoutMetrics()
@@ -105,16 +116,37 @@ Page({
     }
     wx.switchTab({ url: "/pages/home/index" })
   },
-  skipAndFinish() {
-    wx.showToast({
-      title: "已跳过拍照，后续可补充上传",
-      icon: "none"
+  goReportPage(logged) {
+    if (logged) {
+      wx.navigateTo({ url: "/pages/analysis-report/index?logged=1&from=upload" })
+      return
+    }
+    wx.navigateTo({ url: "/pages/analysis-auth/index?from=upload" })
+  },
+  clearGenerateTimer() {
+    if (this._generateTimer) {
+      clearTimeout(this._generateTimer)
+      this._generateTimer = null
+    }
+  },
+  triggerGenerateReport(logged) {
+    if (this._isGenerating) return
+    this._isGenerating = true
+    wx.showLoading({
+      title: "正在生成报告",
+      mask: true
     })
+    this.clearGenerateTimer()
+    this._generateTimer = setTimeout(() => {
+      wx.hideLoading()
+      this._isGenerating = false
+      this.goReportPage(logged)
+    }, 650)
+  },
+  skipAndFinish() {
+    this.triggerGenerateReport(false)
   },
   finish() {
-    wx.showToast({
-      title: "演示版：报告生成功能待接入",
-      icon: "none"
-    })
+    this.triggerGenerateReport(true)
   }
 })

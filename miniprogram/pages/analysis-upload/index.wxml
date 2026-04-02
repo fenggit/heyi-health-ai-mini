@@ -6,6 +6,7 @@
       <view class="mini-nav__back" bindtap="handleBack">
         <image class="mini-nav__back-icon" src="/assets/analysis/nav_back.png" mode="aspectFit" />
       </view>
+      <view class="mini-nav__title">趣味分析</view>
     </view>
     <view
       class="mini-nav__capsule-space"
@@ -17,84 +18,95 @@
 
   <view class="upload-wrap">
     <view class="upload-head">
-      <view class="upload-head__subtitle">{{title}}</view>
-      <view class="upload-head__title">{{subTitle}}</view>
+      <view class="upload-head__title">{{title}}</view>
+      <view class="upload-head__subtitle">{{subTitle}}</view>
       <view class="upload-head__tag">趣味分析</view>
     </view>
 
     <view class="card-panel upload-step-card">
+      <image class="upload-step-card__bg" src="/assets/analysis/page03_wrap@2x.png" mode="scaleToFill" />
       <view class="upload-step-row">
-        <view class="upload-step-left">
-          <text class="upload-step-label">步骤二：</text>
-          <view class="upload-step-title-wrap">
-            <text class="upload-step-title">上传图片</text>
-            <image class="upload-step-title__dec" src="/assets/analysis/title_dec.png" mode="widthFix" />
-          </view>
-        </view>
-        <view class="upload-step-count">
-          <text class="upload-step-count__num">2</text>
-          <text class="upload-step-count__rest"> / 2 步</text>
-        </view>
+        <text class="upload-step-label">步骤二：</text>
+        <text class="upload-step-title">视觉分析</text>
       </view>
-
-      <view class="upload-progress-track">
-        <view class="upload-progress-fill"></view>
-        <view class="upload-progress-dot"></view>
+      <view class="upload-step-intro">
+        <view class="upload-step-intro__line">
+          <text class="upload-step-intro__label">AI 视觉分析：</text>
+          <text class="upload-step-intro__text">{{intro}}</text>
+        </view>
+        <view class="upload-step-intro__notice">{{introNotice}}</view>
       </view>
     </view>
 
-    <view class="card-panel upload-main-card">
-      <view class="upload-intro">{{intro}}</view>
-
-      <view class="upload-card">
-        <view class="upload-card__title">舌苔拍照</view>
-        <view class="upload-photo">
-          <image wx:if="{{tongueImage}}" class="upload-photo__img" src="{{tongueImage}}" mode="aspectFill" />
-          <view wx:else class="upload-photo__placeholder">
-            <view class="upload-photo__plus">+</view>
-            <view class="upload-photo__label">上传舌苔样本</view>
+    <view class="card-panel upload-card">
+      <view class="upload-card__head">
+        <view class="upload-card__icon-wrap">
+          <image class="upload-card__icon" src="/assets/analysis/camera_icon@2x.png" mode="aspectFit" />
+        </view>
+        <view class="upload-card__meta">
+          <view class="upload-card__title">舌苔拍照</view>
+          <view class="upload-card__desc">{{tongueDesc}}</view>
+        </view>
+      </view>
+      <view wx:if="{{tongueImage}}" class="upload-photo-preview">
+        <image class="upload-photo-preview__img" src="{{tongueImage}}" mode="aspectFill" />
+      </view>
+      <view class="upload-actions">
+        <view class="upload-action" bindtap="chooseTongueCamera">
+          <view class="upload-action__content">
+            <image class="upload-action-icon" src="/assets/analysis/image_icon@2x.png" mode="aspectFit" />
+            <text class="upload-action__text">拍摄舌苔照片</text>
           </view>
         </view>
-        <view class="upload-actions">
-          <view class="upload-action upload-action--primary" bindtap="chooseTongueCamera">拍摄舌苔照片</view>
-          <view class="upload-action upload-action--ghost" bindtap="chooseTongueAlbum">从相册获取</view>
-        </view>
-        <view class="upload-tip">
-          <text class="upload-tip__label">拍摄提示：</text>
-          <text>{{tongueTip}}</text>
-        </view>
-      </view>
-
-      <view class="upload-card">
-        <view class="upload-card__title">面色拍照</view>
-        <view class="upload-photo">
-          <image wx:if="{{faceImage}}" class="upload-photo__img" src="{{faceImage}}" mode="aspectFill" />
-          <view wx:else class="upload-photo__placeholder">
-            <view class="upload-photo__plus">+</view>
-            <view class="upload-photo__label">上传面部样本</view>
+        <view class="upload-action" bindtap="chooseTongueAlbum">
+          <view class="upload-action__content">
+            <image class="upload-action-icon" src="/assets/analysis/upload_icon@2x.png" mode="aspectFit" />
+            <text class="upload-action__text">从相册获取</text>
           </view>
         </view>
-        <view class="upload-actions">
-          <view class="upload-action upload-action--primary" bindtap="chooseFaceCamera">拍摄面部照片</view>
-          <view class="upload-action upload-action--ghost" bindtap="chooseFaceAlbum">从相册获取</view>
-        </view>
-        <view class="upload-tip">
-          <text class="upload-tip__label">拍摄提示：</text>
-          <text>{{faceTip}}</text>
-        </view>
       </view>
-
-      <view class="upload-disclaimer-wrap">
-        <view class="upload-disclaimer">图片识别由AI辅助完成，仅供健康管理参考，不作为医疗诊断依据。</view>
+      <view class="upload-tip-divider"></view>
+      <view class="upload-tip">
+        <text class="upload-tip__label">拍摄提示：</text>
+        <text>{{tongueTip}}</text>
       </view>
-
-      <view class="upload-bottom-actions">
-        <view class="upload-btn upload-btn--ghost" bindtap="skipAndFinish">跳过拍照</view>
-        <view class="upload-btn upload-btn--primary {{!tongueImage && !faceImage ? 'upload-btn--disabled' : ''}}" bindtap="finish">
-          完成分析
-        </view>
-      </view>
-      <view class="upload-link" bindtap="skipAndFinish">直接生成问卷版报告</view>
     </view>
+
+    <view class="card-panel upload-card">
+      <view class="upload-card__head">
+        <view class="upload-card__icon-wrap">
+          <image class="upload-card__icon" src="/assets/analysis/camera_icon@2x.png" mode="aspectFit" />
+        </view>
+        <view class="upload-card__meta">
+          <view class="upload-card__title">面色拍照</view>
+          <view class="upload-card__desc">{{faceDesc}}</view>
+        </view>
+      </view>
+      <view wx:if="{{faceImage}}" class="upload-photo-preview">
+        <image class="upload-photo-preview__img" src="{{faceImage}}" mode="aspectFill" />
+      </view>
+      <view class="upload-actions">
+        <view class="upload-action" bindtap="chooseFaceCamera">
+          <view class="upload-action__content">
+            <image class="upload-action-icon" src="/assets/analysis/image_icon@2x.png" mode="aspectFit" />
+            <text class="upload-action__text">拍摄面部照片</text>
+          </view>
+        </view>
+        <view class="upload-action" bindtap="chooseFaceAlbum">
+          <view class="upload-action__content">
+            <image class="upload-action-icon" src="/assets/analysis/upload_icon@2x.png" mode="aspectFit" />
+            <text class="upload-action__text">从相册获取</text>
+          </view>
+        </view>
+      </view>
+      <view class="upload-tip-divider"></view>
+      <view class="upload-tip">
+        <text class="upload-tip__label">拍摄提示：</text>
+        <text>{{faceTip}}</text>
+      </view>
+    </view>
+
+    <view class="upload-btn upload-btn--primary" bindtap="finish">完成分析</view>
+    <view class="upload-link" bindtap="skipAndFinish">跳过拍照，直接生成报告</view>
   </view>
 </view>

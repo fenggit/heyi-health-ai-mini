@@ -1,6 +1,5 @@
 {
   "pages": [
-    "pages/analysis-quiz/index",
     "pages/home/index",
     "pages/activity-detail/index",
     "pages/mall/index",
@@ -18,8 +17,11 @@
     "pages/invite-friends/index",
     "pages/ai-chat/index",
     "pages/analysis/index",
+    "pages/analysis-quiz/index",
+    "pages/analysis-auth/index",
+    "pages/analysis-upload/index",
+    "pages/analysis-report/index"
 
-    "pages/analysis-upload/index"
   ],
   "window": {
     "backgroundColor": "#F4F5F8",
