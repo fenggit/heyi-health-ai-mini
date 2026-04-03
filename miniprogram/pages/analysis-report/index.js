@@ -201,7 +201,7 @@ Page({
     wx.redirectTo({ url: "/pages/analysis-report/index?logged=1&from=report-login" })
   },
   openDietPlan() {
-    wx.navigateTo({ url: "/pages/my-plan/index" })
+    wx.switchTab({ url: "/pages/diet/index" })
   },
   downloadReport() {
     wx.showToast({

@@ -55,7 +55,7 @@ const MOCK_HOME_DATA = {
       title: "AI趣味分析",
       description: "3分钟分析生活趋势",
       styleType: "robot",
-      bgImage: "/assets/home/shortcut_bg_right.png",
+      bgImage: "/assets/home/shortcut_bg_left.png",
       checkCircle: "/assets/home/shortcut_icon_circle_left.png",
       checkTick: "/assets/home/shortcut_icon_tick_left.png",
       path: "/pages/analysis/index"
@@ -68,7 +68,7 @@ const MOCK_HOME_DATA = {
       bgImage: "/assets/home/shortcut_bg_right.png",
       checkCircle: "/assets/home/shortcut_icon_circle_right.png",
       checkTick: "/assets/home/shortcut_icon_tick_right.png",
-      path: "/pages/analysis-quiz/index"
+      path: "/pages/constitution-assessment/index"
     }
   ],
   recommendation: {

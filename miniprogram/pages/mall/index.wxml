@@ -17,28 +17,19 @@
         type="text"
         value="{{searchKeyword}}"
         placeholder="{{searchPlaceholder}}"
+        placeholder-style="color: #94a3b8;"
         bindinput="onInputSearch"
       />
     </view>
-    <view class="mall-cart card-panel">
+    <view class="mall-cart card-panel" bindtap="openCart">
       <image class="mall-cart__icon" src="/assets/mall/icon-cart.png" mode="aspectFit" />
+      <view class="mall-cart__badge" wx:if="{{cartCount > 0}}">
+        <text>{{cartCount > 99 ? '99+' : cartCount}}</text>
+      </view>
     </view>
   </view>
 
   <view class="mall-content">
-    <view class="mall-tabs">
-      <block wx:for="{{categories}}" wx:key="*this">
-        <view
-          class="mall-tab {{index === activeCategory ? 'mall-tab--active' : ''}}"
-          data-index="{{index}}"
-          bindtap="selectCategory"
-        >
-          <text>{{item}}</text>
-          <view wx:if="{{index === activeCategory}}" class="mall-tab__dec"></view>
-        </view>
-      </block>
-    </view>
-
     <view class="mall-banner card-panel">
       <swiper
         class="mall-banner-swiper"
@@ -64,9 +55,26 @@
       </view>
     </view>
 
+    <view class="mall-tabs">
+      <block wx:for="{{categories}}" wx:key="key">
+        <view
+          class="mall-tab {{index === activeCategory ? 'mall-tab--active' : ''}}"
+          data-index="{{index}}"
+          data-key="{{item.key}}"
+          bindtap="selectCategory"
+        >
+          <text>{{item.label}}</text>
+          <view wx:if="{{index === activeCategory}}" class="mall-tab__dec"></view>
+        </view>
+      </block>
+    </view>
+
     <view class="mall-grid">
       <block wx:for="{{products}}" wx:key="id">
-        <view class="card-panel mall-product">
+        <view class="card-panel mall-product" data-id="{{item.id}}" bindtap="openProduct">
+          <view wx:if="{{item.badge}}" class="mall-product__badge mall-product__badge--{{item.badgeType ? item.badgeType : 'new'}}">
+            {{item.badge}}
+          </view>
           <view class="mall-product__thumb-wrap">
             <image class="mall-product__thumb" src="{{item.image}}" mode="aspectFit" />
           </view>
@@ -84,10 +92,11 @@
               <text class="mall-product__price-main">{{item.price}}</text>
               <text class="mall-product__price-unit">{{item.unit}}</text>
             </view>
-            <view class="mall-product__add" data-id="{{item.id}}" bindtap="addToCart">+</view>
+            <view class="mall-product__add" data-id="{{item.id}}" catchtap="addToCart">+</view>
           </view>
         </view>
       </block>
+      <view class="mall-empty" wx:if="{{products.length === 0}}">暂无符合条件的商品</view>
     </view>
   </view>
 </view>

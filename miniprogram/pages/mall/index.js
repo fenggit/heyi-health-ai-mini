@@ -4,7 +4,11 @@ const MOCK_MALL_DATA = {
   mallTitle: "合一商城",
   city: "成都市",
   searchPlaceholder: "关键词搜索",
-  categories: ["有机果蔬", "超级食物", "便捷配方包"],
+  categories: [
+    { key: "organic", label: "有机果蔬" },
+    { key: "superfood", label: "超级食物" },
+    { key: "ready-pack", label: "便捷配方包" }
+  ],
   activityBanners: [
     {
       id: "tea-experience",
@@ -19,6 +23,9 @@ const MOCK_MALL_DATA = {
     {
       id: "jujube",
       name: "有机红枣",
+      categories: ["organic"],
+      badge: "新品",
+      badgeType: "new",
       score: "4.8",
       stock: 156,
       price: "28.8",
@@ -28,6 +35,9 @@ const MOCK_MALL_DATA = {
     {
       id: "goji",
       name: "宁夏枸杞",
+      categories: ["organic", "superfood"],
+      badge: "推荐",
+      badgeType: "recommend",
       score: "4.9",
       stock: 19,
       price: "35",
@@ -37,6 +47,9 @@ const MOCK_MALL_DATA = {
     {
       id: "carrot",
       name: "有机胡萝卜",
+      categories: ["organic", "ready-pack"],
+      badge: "热销",
+      badgeType: "hot",
       score: "4.8",
       stock: 236,
       price: "12.8",
@@ -46,13 +59,15 @@ const MOCK_MALL_DATA = {
     {
       id: "apple",
       name: "新鲜苹果",
+      categories: ["organic", "ready-pack"],
       score: "4.6",
       stock: 178,
       price: "19.9",
       unit: "/500g",
       image: "/assets/mall/product-apple.png"
     }
-  ]
+  ],
+  cartCount: 32
 }
 
 function fetchMallData() {
@@ -69,8 +84,10 @@ Page({
     searchKeyword: "",
     categories: [],
     activeCategory: 0,
+    activeCategoryKey: "",
     bannerCurrent: 0,
     activityBanners: [],
+    sourceProducts: [],
     products: [],
     cartCount: 0
   },
@@ -91,22 +108,71 @@ Page({
   },
   async loadPageData() {
     const payload = await fetchMallData()
-    this.setData(payload)
+    const { categories = [], products = [] } = payload
+    const activeCategoryKey = categories.length ? categories[0].key : ""
+    this.setData(
+      {
+        ...payload,
+        sourceProducts: products,
+        activeCategoryKey
+      },
+      () => {
+        this.applyProductFilters()
+      }
+    )
   },
   onInputSearch(e) {
-    this.setData({
-      searchKeyword: e.detail.value
-    })
+    this.setData(
+      {
+        searchKeyword: e.detail.value
+      },
+      () => {
+        this.applyProductFilters()
+      }
+    )
   },
   selectCategory(e) {
-    const { index } = e.currentTarget.dataset
-    this.setData({
-      activeCategory: Number(index)
-    })
+    const { index, key } = e.currentTarget.dataset
+    this.setData(
+      {
+        activeCategory: Number(index),
+        activeCategoryKey: key || ""
+      },
+      () => {
+        this.applyProductFilters()
+      }
+    )
   },
   onBannerChange(e) {
     this.setData({
       bannerCurrent: e.detail.current
+    })
+  },
+  applyProductFilters() {
+    const { sourceProducts, searchKeyword, activeCategoryKey } = this.data
+    const normalizedKeyword = (searchKeyword || "").trim().toLowerCase()
+    const nextProducts = sourceProducts.filter((product) => {
+      const categoryList = Array.isArray(product.categories) ? product.categories : [product.category]
+      const inCategory = !activeCategoryKey || categoryList.includes(activeCategoryKey)
+      if (!inCategory) return false
+      if (!normalizedKeyword) return true
+      const matchedText = `${product.name}${product.badge || ""}`.toLowerCase()
+      return matchedText.includes(normalizedKeyword)
+    })
+    this.setData({
+      products: nextProducts
+    })
+  },
+  openCart() {
+    wx.navigateTo({
+      url: "/pages/cart/index"
+    })
+  },
+  openProduct(e) {
+    const { id } = e.currentTarget.dataset
+    wx.showToast({
+      title: id ? "已选中商品" : "商品详情开发中",
+      icon: "none"
     })
   },
   addToCart(e) {

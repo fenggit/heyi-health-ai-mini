@@ -1,0 +1,372 @@
+<view class="cart-page design-page page-with-nav">
+  <image class="page-bg" src="/assets/bg_img.png" mode="widthFix" />
+
+  <view class="mini-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="mini-nav__inner" style="height: {{navBarHeight}}px;">
+      <view class="mini-nav__back" bindtap="handleBack">
+        <image class="mini-nav__back-icon" src="/assets/analysis/nav_back.png" mode="aspectFit" />
+      </view>
+      <view class="mini-nav__title">{{navTitle}}</view>
+    </view>
+    <view
+      class="mini-nav__capsule-space"
+      style="width: {{menuWidth}}px; height: {{menuHeight}}px; right: {{menuRight}}px; top: {{menuTop}}px;"
+    ></view>
+  </view>
+
+  <view class="page-top-gap" style="height: {{topInset}}px;"></view>
+
+  <view class="cart-content">
+    <view class="cart-address" bindtap="changeAddress">
+      <image class="cart-address__icon" src="/assets/mall/icon-location.png" mode="aspectFit" />
+      <text class="cart-address__text">{{deliveryAddress}}</text>
+      <view class="cart-address__switch">
+        <text class="cart-address__switch-text">切换</text>
+        <text class="cart-address__switch-arrow">›</text>
+      </view>
+    </view>
+
+    <block wx:for="{{items}}" wx:key="id">
+      <view class="glass-card cart-item">
+        <view class="cart-item__select" data-id="{{item.id}}" bindtap="toggleItem">
+          <view class="cart-check {{item.selected ? 'cart-check--active' : ''}}">
+            <text wx:if="{{item.selected}}" class="cart-check__mark">✓</text>
+          </view>
+        </view>
+
+        <image class="cart-item__image" src="{{item.image}}" mode="aspectFill" />
+
+        <view class="cart-item__content">
+          <text class="cart-item__name">{{item.name}}</text>
+          <view class="cart-item__tags">
+            <block wx:for="{{item.tags}}" wx:key="*this" wx:for-item="tag">
+              <text class="cart-item__tag">{{tag}}</text>
+            </block>
+          </view>
+          <view class="cart-item__price">
+            <text class="cart-item__price-symbol">￥</text>
+            <text class="cart-item__price-main">{{item.price}}</text>
+            <text class="cart-item__price-unit">/份</text>
+          </view>
+        </view>
+
+        <view class="cart-item__stepper">
+          <view class="cart-stepper-btn" data-id="{{item.id}}" bindtap="decreaseCount">-</view>
+          <text class="cart-stepper-value">{{item.count}}</text>
+          <view class="cart-stepper-btn cart-stepper-btn--plus" data-id="{{item.id}}" bindtap="increaseCount">+</view>
+        </view>
+      </view>
+    </block>
+
+    <view class="glass-card cart-coupon" bindtap="openCouponPicker">
+      <text class="cart-coupon__label">优惠券</text>
+      <view class="cart-coupon__tail">
+        <text wx:if="{{selectedCouponId}}" class="cart-coupon__value cart-coupon__value--discount">-￥{{couponDiscountText}}</text>
+        <text wx:else class="cart-coupon__value">选择优惠券</text>
+        <text class="cart-coupon__arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <view
+    wx:if="{{showCouponPicker}}"
+    class="cart-coupon-mask"
+    catchtap="closeCouponPicker"
+  ></view>
+  <view
+    wx:if="{{showCouponPicker}}"
+    class="cart-coupon-sheet"
+    catchtap="stopCouponPickerTap"
+  >
+    <view class="cart-coupon-sheet__title">选择使用优惠券</view>
+
+    <view class="cart-coupon-sheet__tabs">
+      <view
+        class="cart-coupon-sheet__tab {{couponTab === 'available' ? 'cart-coupon-sheet__tab--active' : ''}}"
+        data-tab="available"
+        bindtap="switchCouponTab"
+      >
+        <text>可用优惠券</text>
+        <text class="cart-coupon-sheet__tab-count">({{availableCoupons.length}})</text>
+        <view wx:if="{{couponTab === 'available'}}" class="cart-coupon-sheet__tab-line"></view>
+      </view>
+      <view
+        class="cart-coupon-sheet__tab {{couponTab === 'unavailable' ? 'cart-coupon-sheet__tab--active' : ''}}"
+        data-tab="unavailable"
+        bindtap="switchCouponTab"
+      >
+        <text>不可用优惠券</text>
+        <text class="cart-coupon-sheet__tab-count">({{unavailableCoupons.length}})</text>
+        <view wx:if="{{couponTab === 'unavailable'}}" class="cart-coupon-sheet__tab-line"></view>
+      </view>
+    </view>
+
+    <view class="cart-coupon-sheet__tip">
+      <text>您已选中优惠券</text>
+      <text class="cart-coupon-sheet__tip-red">{{couponPickedCount}}</text>
+      <text>张，共抵扣</text>
+      <text class="cart-coupon-sheet__tip-red">￥{{couponPickedAmountFixed}}</text>
+    </view>
+
+    <view
+      wx:if="{{couponTab === 'available'}}"
+      class="cart-coupon-sheet__list"
+    >
+      <block wx:for="{{availableCoupons}}" wx:key="id">
+        <view class="cart-picker-item" data-id="{{item.id}}" bindtap="chooseCoupon">
+          <view class="cart-picker-item__amount">
+            <view class="cart-picker-item__money">
+              <text class="cart-picker-item__money-symbol">￥</text>
+              <text class="cart-picker-item__money-main">{{item.amount}}</text>
+            </view>
+            <text class="cart-picker-item__amount-rule">满{{item.threshold}}元可用</text>
+          </view>
+          <view class="cart-picker-item__divider">
+            <view class="cart-picker-item__divider-line"></view>
+          </view>
+          <view class="cart-picker-item__info">
+            <text class="cart-picker-item__title">满{{item.threshold}}减{{item.amount}}元</text>
+            <text class="cart-picker-item__expire">有效期至 {{item.expireDate}}</text>
+          </view>
+          <view class="cart-picker-item__check {{draftCouponId === item.id ? 'cart-picker-item__check--active' : ''}}">
+            <text wx:if="{{draftCouponId === item.id}}" class="cart-picker-item__check-mark">✓</text>
+          </view>
+        </view>
+      </block>
+
+      <view class="cart-picker-none" bindtap="chooseNoCoupon">
+        <text class="cart-picker-none__text">不使用优惠券</text>
+        <view class="cart-picker-item__check {{!draftCouponId ? 'cart-picker-item__check--active' : ''}}">
+          <text wx:if="{{!draftCouponId}}" class="cart-picker-item__check-mark">✓</text>
+        </view>
+      </view>
+    </view>
+
+    <view
+      wx:if="{{couponTab === 'unavailable'}}"
+      class="cart-coupon-sheet__list"
+    >
+      <block wx:for="{{unavailableCoupons}}" wx:key="id">
+        <view class="cart-picker-item cart-picker-item--disabled">
+          <view class="cart-picker-item__amount">
+            <view class="cart-picker-item__money">
+              <text class="cart-picker-item__money-symbol">￥</text>
+              <text class="cart-picker-item__money-main">{{item.amount}}</text>
+            </view>
+            <text class="cart-picker-item__amount-rule">满{{item.threshold}}元可用</text>
+          </view>
+          <view class="cart-picker-item__divider">
+            <view class="cart-picker-item__divider-line"></view>
+          </view>
+          <view class="cart-picker-item__info">
+            <text class="cart-picker-item__title">满{{item.threshold}}减{{item.amount}}元</text>
+            <text class="cart-picker-item__expire">有效期至 {{item.expireDate}}</text>
+          </view>
+        </view>
+      </block>
+    </view>
+
+    <view class="cart-coupon-sheet__actions">
+      <view class="cart-coupon-sheet__btn cart-coupon-sheet__btn--cancel" bindtap="cancelCouponPicker">取消</view>
+      <view class="cart-coupon-sheet__btn cart-coupon-sheet__btn--confirm" bindtap="confirmCouponPicker">确定</view>
+    </view>
+    <view class="cart-coupon-sheet__safe"></view>
+  </view>
+
+  <view
+    wx:if="{{showAmountDetail}}"
+    class="cart-detail-mask"
+    catchtap="closeAmountDetail"
+  ></view>
+  <view
+    wx:if="{{showAmountDetail}}"
+    class="cart-detail-sheet"
+    catchtap="stopDetailSheetTap"
+  >
+    <view class="cart-detail-sheet__title">金额明细</view>
+    <view class="cart-detail-thumbs">
+      <block wx:for="{{detailItems}}" wx:key="id">
+        <view class="cart-detail-thumb">
+          <image class="cart-detail-thumb__img" src="{{item.image}}" mode="aspectFill" />
+          <view class="cart-detail-thumb__count">x{{item.count}}</view>
+        </view>
+      </block>
+    </view>
+    <view class="cart-detail-rows">
+      <view class="cart-detail-row">
+        <text class="cart-detail-row__label">商品总价</text>
+        <view class="cart-detail-row__value">
+          <text class="cart-detail-row__symbol">￥</text>
+          <text class="cart-detail-row__amount">{{subtotalAmount}}</text>
+        </view>
+      </view>
+      <view class="cart-detail-row">
+        <text class="cart-detail-row__label">配送费</text>
+        <view class="cart-detail-row__value">
+          <text class="cart-detail-row__symbol">￥</text>
+          <text class="cart-detail-row__amount">{{shippingFeeText}}</text>
+        </view>
+      </view>
+      <view class="cart-detail-row">
+        <text class="cart-detail-row__label">优惠券</text>
+        <view class="cart-detail-row__value cart-detail-row__value--discount">
+          <text class="cart-detail-row__minus">-</text>
+          <text class="cart-detail-row__symbol">￥</text>
+          <text class="cart-detail-row__amount">{{effectiveDiscountText}}</text>
+        </view>
+      </view>
+      <view class="cart-detail-row cart-detail-row--total">
+        <text class="cart-detail-row__label">合计金额</text>
+        <view class="cart-detail-row__value">
+          <text class="cart-detail-row__symbol">￥</text>
+          <text class="cart-detail-row__amount">{{payableAmountText}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="cart-footer">
+    <view class="cart-footer__main">
+      <view class="cart-footer__select" bindtap="toggleAll">
+        <view class="cart-check {{allSelected ? 'cart-check--active' : ''}}">
+          <text wx:if="{{allSelected}}" class="cart-check__mark">✓</text>
+        </view>
+        <text class="cart-footer__select-text">全选</text>
+      </view>
+
+      <view class="cart-footer__summary">
+        <view class="cart-footer__line">
+          <text class="cart-footer__label">券后合计：</text>
+          <text class="cart-footer__symbol">￥</text>
+          <text class="cart-footer__amount">{{payableAmountText}}</text>
+          <text class="cart-footer__detail" bindtap="openAmountDetail">明细</text>
+          <text class="cart-footer__detail-arrow" bindtap="openAmountDetail">{{showAmountDetail ? '⌄' : '⌃'}}</text>
+        </view>
+        <view class="cart-footer__line cart-footer__line--sub">
+          <text>免配送费</text>
+          <text class="cart-footer__divider"></text>
+          <text class="cart-footer__discount">已减￥{{effectiveDiscountText}}</text>
+        </view>
+      </view>
+
+      <view class="cart-footer__checkout" bindtap="checkout">结算 ({{selectedItemCount}})</view>
+    </view>
+    <view class="cart-footer__safe"></view>
+  </view>
+
+  <!-- 地址选择弹窗 -->
+  <view wx:if="{{showAddressPicker}}" class="cart-addr-mask" catchtap="closeAddressPicker"></view>
+  <view wx:if="{{showAddressPicker}}" class="cart-addr-sheet" catchtap="stopAddressPickerTap">
+    <view class="cart-addr-sheet__title">选择收货地址</view>
+
+    <view class="cart-addr-sheet__header">
+      <text class="cart-addr-sheet__label">我的地址</text>
+      <view class="cart-addr-sheet__add" bindtap="openAddressForm">
+        <text class="cart-addr-sheet__add-icon">+</text>
+        <text class="cart-addr-sheet__add-text">新增</text>
+      </view>
+    </view>
+
+    <view class="cart-addr-sheet__list">
+      <block wx:for="{{addressList}}" wx:key="id">
+        <view
+          class="cart-addr-item {{draftAddressId === item.id ? 'cart-addr-item--active' : ''}}"
+          data-id="{{item.id}}"
+          bindtap="selectAddress"
+        >
+          <view class="cart-addr-item__top">
+            <text class="cart-addr-item__name">{{item.name}}</text>
+            <text class="cart-addr-item__phone">{{item.phone}}</text>
+            <text class="cart-addr-item__edit-icon" data-id="{{item.id}}" catchtap="openEditAddressForm">✎</text>
+          </view>
+          <text class="cart-addr-item__address">{{item.address}}</text>
+          <view class="cart-addr-item__divider"></view>
+          <view class="cart-addr-item__bottom">
+            <view class="cart-addr-item__default">
+              <view class="cart-addr-check {{item.isDefault ? 'cart-addr-check--active' : ''}}">
+                <text wx:if="{{item.isDefault}}" class="cart-addr-check__mark">✓</text>
+              </view>
+              <text class="cart-addr-item__default-text {{item.isDefault ? 'cart-addr-item__default-text--active' : ''}}">默认地址</text>
+            </view>
+            <view class="cart-addr-item__delete" data-id="{{item.id}}" catchtap="deleteAddress">
+              <text class="cart-addr-item__delete-text">删除</text>
+            </view>
+          </view>
+        </view>
+      </block>
+    </view>
+
+    <view class="cart-addr-sheet__actions">
+      <view class="cart-addr-sheet__btn cart-addr-sheet__btn--cancel" bindtap="cancelAddressPicker">取消</view>
+      <view class="cart-addr-sheet__btn cart-addr-sheet__btn--confirm" bindtap="confirmAddressPicker">确定</view>
+    </view>
+    <view class="cart-addr-sheet__safe"></view>
+  </view>
+
+  <!-- 新增地址弹窗 -->
+  <view wx:if="{{showAddressForm}}" class="cart-addr-mask cart-addr-mask--top" catchtap="closeAddressForm"></view>
+  <view wx:if="{{showAddressForm}}" class="cart-addr-sheet cart-addr-sheet--top" catchtap="stopAddressPickerTap">
+    <view class="cart-addr-sheet__title">{{editAddressId ? '编辑收货地址' : '新增收货地址'}}</view>
+
+    <view class="cart-addr-form">
+      <!-- 收货地址 -->
+      <view class="cart-addr-form__row">
+        <text class="cart-addr-form__label">收货地址：</text>
+        <input
+          class="cart-addr-form__input"
+          placeholder="请输入详细地址"
+          placeholder-class="cart-addr-form__placeholder"
+          data-field="address"
+          bindinput="onNewAddressInput"
+          value="{{newAddress.address}}"
+        />
+      </view>
+      <!-- 收货人 -->
+      <view class="cart-addr-form__row">
+        <text class="cart-addr-form__label">收货人：</text>
+        <input
+          class="cart-addr-form__input"
+          placeholder="请输入姓名"
+          placeholder-class="cart-addr-form__placeholder"
+          data-field="name"
+          bindinput="onNewAddressInput"
+          value="{{newAddress.name}}"
+        />
+        <view class="cart-addr-form__gender">
+          <view class="cart-addr-form__gender-item" data-gender="female" bindtap="onGenderTap">
+            <view class="cart-addr-form__radio {{newAddress.gender === 'female' ? 'cart-addr-form__radio--active' : ''}}">
+              <text wx:if="{{newAddress.gender === 'female'}}" class="cart-addr-form__radio-mark">✓</text>
+            </view>
+            <text class="cart-addr-form__gender-text {{newAddress.gender === 'female' ? '' : 'cart-addr-form__gender-text--inactive'}}">女士</text>
+          </view>
+          <view class="cart-addr-form__gender-item" data-gender="male" bindtap="onGenderTap">
+            <view class="cart-addr-form__radio {{newAddress.gender === 'male' ? 'cart-addr-form__radio--active' : ''}}">
+              <text wx:if="{{newAddress.gender === 'male'}}" class="cart-addr-form__radio-mark">✓</text>
+            </view>
+            <text class="cart-addr-form__gender-text {{newAddress.gender !== 'male' ? 'cart-addr-form__gender-text--inactive' : ''}}">先生</text>
+          </view>
+        </view>
+      </view>
+      <!-- 手机号 -->
+      <view class="cart-addr-form__row">
+        <text class="cart-addr-form__label">手机号：</text>
+        <input
+          class="cart-addr-form__input"
+          placeholder="请输入手机号"
+          placeholder-class="cart-addr-form__placeholder"
+          type="number"
+          data-field="phone"
+          bindinput="onNewAddressInput"
+          value="{{newAddress.phone}}"
+        />
+      </view>
+    </view>
+
+    <view class="cart-addr-sheet__actions">
+      <view class="cart-addr-sheet__btn cart-addr-sheet__btn--cancel" bindtap="closeAddressForm">取消</view>
+      <view class="cart-addr-sheet__btn cart-addr-sheet__btn--confirm" bindtap="saveNewAddress">保存</view>
+    </view>
+    <view class="cart-addr-sheet__safe"></view>
+  </view>
+
+</view>
