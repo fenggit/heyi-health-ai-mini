@@ -38,7 +38,10 @@ Page({
       content: '确认退出当前账号吗？',
       success: (res) => {
         if (res.confirm) {
-          wx.showToast({ title: '已退出（演示）', icon: 'none' })
+          wx.removeStorageSync('token')
+          const app = getApp()
+          if (app) app.globalData.isLoggedIn = false
+          wx.reLaunch({ url: '/pages/login/index' })
         }
       }
     })
