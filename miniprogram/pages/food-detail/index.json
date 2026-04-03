@@ -1,0 +1,6 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "title-view": "/components/title-view/index"
+  }
+}

@@ -79,7 +79,7 @@
       </block>
     </view>
 
-    <view class="card-panel section-block">
+    <view class="card-panel section-block" bindtap="openIngredientPackDetail">
       <view class="section-head">
         <text class="section-title">{{recommendation.title}}</text>
         <text class="section-action">{{recommendation.actionText}} →</text>

@@ -22,7 +22,8 @@
     "pages/analysis-quiz/index",
     "pages/analysis-auth/index",
     "pages/analysis-upload/index",
-    "pages/analysis-report/index"
+    "pages/analysis-report/index",
+    "pages/food-detail/index"
 
   ],
   "window": {

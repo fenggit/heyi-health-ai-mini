@@ -1,0 +1,167 @@
+<view class="dp design-page">
+  <image class="dp-bg" src="/assets/bg_img.png" mode="widthFix" />
+
+  <!-- 小程序标准 mini-nav，返回箭头 + 标题并排 -->
+  <view class="mini-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="mini-nav__inner" style="height: {{navBarHeight}}px;">
+      <view class="mini-nav__back" bindtap="goBack">
+        <image class="mini-nav__back-icon" src="/assets/analysis/nav_back.png" mode="aspectFit" />
+        <text class="dp-nav__title">详情</text>
+      </view>
+    </view>
+    <view
+      class="mini-nav__capsule-space"
+      style="width: {{menuWidth}}px; height: {{menuHeight}}px; right: {{menuRight}}px; top: {{menuTop}}px;"
+    ></view>
+  </view>
+
+  <view class="page-top-gap" style="height: {{topInset}}px;"></view>
+
+  <!-- 主图卡片 -->
+  <view class="dp-hero-card">
+    <view class="dp-hero-img-wrap">
+      <image class="dp-hero-img" src="{{packInfo.image}}" mode="aspectFill" />
+    </view>
+
+    <!-- 标题（title-view 组件） -->
+    <view class="dp-title-row">
+      <title-view text="{{packInfo.name}}" />
+    </view>
+
+    <!-- 标签 -->
+    <view class="dp-tags">
+      <block wx:for="{{packInfo.tags}}" wx:key="*this">
+        <view class="dp-tag">{{item}}</view>
+      </block>
+    </view>
+
+    <!-- 描述 -->
+    <text class="dp-desc">{{packInfo.description}}</text>
+
+    <!-- 价格区：未选择（qty===1且未展开）只显示价格+加购；已选择显示减-数字-加 -->
+    <view class="dp-price-row">
+      <view class="dp-price">
+        <text class="dp-price__yen">￥</text>
+        <text class="dp-price__num">{{packInfo.price}}</text>
+        <text class="dp-price__unit">/包</text>
+      </view>
+      <!-- 未选择：只有加购按钮 -->
+      <view wx:if="{{!qtySelected}}" class="dp-btn-add" bindtap="onFirstAdd">
+        <view class="dp-btn-add__h"></view>
+        <view class="dp-btn-add__v"></view>
+      </view>
+      <!-- 已选择：减 数字 加 -->
+      <view wx:else class="dp-qty">
+        <view class="dp-qty__minus" bindtap="decreaseQty">
+          <view class="dp-qty__minus-line"></view>
+        </view>
+        <text class="dp-qty__num">{{qty}}</text>
+        <view class="dp-qty__plus" bindtap="increaseQty">
+          <view class="dp-qty__plus-h"></view>
+          <view class="dp-qty__plus-v"></view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 详情大卡片 -->
+  <view class="dp-detail-card">
+
+    <!-- 食材包配比 -->
+    <view class="dp-section">
+      <view class="dp-section__head">
+        <title-view text="食材包配比" />
+        <view class="dp-kcal">
+          <text class="dp-kcal__text">{{packInfo.kcal}}Kcal</text>
+        </view>
+      </view>
+      <view class="dp-tip">
+        <text class="dp-tip__text">{{packInfo.tipText}}</text>
+      </view>
+      <view class="dp-ingredients">
+        <block wx:for="{{packInfo.ingredients}}" wx:key="name">
+          <view class="dp-ing-row">
+            <text class="dp-ing-row__name">{{item.name}}</text>
+            <view class="dp-ing-row__line"></view>
+            <text class="dp-ing-row__amount">{{item.amount}}</text>
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <!-- 制作步骤 -->
+    <view class="dp-section">
+      <title-view text="制作步骤" />
+      <view class="dp-steps">
+        <block wx:for="{{packInfo.steps}}" wx:key="index">
+          <view class="dp-step">
+            <view class="dp-step__circle">
+              <text class="dp-step__num">{{index + 1}}</text>
+            </view>
+            <text class="dp-step__text">{{item}}</text>
+            <view class="dp-step__vline" wx:if="{{index < packInfo.steps.length - 1}}"></view>
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <!-- 功效说明 -->
+    <view class="dp-section">
+      <title-view text="功效说明" />
+      <view class="dp-effects">
+        <block wx:for="{{packInfo.effects}}" wx:key="*this">
+          <view class="dp-effect-row">
+            <view class="dp-effect-row__check">
+              <view class="dp-effect-row__tick"></view>
+            </view>
+            <text class="dp-effect-row__text">{{item}}</text>
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <!-- 视频教程 -->
+    <view class="dp-section dp-section--last">
+      <title-view text="视频教程" />
+      <view class="dp-video" bindtap="playVideo">
+        <image class="dp-video__cover" src="{{packInfo.image}}" mode="aspectFill" />
+        <view class="dp-video__mask"></view>
+        <view class="dp-video__play">
+          <view class="dp-video__play-icon"></view>
+        </view>
+      </view>
+    </view>
+
+  </view>
+
+  <!-- 底部占位：98rpx内容高度 + 系统安全区 -->
+  <view style="height: calc(98rpx + {{safeAreaBottom}}px);"></view>
+
+  <!-- 底部 TabBar：内容区98rpx，下方系统手势区白色背景 -->
+  <view class="dp-bar" style="padding-bottom: {{safeAreaBottom}}px;">
+    <!-- 购物车 -->
+    <view class="dp-bar__item" bindtap="openCart">
+      <view class="dp-bar__cart-wrap">
+        <image class="dp-bar__cart-img" src="/assets/mall/icon-cart.png" mode="aspectFit" />
+        <view class="dp-bar__badge" wx:if="{{cartCount > 0}}">
+          <text class="dp-bar__badge-text">{{cartCount > 99 ? '99+' : cartCount}}</text>
+        </view>
+      </view>
+      <text class="dp-bar__label">购物车</text>
+    </view>
+
+    <!-- 点赞 / 已赞（同一元素，两种状态） -->
+    <view class="dp-bar__item" bindtap="toggleLike">
+      <view class="dp-bar__like-wrap">
+        <view class="dp-bar__like-icon {{isLiked ? 'dp-bar__like-icon--on' : ''}}"></view>
+      </view>
+      <text class="dp-bar__label {{isLiked ? 'dp-bar__label--liked' : ''}}">{{isLiked ? '已赞' : '点赞'}}</text>
+    </view>
+
+    <!-- 分享 -->
+    <view class="dp-bar__item" bindtap="onShare">
+      <view class="dp-bar__share-icon"></view>
+      <text class="dp-bar__label">分享</text>
+    </view>
+  </view>
+</view>

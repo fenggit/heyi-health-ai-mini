@@ -170,9 +170,8 @@ Page({
   },
   openProduct(e) {
     const { id } = e.currentTarget.dataset
-    wx.showToast({
-      title: id ? "已选中商品" : "商品详情开发中",
-      icon: "none"
+    wx.navigateTo({
+      url: `/pages/food-detail/index?id=${id || ""}`
     })
   },
   addToCart(e) {

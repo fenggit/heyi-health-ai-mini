@@ -142,5 +142,10 @@ Page({
     const { path } = e.currentTarget.dataset
     if (!path) return
     wx.navigateTo({ url: path })
+  },
+  openIngredientPackDetail() {
+    wx.navigateTo({
+      url: "/pages/food-detail/index"
+    })
   }
 })
