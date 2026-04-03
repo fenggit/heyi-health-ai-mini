@@ -1,0 +1,41 @@
+<view class="login-page">
+  <!-- 背景图 -->
+  <image class="login-bg" src="/assets/bg_img.png" mode="scaleToFill" />
+
+  <!-- 上半区：Logo 居中 -->
+  <view class="login-top">
+    <view class="login-logo-wrap">
+      <view class="login-logo">
+        <text class="login-logo-text">合</text>
+      </view>
+      <text class="login-app-name">合一食养</text>
+    </view>
+  </view>
+
+  <!-- 下半区：按钮+协议垂直居中 -->
+  <view class="login-bottom">
+    <view class="login-footer">
+      <button
+        class="login-btn {{agreed ? '' : 'login-btn--disabled'}}"
+        open-type="{{agreed ? 'getPhoneNumber' : ''}}"
+        bindgetphonenumber="onGetPhoneNumber"
+        bindtap="onLoginTap"
+      >微信授权登录</button>
+
+      <view class="login-agreement" bindtap="toggleAgreed">
+        <view class="login-checkbox {{agreed ? 'login-checkbox--checked' : ''}}">
+          <text wx:if="{{agreed}}" class="login-checkbox-tick">✓</text>
+        </view>
+        <text class="login-agreement-text">我已阅读并接受<text class="login-link" catchtap="openUserAgreement">《用户协议》</text>、<text class="login-link" catchtap="openPrivacyPolicy">《隐私协议》</text></text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 协议弹窗 -->
+<agreement-popup
+  show="{{popupShow}}"
+  title="{{popupTitle}}"
+  content="{{popupContent}}"
+  bind:confirm="onPopupConfirm"
+/>

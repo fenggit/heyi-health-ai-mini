@@ -1,0 +1,81 @@
+/* 设计稿 375px，1px = 2rpx */
+
+.popup-wrap {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 750rpx;
+  height: 100%;
+  z-index: 999;
+}
+
+/* 遮罩：#1e293b 50% opacity */
+.popup-mask {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(30, 41, 59, 0.5);
+}
+
+/* 白色卡片，从底部 548px 高度弹出 */
+.popup-card {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 750rpx;
+  height: 1096rpx; /* 548px */
+  background: #ffffff;
+  border-radius: 24rpx 24rpx 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 56rpx 68rpx;
+  box-sizing: border-box;
+}
+
+/* 标题 */
+.popup-title {
+  margin-top: 48rpx;
+  color: #1e293b;
+  font-size: 32rpx;
+  font-weight: 700;
+  line-height: 30rpx;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* 可滚动内容区，高度 441px = 882rpx */
+.popup-scroll {
+  flex: 1;
+  width: 638rpx;
+  margin-top: 40rpx;
+  overflow: hidden;
+}
+
+.popup-content {
+  display: block;
+  color: #1e293b;
+  font-size: 28rpx;
+  line-height: 42rpx;
+}
+
+/* 渐变确认按钮 */
+.popup-btn {
+  flex-shrink: 0;
+  width: 638rpx;
+  height: 80rpx;
+  margin-top: 32rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(126deg, #4EFFE2 0%, #CEF94C 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-btn-text {
+  color: #1e293b;
+  font-size: 32rpx;
+  font-weight: 700;
+}

@@ -1,0 +1,6 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "agreement-popup": "/components/agreement-popup/index"
+  }
+}

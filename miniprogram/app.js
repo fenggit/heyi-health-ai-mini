@@ -5,10 +5,22 @@ App({
       navBarHeight: 44,
       headerHeight: 64,
       safeBottom: 0
-    }
+    },
+    isLoggedIn: false
   },
   onLaunch() {
     this.globalData.layout = this.computeLayout()
+    this.checkLogin()
+  },
+  checkLogin() {
+    // 检查本地是否有 token，有则视为已登录直接进首页
+    const token = wx.getStorageSync('token')
+    if (!token) {
+      // 未登录，跳转登录页（pages 第一项已是 login，默认启动即登录页，无需额外跳转）
+      return
+    }
+    this.globalData.isLoggedIn = true
+    wx.switchTab({ url: '/pages/home/index' })
   },
   computeLayout() {
     const windowInfo = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()

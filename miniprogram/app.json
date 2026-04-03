@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/login/index",
     "pages/home/index",
     "pages/activity-detail/index",
     "pages/mall/index",

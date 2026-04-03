@@ -1,0 +1,158 @@
+/* 设计稿 375×812，1px = 2rpx */
+
+.login-page {
+  position: relative;
+  width: 750rpx;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 背景图全屏 */
+.login-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 750rpx;
+  height: 100%;
+  z-index: 0;
+}
+
+/* 上半区：50%高度，logo 垂直水平居中 */
+.login-top {
+  position: relative;
+  z-index: 1;
+  height: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 下半区：50%高度，footer 从顶部开始排列，水平居中 */
+.login-bottom {
+  position: relative;
+  z-index: 1;
+  height: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 60rpx;
+}
+
+/* Logo 区域 */
+.login-logo-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.login-logo {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 48rpx;
+  background: linear-gradient(135deg, #7CEE89 0%, #2BC383 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-logo-text {
+  color: #ffffff;
+  font-size: 80rpx;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.login-app-name {
+  margin-top: 30rpx;
+  color: #1e293b;
+  font-size: 40rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+  text-align: center;
+}
+
+/* 底部操作区，左右 48rpx */
+.login-footer {
+  width: 750rpx;
+  padding: 0 48rpx;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* 登录按钮 */
+.login-btn {
+  display: block;
+  width: 100%;
+  height: 96rpx;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 24rpx;
+  background: linear-gradient(126deg, #4EFFE2 0%, #CEF94C 100%);
+  color: #1e293b;
+  font-size: 32rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+  line-height: 96rpx;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.login-btn::after {
+  border: none;
+}
+
+.login-btn--disabled {
+  opacity: 0.65;
+}
+
+/* 协议行，按钮下方 40rpx */
+.login-agreement {
+  margin-top: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-checkbox {
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 6rpx;
+  border: 2rpx solid #94a3b8;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.login-checkbox--checked {
+  background: linear-gradient(135deg, #4EFFE2 0%, #CEF94C 100%);
+  border-color: transparent;
+}
+
+.login-checkbox-tick {
+  color: #1e293b;
+  font-size: 20rpx;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.login-agreement-text {
+  margin-left: 16rpx;
+  color: #94a3b8;
+  font-size: 24rpx;
+  line-height: 36rpx;
+}
+
+.login-link {
+  color: #00674a;
+  font-size: 24rpx;
+  font-weight: 500;
+}
