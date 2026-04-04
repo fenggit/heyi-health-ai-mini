@@ -161,17 +161,17 @@
           </view>
 
           <view class="pref-grid">
-            <block wx:for="{{preferences}}" wx:key="id">
-              <view
-                class="pref-chip {{selectedPreferences.indexOf(item.id) > -1 ? 'pref-chip--active' : ''}}"
-                data-id="{{item.id}}"
-                bindtap="togglePreference"
-                hover-class="pref-chip--hover"
-                hover-stay-time="100"
-              >
-                {{item.label}}
-              </view>
-            </block>
+            <view
+              wx:for="{{preferences}}"
+              wx:key="id"
+              class="pref-chip {{item.selected ? 'pref-chip--active' : ''}}"
+              data-id="{{item.id}}"
+              bindtap="togglePreference"
+              hover-class="pref-chip--hover"
+              hover-stay-time="100"
+            >
+              {{item.label}}
+            </view>
           </view>
 
           <view class="pref-subtitle-wrap">

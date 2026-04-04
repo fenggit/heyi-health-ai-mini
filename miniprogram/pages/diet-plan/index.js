@@ -23,14 +23,14 @@ const MEAL_TIME_OPTIONS = {
 }
 
 const PREFERENCES = [
-  { id: "vegetarian", label: "素食" },
-  { id: "lowOil", label: "少油" },
-  { id: "lowSugar", label: "低糖" },
-  { id: "lowSalt", label: "低盐" },
-  { id: "noSpicy", label: "无辣" },
-  { id: "warm", label: "温热食物" },
-  { id: "easyDigest", label: "易消化" },
-  { id: "highProtein", label: "高蛋白" }
+  { id: "vegetarian", label: "素食", selected: false },
+  { id: "lowOil", label: "少油", selected: true },
+  { id: "lowSugar", label: "低糖", selected: true },
+  { id: "lowSalt", label: "低盐", selected: false },
+  { id: "noSpicy", label: "无辣", selected: false },
+  { id: "warm", label: "温热食物", selected: false },
+  { id: "easyDigest", label: "易消化", selected: false },
+  { id: "highProtein", label: "高蛋白", selected: true }
 ]
 
 function buildStepMeta(step) {
@@ -69,7 +69,7 @@ Page({
     meals: MEALS,
 
     preferences: PREFERENCES,
-    selectedPreferences: ["lowOil", "lowSugar", "highProtein"],
+    selectedPreferences: PREFERENCES.filter(item => item.selected).map(item => item.id),
     remark: "",
 
     summary: {
@@ -217,19 +217,12 @@ Page({
     const { id } = e.currentTarget.dataset
     if (!id) return
 
-    const selected = new Set(this.data.selectedPreferences)
-    if (selected.has(id)) {
-      selected.delete(id)
-    } else {
-      selected.add(id)
-    }
-
-    this.setData(
-      {
-        selectedPreferences: Array.from(selected)
-      },
-      () => this.updateDerivedData()
+    const preferences = this.data.preferences.map(item =>
+      item.id === id ? { ...item, selected: !item.selected } : item
     )
+    const selectedPreferences = preferences.filter(item => item.selected).map(item => item.id)
+
+    this.setData({ preferences, selectedPreferences }, () => this.updateDerivedData())
   },
 
   onRemarkInput(e) {

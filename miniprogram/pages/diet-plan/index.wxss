@@ -437,11 +437,10 @@
 .pref-chip {
   height: 72rpx;
   border-radius: 24rpx;
-  border: 2rpx solid #e2e8f0;
-  background: #ffffff;
+  background: #f3f4f6;
   color: #1e293b;
   font-size: 28rpx;
-  line-height: 68rpx;
+  line-height: 72rpx;
   text-align: center;
   margin-right: 16rpx;
   margin-bottom: 16rpx;
@@ -449,20 +448,13 @@
   box-sizing: border-box;
 }
 
-.pref-chip:active {
-  opacity: 0.7;
-}
-
 .pref-chip--hover {
-  opacity: 0.7;
+  opacity: 0.75;
 }
 
 .pref-chip--active {
-  border-color: transparent;
   background: #00c950;
   color: #ffffff;
-  font-weight: 700;
-  box-shadow: 0 4rpx 16rpx rgba(0, 201, 80, 0.3);
 }
 
 .pref-subtitle-wrap {
