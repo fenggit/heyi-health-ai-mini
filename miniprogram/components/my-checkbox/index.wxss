@@ -1,3 +1,10 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
 .my-checkbox {
   display: inline-flex;
   align-items: center;
@@ -9,6 +16,7 @@
   width: 100%;
   height: 100%;
   display: block;
+  flex-shrink: 0;
 }
 
 /* circle 模式：用于列表选择项，48rpx */
@@ -17,26 +25,17 @@
   height: 48rpx;
 }
 
-/* square 模式：用于协议勾选，32rpx，保留原有方形外观 */
+/* square 模式：用于协议勾选，32rpx，完全由图片表现状态 */
 .my-checkbox--square {
   width: 32rpx;
   height: 32rpx;
-  border-radius: 6rpx;
-  border: 2rpx solid #94a3b8;
-  background: transparent;
-  box-sizing: border-box;
-  overflow: hidden;
-}
-
-.my-checkbox--square.my-checkbox--checked {
-  border-color: transparent;
-  background: linear-gradient(135deg, #4EFFE2 0%, #CEF94C 100%);
+  flex-shrink: 0;
 }
 
 /* square 模式下图标覆盖整个区域 */
 .my-checkbox--square .my-checkbox__icon {
-  width: 100%;
-  height: 100%;
+  width: 32rpx;
+  height: 32rpx;
 }
 
 .my-checkbox--disabled {

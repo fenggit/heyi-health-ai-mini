@@ -1,4 +1,5 @@
 const request = require('../../utils/request')
+const { wxPhoneLogin } = require('../../http/auth')
 
 const AGREEMENT_CONTENT = '基于中医体质理论和现代营养学，运用AI技术为每一位用户提供个性化的食养方案，帮助大家通过科学饮食改善体质，实现健康生活。\n\n基于中医体质理论和现代营养学，运用AI技术为每一位用户提供个性化的食养方案，帮助大家通过科学饮食改善体质，实现健康生活。基于中医体质理论和现代营养学，运用AI技术为每一位用户提供个性化的食养方案，帮助大家通过科学饮食改善体质，实现健康生活。'
 
@@ -34,35 +35,24 @@ Page({
       return
     }
 
-    const { code, encryptedData, iv } = e.detail
-    console.log('[getPhoneNumber] code:', code)
-    console.log('[getPhoneNumber] encryptedData:', encryptedData)
-    console.log('[getPhoneNumber] iv:', iv)
+    const { code: phoneCode } = e.detail
 
-    // 先调用 wx.login 获取 code，再结合手机号 code 请求后端
-    wx.login({
-      success: (loginRes) => {
-        console.log('[wx.login] 完整回调数据:', JSON.stringify(loginRes))
+    wx.showLoading({ title: '登录中...', mask: true })
 
-        if (!loginRes.code) {
-          wx.showToast({ title: '登录失败，请重试', icon: 'none' })
-          return
-        }
-
-        console.log('[wx.login] code:', loginRes.code)
-        console.log('[合并数据]', JSON.stringify({ loginCode: loginRes.code, phoneCode: code, encryptedData, iv }))
-
-        // 模拟登录成功，存储 token 后跳转首页
-        // 实际项目中 token 由后端返回，此处用 loginRes.code 占位
-        request.setAuthToken(loginRes.code)
+    wxPhoneLogin({ phoneCode })
+      .then((res) => {
+        console.log('[wxPhoneLogin] 登录成功:', JSON.stringify(res))
+        const token = res.data?.access_token || ''
+        request.setAuthToken(token)
         const app = getApp()
         if (app) app.globalData.isLoggedIn = true
+        wx.hideLoading()
         this._goHome()
-      },
-      fail: () => {
-        wx.showToast({ title: '登录失败，请重试', icon: 'none' })
-      }
-    })
+      })
+      .catch((err) => {
+        console.error('[wxPhoneLogin] 登录失败:', err)
+        wx.hideLoading()
+      })
   },
 
   _goHome() {

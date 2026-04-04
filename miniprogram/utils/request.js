@@ -85,12 +85,18 @@ function request(options = {}) {
   const finalHeader = buildHeaders(header, withAuth)
   const requestId = `${Date.now()}_${Math.random().toString(16).slice(2, 8)}`
 
+  // 只打印非空 header 字段
+  const printHeader = Object.keys(finalHeader).reduce((acc, k) => {
+    if (finalHeader[k]) acc[k] = finalHeader[k]
+    return acc
+  }, {})
+
   console.log(`[request:${requestId}] 请求信息`, JSON.stringify({
-    url: finalUrl,
+    path: url,
     method: upperMethod,
-    data: data || null
+    body: data || null,
+    header: printHeader
   }))
-  console.log(`[request:${requestId}] 请求头`, JSON.stringify(finalHeader || {}))
 
   return new Promise((resolve, reject) => {
     wx.request({
@@ -100,21 +106,37 @@ function request(options = {}) {
       header: finalHeader,
       timeout,
       success: (res) => {
+        const body = res.data
         console.log(`[request:${requestId}] 响应信息`, JSON.stringify({
-          statusCode: res.statusCode,
-          data: res.data,
-          header: res.header
+          path: url,
+          response: body
         }))
 
         if (res.statusCode >= 200 && res.statusCode < 300) {
-          resolve(res.data)
+          if (body && body.code !== undefined && body.code !== 200) {
+            const msg = body.msg || body.message || '请求失败'
+            console.warn(`[request:${requestId}] 业务错误 code=${body.code} msg=${msg}`)
+            setTimeout(() => {
+              wx.showToast({ title: `${msg}(${body.code})`, icon: 'none', duration: 3000 })
+            }, 300)
+            reject(Object.assign(new Error(msg), { code: body.code, data: body }))
+            return
+          }
+          resolve(body)
           return
         }
 
+        console.error(`[request:${requestId}] HTTP错误 statusCode=${res.statusCode}`)
+        setTimeout(() => {
+          wx.showToast({ title: `请求失败(${res.statusCode})`, icon: 'none', duration: 3000 })
+        }, 300)
         reject(createHttpError(res, finalUrl, upperMethod))
       },
       fail: (error) => {
-        console.log(`[request:${requestId}] 请求失败`, JSON.stringify(error))
+        console.error(`[request:${requestId}] 网络错误`, JSON.stringify(error))
+        setTimeout(() => {
+          wx.showToast({ title: '网络异常，请稍后重试', icon: 'none', duration: 3000 })
+        }, 300)
         reject(error)
       }
     })
