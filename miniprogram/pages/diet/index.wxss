@@ -12,9 +12,28 @@
 }
 
 .page-top-gap,
+.diet-title-row,
 .diet-wrap {
   position: relative;
   z-index: 1;
+}
+
+/* 标题行：左侧标题，右侧为微信胶囊留白 */
+.diet-title-row {
+  width: 750rpx;
+  box-sizing: border-box;
+  padding-left: 32rpx;
+  padding-top: 4rpx;
+  padding-bottom: 4rpx;
+  display: flex;
+  align-items: center;
+}
+
+.diet-title {
+  color: #1e293b;
+  font-size: 28rpx;
+  line-height: 40rpx;
+  font-weight: 700;
 }
 
 .diet-page .card-panel {
@@ -28,10 +47,11 @@
 
 .diet-wrap {
   width: 702rpx;
-  margin: 6rpx auto 0;
+  margin: 0 auto;
 }
 
 .diet-search-row {
+  margin-top: 28rpx;
   display: flex;
   align-items: center;
 }
@@ -66,13 +86,9 @@
   width: 64rpx;
   height: 64rpx;
   margin-left: 14rpx;
-  border-radius: 20rpx;
-  border: 2rpx solid rgba(255, 255, 255, 0.96);
-  background: rgba(255, 255, 255, 0.72);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box;
 }
 
 .diet-cart__icon {
@@ -88,8 +104,8 @@
   height: 28rpx;
   border-radius: 14rpx;
   padding: 0 8rpx;
-  background: #ffb900;
-  color: #1e293b;
+  background: #fb2c36;
+  color: #ffffff;
   font-size: 18rpx;
   line-height: 28rpx;
   text-align: center;
@@ -179,13 +195,14 @@
 }
 
 .diet-week__status {
-  height: 42rpx;
-  border-radius: 999rpx;
+  height: 40rpx;
+  border-radius: 12rpx;
   padding: 0 14rpx;
-  background: rgba(0, 201, 80, 0.16);
-  color: #008435;
-  font-size: 20rpx;
-  line-height: 42rpx;
+  background: #131313;
+  color: #cdff71;
+  font-size: 24rpx;
+  line-height: 40rpx;
+  font-weight: 700;
 }
 
 .diet-week__meta {
@@ -315,6 +332,7 @@
   display: flex;
   align-items: center;
   background: rgba(255, 255, 255, 0.72);
+  min-height: 106rpx;
 }
 
 .diet-recipe + .diet-recipe {
@@ -322,78 +340,104 @@
 }
 
 .diet-recipe__cover {
-  width: 114rpx;
-  height: 114rpx;
-  border-radius: 50%;
+  width: 160rpx;
+  height: 180rpx;
+  border-radius: 24rpx;
   flex-shrink: 0;
-  background: rgba(110, 221, 145, 0.18);
+  background: linear-gradient(180deg, #e8fff5 0%, #d1fae8 100%);
+  display: block;
 }
 
 .diet-recipe__body {
-  margin-left: 14rpx;
+  margin-left: 24rpx;
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 180rpx;
 }
 
-.diet-recipe__head {
+.diet-recipe__top {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  flex-direction: column;
 }
 
 .diet-recipe__name {
   color: #1e293b;
-  font-size: 30rpx;
-  line-height: 1.35;
-  font-weight: 700;
-  max-width: 320rpx;
-}
-
-.diet-recipe__price {
-  margin-left: 12rpx;
-  white-space: nowrap;
-}
-
-.diet-recipe__price-currency {
-  color: #00a340;
-  font-size: 22rpx;
+  font-size: 28rpx;
+  line-height: 40rpx;
   font-weight: 700;
 }
 
-.diet-recipe__price-main {
-  color: #00a340;
-  font-size: 32rpx;
-  font-weight: 700;
-}
-
-.diet-recipe__price-unit {
-  margin-left: 4rpx;
+.diet-recipe__type {
+  margin-top: 4rpx;
   color: #94a3b8;
-  font-size: 20rpx;
+  font-size: 24rpx;
+  line-height: 30rpx;
 }
 
 .diet-recipe__tags {
   display: flex;
+  flex-wrap: wrap;
   margin-top: 8rpx;
 }
 
 .diet-recipe__tag {
-  height: 38rpx;
+  height: 40rpx;
   padding: 0 14rpx;
-  border-radius: 999rpx;
-  background: rgba(0, 201, 80, 0.14);
+  border-radius: 12rpx;
+  background: rgba(0, 201, 80, 0.10);
   color: #008435;
-  font-size: 20rpx;
-  line-height: 38rpx;
+  font-size: 24rpx;
+  line-height: 40rpx;
+  font-weight: 500;
 }
 
 .diet-recipe__tag + .diet-recipe__tag {
   margin-left: 8rpx;
 }
 
-.diet-recipe__type {
-  display: block;
+.diet-recipe__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-top: 8rpx;
-  color: #64748b;
+}
+
+.diet-recipe__price {
+  display: inline-flex;
+  align-items: baseline;
+}
+
+.diet-recipe__price-currency {
+  color: #fb2c36;
   font-size: 22rpx;
+  font-weight: 700;
+  opacity: 0.55;
+}
+
+.diet-recipe__price-main {
+  color: #fb2c36;
+  font-size: 36rpx;
+  font-weight: 700;
+}
+
+.diet-recipe__price-unit {
+  margin-left: 4rpx;
+  color: #94a3b8;
+  font-size: 28rpx;
+}
+
+.diet-recipe__add {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7ceef9 0%, #cef94c 100%);
+  color: #ffffff;
+  font-size: 36rpx;
+  line-height: 44rpx;
+  text-align: center;
+  font-weight: 400;
+  flex-shrink: 0;
 }

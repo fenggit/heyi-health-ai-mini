@@ -29,32 +29,32 @@ const MOCK_DIET_DATA = {
       id: "r1",
       name: "养胃气血汁水",
       tags: ["养脾胃", "补气血"],
-      type: "简单 · 气虚质",
-      price: "28.8",
+      type: "简单·气虚质",
+      price: "68",
       unit: "/份"
     },
     {
       id: "r2",
       name: "清肝明目汁",
       tags: ["明目", "清肝火"],
-      type: "简单 · 湿热质",
-      price: "28.8",
+      type: "简单·湿热质",
+      price: "58",
       unit: "/份"
     },
     {
       id: "r3",
       name: "润燥生津汁",
-      tags: ["养脾胃", "补气血"],
-      type: "简单 · 阴虚质",
-      price: "28.8",
+      tags: ["滋阴", "润燥"],
+      type: "简单·阴虚质",
+      price: "72",
       unit: "/份"
     },
     {
       id: "r4",
       name: "健脾祛湿汁",
       tags: ["养脾胃", "补气血"],
-      type: "简单 · 痰湿质",
-      price: "28.8",
+      type: "简单·痰湿质",
+      price: "58",
       unit: "/份"
     }
   ]
@@ -88,9 +88,7 @@ Page({
   },
   syncLayout() {
     const { statusBarHeight } = getLayoutMetrics()
-    this.setData({
-      topInset: Math.max(statusBarHeight + 12, 32)
-    })
+    this.setData({ topInset: Math.max(statusBarHeight + 12, 32) })
   },
   async loadPageData() {
     const payload = await fetchDietData()
@@ -113,6 +111,9 @@ Page({
       activeCategory: Number(index)
     })
   },
+  openCart() {
+    wx.navigateTo({ url: '/pages/cart/index' })
+  },
   openDietPlan() {
     wx.navigateTo({
       url: "/pages/diet-plan/index"
@@ -124,5 +125,9 @@ Page({
       title: `演示版：${id}详情待接入`,
       icon: "none"
     })
+  },
+  addToCart(e) {
+    const { id } = e.currentTarget.dataset
+    wx.showToast({ title: '已加入购物车', icon: 'success' })
   }
 })

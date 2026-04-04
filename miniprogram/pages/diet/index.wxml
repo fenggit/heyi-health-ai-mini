@@ -2,15 +2,21 @@
   <image class="diet-page-bg" src="/assets/bg_img.png" mode="widthFix" />
   <view class="page-top-gap" style="height: {{topInset}}px;"></view>
 
+  <!-- 标题行：左侧标题，右侧为微信胶囊留白 -->
+  <view class="diet-title-row">
+    <text class="diet-title">合一食养</text>
+  </view>
+
   <view class="diet-wrap">
+    <!-- 搜索行：搜索框宽度避开右侧胶囊，购物车图标对齐胶囊左侧 -->
     <view class="diet-search-row">
       <view class="diet-search">
         <image class="diet-search__icon" src="/assets/mall/icon-search.png" mode="aspectFit" />
         <text class="diet-search__placeholder">关键词搜索</text>
       </view>
-      <view class="diet-cart">
+      <view class="diet-cart" bindtap="openCart">
         <image class="diet-cart__icon" src="/assets/mall/icon-cart.png" mode="aspectFit" />
-        <view class="diet-cart__badge">{{cartCount}}</view>
+        <view class="diet-cart__badge" wx:if="{{cartCount > 0}}">{{cartCount > 99 ? '99+' : cartCount}}</view>
       </view>
     </view>
 
@@ -67,20 +73,23 @@
         <view class="card-panel diet-recipe" data-id="{{item.id}}" bindtap="openRecipe">
           <image class="diet-recipe__cover" src="{{item.cover}}" mode="aspectFill" />
           <view class="diet-recipe__body">
-            <view class="diet-recipe__head">
+            <view class="diet-recipe__top">
               <text class="diet-recipe__name">{{item.name}}</text>
-              <view class="diet-recipe__price">
-                <text class="diet-recipe__price-currency">￥</text>
-                <text class="diet-recipe__price-main">{{item.price}}</text>
-                <text class="diet-recipe__price-unit">{{item.unit}}</text>
-              </view>
+              <text class="diet-recipe__type">{{item.type}}</text>
             </view>
             <view class="diet-recipe__tags">
               <block wx:for="{{item.tags}}" wx:key="*this">
                 <text class="diet-recipe__tag">{{item}}</text>
               </block>
             </view>
-            <text class="diet-recipe__type">{{item.type}}</text>
+            <view class="diet-recipe__foot">
+              <view class="diet-recipe__price">
+                <text class="diet-recipe__price-currency">￥</text>
+                <text class="diet-recipe__price-main">{{item.price}}</text>
+                <text class="diet-recipe__price-unit"> /份</text>
+              </view>
+              <view class="diet-recipe__add" catchtap="addToCart" data-id="{{item.id}}">+</view>
+            </view>
           </view>
         </view>
       </block>
