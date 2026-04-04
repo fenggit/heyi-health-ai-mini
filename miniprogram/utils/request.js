@@ -1,5 +1,6 @@
 const STORAGE_TOKEN_KEY = 'token'
 const DEFAULT_TIMEOUT = 15000
+const HOST = 'https://api.tyhctech.com'
 
 let authToken = ''
 
@@ -71,7 +72,7 @@ function request(options = {}) {
     data,
     header = {},
     timeout = DEFAULT_TIMEOUT,
-    baseUrl = '',
+    baseUrl = HOST,
     withAuth = true
   } = options
 
@@ -142,6 +143,7 @@ module.exports = {
   post,
   put,
   del,
+  HOST,
   initAuthToken,
   setAuthToken,
   getAuthToken,
