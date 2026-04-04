@@ -209,31 +209,7 @@
 }
 
 .hydration-track {
-  position: relative;
-  width: 100%;
-  height: 12rpx;
   margin-top: 12rpx;
-  border-radius: 12rpx;
-  background: rgba(255, 255, 255, 0.45);
-}
-
-.hydration-fill {
-  height: 12rpx;
-  background: linear-gradient(90deg, #87fb9b 0%, #1efad5 34.03%, #2cebff 70.86%, #b0ff2f 100%);
-  border-radius: 12rpx;
-}
-
-.hydration-thumb {
-  position: absolute;
-  top: 50%;
-  width: 20rpx;
-  height: 20rpx;
-  background: linear-gradient(180deg, #4effe2 0%, #cef94c 100%);
-  box-shadow: 0rpx 0rpx 20rpx 2rpx rgba(0, 132, 53, 0.15);
-  border: 4rpx solid #ffffff;
-  border-radius: 50%;
-  box-sizing: border-box;
-  transform: translate(-50%, -50%);
 }
 
 .shortcut-grid {

@@ -31,14 +31,16 @@
       <view class="step-panel">
         <image class="step-panel__bg" src="/assets/diet-plan/page06_wrap.png" mode="scaleToFill" />
         <view class="step-panel__head">
-          <text class="step-panel__left">步骤{{stepPrefix}}：{{stepName}}</text>
-          <text class="step-panel__right"><text class="step-panel__num">{{step}}</text> / 4 步</text>
+          <view class="step-panel__head-content">
+            <text class="step-panel__left">步骤{{stepPrefix}}：{{stepName}}</text>
+          </view>
+          <view class="step-panel__divider"></view>
+          <view class="step-panel__right">
+            <text class="step-panel__num">{{step}}</text><text class="step-panel__slash"> / {{steps.length}}</text><text class="step-panel__unit">步</text>
+          </view>
         </view>
         <view class="step-panel__progress">
-          <view class="hydration-track">
-            <view class="hydration-fill" style="width: {{stepPercent}}%;"></view>
-            <view class="hydration-thumb" style="left: {{stepPercent}}%;"></view>
-          </view>
+          <my-progress-bar percent="{{stepPercent}}" />
         </view>
       </view>
 
@@ -101,9 +103,18 @@
                 bindtap="chooseConstitution"
               >
                 <text class="constitution-item__name">{{item}}</text>
-                <view class="constitution-item__dot {{selectedConstitution === item ? 'constitution-item__dot--active' : ''}}">
-                  <text wx:if="{{selectedConstitution === item}}">✓</text>
-                </view>
+                <image
+                  wx:if="{{selectedConstitution === item}}"
+                  class="constitution-item__check-icon"
+                  src="/assets/icons/checkbox-check_icon.png"
+                  mode="aspectFit"
+                />
+                <image
+                  wx:else
+                  class="constitution-item__check-icon"
+                  src="/assets/icons/checkbox-unchecked_icon.png"
+                  mode="aspectFit"
+                />
               </view>
             </block>
           </view>
@@ -113,39 +124,41 @@
             <view class="action-btn action-btn--ghost" bindtap="prevStep">上一步</view>
             <view class="action-btn action-btn--primary" bindtap="nextStep">下一步</view>
           </view>
-          <text class="step-link" bindtap="goAnalysis">还未测评，去测评</text>
         </view>
 
         <view wx:if="{{step === 3}}" class="plan-step-body plan-step-body--step3">
-          <text class="plan-card__title">请选择您的用餐时间</text>
+          <view class="plan-card__title-wrap">
+            <title-view text="请选择您的用餐时间" />
+          </view>
 
-          <block wx:for="{{meals}}" wx:key="id">
-            <view class="meal-row" data-id="{{item.id}}" bindtap="pickMealTime">
-              <view class="meal-row__left">
-                <image class="meal-row__icon" src="{{item.icon}}" mode="aspectFit" />
-                <text class="meal-row__name">{{item.name}}</text>
+          <view wx:for="{{meals}}" wx:key="id" class="meal-row" data-id="{{item.id}}" bindtap="pickMealTime">
+            <view class="meal-row__left">
+              <view class="meal-row__icon-wrap" style="{{item.iconBg}}">                <image class="meal-row__icon" src="{{item.icon}}" mode="aspectFit" />
               </view>
-              <view class="meal-row__right">
-                <text class="meal-row__time {{item.enabled && item.time ? 'meal-row__time--active' : ''}}">
-                  {{item.time || '请选择时间'}}
-                </text>
-                <view class="meal-row__plus">+</view>
-              </view>
+              <text class="meal-row__name">{{item.name}}</text>
             </view>
-          </block>
+            <view class="meal-row__right">
+              <view class="meal-row__time {{item.enabled && item.time ? 'meal-row__time--active' : ''}}">
+                {{item.time || '请选择时间'}}
+              </view>
+              <image class="meal-row__plus" src="/assets/diet-plan/plan-add.png" mode="aspectFit" />
+            </view>
+          </view>
 
           <view class="plan-step-body__grow"></view>
           <view class="plan-actions">
             <view class="action-btn action-btn--ghost" bindtap="prevStep">上一步</view>
             <view class="action-btn action-btn--primary" bindtap="nextStep">下一步</view>
           </view>
-          <text class="step-link" bindtap="goAnalysis">还未测评，去测评</text>
           <view class="meal-divider"></view>
           <text class="meal-tip">提醒设置：我们会在设定的时间前15分钟发送提醒通知，帮助您准时用餐。</text>
         </view>
 
         <view wx:if="{{step === 4}}" class="plan-step-body">
-          <text class="plan-card__title">请选择您的饮食习惯和偏好（可多选）</text>
+          <view class="pref-title-wrap">
+            <title-view text="请选择您的饮食习惯和偏好" />
+            <text class="pref-title-sub">（可多选）</text>
+          </view>
 
           <view class="pref-grid">
             <block wx:for="{{preferences}}" wx:key="id">
@@ -153,13 +166,17 @@
                 class="pref-chip {{selectedPreferences.indexOf(item.id) > -1 ? 'pref-chip--active' : ''}}"
                 data-id="{{item.id}}"
                 bindtap="togglePreference"
+                hover-class="pref-chip--hover"
+                hover-stay-time="100"
               >
                 {{item.label}}
               </view>
             </block>
           </view>
 
-          <text class="pref-subtitle">其他要求</text>
+          <view class="pref-subtitle-wrap">
+            <title-view text="其他要求" />
+          </view>
           <textarea
             class="pref-textarea"
             value="{{remark}}"

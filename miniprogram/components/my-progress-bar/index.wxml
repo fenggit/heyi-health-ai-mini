@@ -1,0 +1,4 @@
+<view class="progress-track" style="height: {{height}}rpx; border-radius: {{height}}rpx;">
+  <view class="progress-fill" style="width: {{percent}}%; height: {{height}}rpx; border-radius: {{height}}rpx;"></view>
+  <view class="progress-thumb" style="left: {{percent}}%;"></view>
+</view>

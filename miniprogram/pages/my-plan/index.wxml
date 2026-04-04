@@ -44,10 +44,7 @@
         </view>
 
         <view class="progress-seekbar">
-          <view class="hydration-track">
-            <view class="hydration-fill" style="width: {{progressPercent}}%;"></view>
-            <view class="hydration-thumb" style="left: {{progressPercent}}%;"></view>
-          </view>
+          <my-progress-bar percent="{{progressPercent}}" />
         </view>
 
         <view class="reminder-strip">{{reminder}}</view>

@@ -55,8 +55,7 @@
           <text class="hydration-value">{{hydration.value}}</text>
         </view>
         <view class="hydration-track">
-          <view class="hydration-fill" style="width: {{hydrationProgress}}%;"></view>
-          <view class="hydration-thumb" style="left: {{hydrationProgress}}%;"></view>
+          <my-progress-bar percent="{{hydrationProgress}}" height="{{12}}" />
         </view>
       </view>
     </view>

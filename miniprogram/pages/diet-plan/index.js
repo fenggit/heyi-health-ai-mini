@@ -11,9 +11,9 @@ const PLAN_TYPES = [
 const CONSTITUTIONS = ["气虚质", "阴虚质", "湿热质", "阳虚质", "痰湿质", "平和质"]
 
 const MEALS = [
-  { id: "breakfast", name: "早餐", icon: "/assets/diet-plan/icon_breakfast.png", enabled: true, time: "08:00" },
-  { id: "lunch", name: "午餐", icon: "/assets/diet-plan/icon_lunch.png", enabled: false, time: "" },
-  { id: "dinner", name: "晚餐", icon: "/assets/diet-plan/icon_dinner.png", enabled: false, time: "" }
+  { id: "breakfast", name: "早餐", icon: "/assets/diet-plan/icon_breakfast.png", enabled: true, time: "07:00", iconBg: "background: linear-gradient(133deg, #7cee89 0%, #2bc383 100%);" },
+  { id: "lunch", name: "午餐", icon: "/assets/diet-plan/icon_lunch.png", enabled: true, time: "12:00", iconBg: "background: linear-gradient(133deg, #7cee89 0%, #2bc383 100%);" },
+  { id: "dinner", name: "晚餐", icon: "/assets/diet-plan/icon_dinner.png", enabled: true, time: "18:00", iconBg: "background: linear-gradient(133deg, #7cee89 0%, #2bc383 100%);" }
 ]
 
 const MEAL_TIME_OPTIONS = {
