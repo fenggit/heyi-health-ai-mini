@@ -1,0 +1,561 @@
+.my-plan-screen {
+  background: #f3f4f8;
+}
+
+.my-plan-screen__bg {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 750rpx;
+  transform: translateX(-50%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.page-top-gap,
+.my-plan-scroll {
+  position: relative;
+  z-index: 1;
+}
+
+.my-plan-nav__title {
+  margin-left: 8rpx;
+  color: #1e293b;
+  font-size: 32rpx;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.my-plan-wrap {
+  width: 702rpx;
+  margin: 0 auto;
+}
+
+.my-plan-hero {
+  padding: 22rpx 24rpx 0;
+}
+
+.my-plan-hero__title {
+  display: block;
+  color: #1e293b;
+  font-size: 52rpx;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+.my-plan-hero__sub {
+  display: block;
+  margin-top: 10rpx;
+  color: #334155;
+  font-size: 24rpx;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+.info-card,
+.day-card {
+  margin-top: 16rpx;
+  border-radius: 24rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.96);
+  background: rgba(255, 255, 255, 0.72);
+  box-sizing: border-box;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* progress-card: 参考 diet-plan step-panel，使用 page06_wrap.png 背景图 */
+.progress-card {
+  position: relative;
+  margin-top: 16rpx;
+  height: 196rpx;
+}
+
+.progress-card__bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 196rpx;
+  border-radius: 24rpx;
+}
+
+.progress-card__content {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 64rpx;
+  padding: 24rpx 28rpx 0;
+  box-sizing: border-box;
+}
+
+.progress-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.progress-top-row {
+  display: flex;
+  align-items: center;
+}
+
+.progress-top-row__label {
+  color: #1e293b;
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+.progress-top-row__meta {
+  margin-left: 8rpx;
+  color: #1e293b;
+  font-size: 24rpx;
+  line-height: 1;
+}
+
+.progress-top-row__num {
+  font-size: 36rpx;
+  font-weight: 700;
+}
+
+.progress-status {
+  margin-left: 16rpx;
+  display: inline-block;
+  height: 40rpx;
+  padding: 0 16rpx;
+  border-radius: 12rpx;
+  background: #131313;
+  color: #cdff71;
+  font-size: 24rpx;
+  line-height: 40rpx;
+  font-weight: 700;
+}
+
+.progress-illustration {
+  width: 120rpx;
+  height: 90rpx;
+  position: relative;
+  flex-shrink: 0;
+  margin-top: -6rpx;
+}
+
+.progress-illustration__img {
+  width: 120rpx;
+  height: 90rpx;
+  display: block;
+}
+
+.progress-illustration__shadow {
+  position: absolute;
+  left: 6rpx;
+  right: 6rpx;
+  bottom: 8rpx;
+  height: 18rpx;
+}
+
+.progress-seekbar {
+  margin-top: 12rpx;
+  width: 100%;
+}
+
+.reminder-strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin-top: 20rpx;
+  height: 64rpx;
+  padding: 0 28rpx;
+  border-radius: 0 0 24rpx 24rpx;
+  border-top: 2rpx solid rgba(255, 255, 255, 0.96);
+  background: rgba(252, 249, 235, 0.30);
+  color: #634703;
+  font-size: 24rpx;
+  line-height: 64rpx;
+  box-sizing: border-box;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.info-card {
+  padding: 22rpx 24rpx;
+}
+
+.info-card__title {
+  display: block;
+  color: #1e293b;
+  font-size: 28rpx;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.info-card__line {
+  margin-top: 14rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.info-card__line-label {
+  color: #64748b;
+  font-size: 28rpx;
+  line-height: 1.45;
+}
+
+.info-card__line-value {
+  max-width: 420rpx;
+  color: #1e293b;
+  font-size: 28rpx;
+  line-height: 1.45;
+  text-align: right;
+  font-weight: 500;
+}
+
+.day-card {
+  padding: 22rpx 20rpx 24rpx;
+  overflow: hidden;
+}
+
+.day-card__tag-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.day-card__tag {
+  height: 64rpx;
+  padding: 0 18rpx;
+  border-radius: 22rpx 0 24rpx 0;
+  background: linear-gradient(127deg, #fffad6 0%, #ffd46f 100%);
+  color: #634703;
+  font-size: 28rpx;
+  line-height: 64rpx;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+}
+
+.day-card__link {
+  color: #94a3b8;
+  font-size: 24rpx;
+  line-height: 1;
+}
+
+.day-card__head {
+  margin-top: 16rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.day-card__title {
+  color: #1e293b;
+  font-size: 28rpx;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.day-card__status {
+  height: 40rpx;
+  border-radius: 12rpx;
+  padding: 0 16rpx;
+  background: #131313;
+  color: #cdff71;
+  font-size: 24rpx;
+  line-height: 40rpx;
+  font-weight: 700;
+}
+
+.recipe-list {
+  margin-top: 16rpx;
+}
+
+/* 卡片整体：无背景，flex 布局 */
+.recipe-item {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+
+.recipe-item + .recipe-item {
+  margin-top: 16rpx;
+}
+
+/* 左侧图片列 + 中间内容区合并为带背景的区域 */
+.recipe-item__bg-wrap {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  border-radius: 24rpx;
+  background: #f4f7fa;
+  overflow: hidden;
+}
+
+/* 左侧图片列：绿色渐变背景 + 餐次badge + 图片 */
+.recipe-item__img-col {
+  width: 160rpx;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #e8fff5 0%, #d1fae8 100%);
+  border-radius: 24rpx;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.recipe-item__meal-badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40rpx;
+  background: #00c950;
+  border-radius: 12rpx 12rpx 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.recipe-item__meal-icon {
+  width: 24rpx;
+  height: 24rpx;
+  margin-right: 6rpx;
+}
+
+.recipe-item__meal-text {
+  color: #fff;
+  font-size: 22rpx;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.recipe-item__cover {
+  width: 160rpx;
+  height: 180rpx;
+  display: block;
+  object-fit: cover;
+}
+
+/* 中间内容区 */
+.recipe-item__body {
+  flex: 1;
+  min-width: 0;
+  padding: 20rpx 16rpx 20rpx 20rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.recipe-item__name {
+  display: block;
+  color: #1e293b;
+  font-size: 28rpx;
+  line-height: 1.4;
+  font-weight: 700;
+}
+
+.recipe-item__tags {
+  margin-top: 12rpx;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+
+.recipe-item__tag {
+  height: 36rpx;
+  border-radius: 8rpx;
+  padding: 0 12rpx;
+  background: rgba(0, 201, 80, 0.10);
+  color: #008435;
+  font-size: 22rpx;
+  line-height: 36rpx;
+}
+
+/* 价格行：¥价格 在左，+ 按钮在右 */
+.recipe-item__price-row {
+  margin-top: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.recipe-item__price {
+  display: flex;
+  align-items: baseline;
+  color: #fb2c36;
+}
+
+.recipe-item__price-symbol {
+  font-size: 24rpx;
+  opacity: 0.55;
+}
+
+.recipe-item__price-num {
+  font-size: 36rpx;
+  font-weight: 700;
+  margin: 0 4rpx;
+}
+
+.recipe-item__price-unit {
+  font-size: 24rpx;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.recipe-item__plus {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  background: linear-gradient(133deg, #7cee89 0%, #2bc383 100%);
+  color: #fff;
+  font-size: 40rpx;
+  line-height: 44rpx;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* 右侧 checkbox 列 */
+.recipe-item__check {
+  width: 72rpx;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.finish-btn {
+  margin-top: 10rpx;
+  height: 80rpx;
+  border-radius: 20rpx;
+  background: rgba(0, 201, 80, 0.10);
+  color: #008435;
+  font-size: 32rpx;
+  line-height: 80rpx;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* 7天滑动指示器 */
+.day-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 40rpx;
+  margin-bottom: 24rpx;
+}
+
+.day-dots__track {
+  width: 140rpx;
+  height: 8rpx;
+  border-radius: 4rpx;
+  background: rgba(0, 201, 80, 0.10);
+  overflow: hidden;
+}
+
+.day-dots__fill {
+  height: 100%;
+  border-radius: 4rpx;
+  background: #00c950;
+  transition: width 0.3s ease;
+}
+
+/* swiper 高度由 JS 动态计算注入 */
+.day-swiper {
+  width: 100%;
+}
+
+.day-swiper__item {
+  overflow: visible;
+}
+
+.day-panel {
+  padding: 0 0 4rpx;
+}
+
+.day-panel__head {
+  margin-top: 16rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.day-panel__title-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.day-panel__title {
+  color: #1e293b;
+  font-size: 28rpx;
+  font-weight: 700;
+  line-height: 1.4;
+  position: relative;
+  z-index: 1;
+}
+
+/* 标题下方绿色波浪下划线，对应设计稿 路径50691 */
+.day-panel__title-underline {
+  position: absolute;
+  left: 0;
+  bottom: -4rpx;
+  width: 88rpx;
+  height: 12rpx;
+  background: linear-gradient(90deg, #7cee89 0%, #2bc383 100%);
+  border-radius: 999rpx;
+  opacity: 0.6;
+}
+
+.scroll-spacer {
+  height: 170rpx;
+}
+
+.my-plan-action-dock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  background: #ffffff;
+  border-radius: 32rpx 32rpx 0 0;
+}
+
+.my-plan-action-dock__inner {
+  width: 638rpx;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  padding: 24rpx 0 16rpx;
+}
+
+.my-plan-action-dock__home-bar {
+  background: #ffffff;
+  width: 100%;
+}
+
+.btn-row__btn {
+  width: 310rpx;
+  height: 80rpx;
+  border-radius: 24rpx;
+  text-align: center;
+  line-height: 80rpx;
+  font-size: 32rpx;
+}
+
+.btn-row__btn--primary {
+  background: linear-gradient(90deg, #4effe2 0%, #cef94c 100%);
+  color: #1e293b;
+  font-weight: 700;
+}
+
+.btn-row__btn--ghost {
+  background: linear-gradient(90deg, #e9fbf1 0%, #ecfdf8 54%, #defefd 100%);
+  color: #1e293b;
+  font-weight: 500;
+}

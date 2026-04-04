@@ -2,6 +2,7 @@
   "navigationStyle": "custom",
   "usingComponents": {
     "title-view": "/components/title-view/index",
-    "my-progress-bar": "/components/my-progress-bar/index"
+    "my-progress-bar": "/components/my-progress-bar/index",
+    "my-checkbox": "/components/my-checkbox/index"
   }
 }

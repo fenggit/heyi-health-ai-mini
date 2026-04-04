@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/my-week-plan/index",
     "pages/login/index",
     "pages/home/index",
     "pages/activity-detail/index",
@@ -7,7 +8,7 @@
     "pages/cart/index",
     "pages/diet/index",
     "pages/diet-plan/index",
-    "pages/my-plan/index",
+ 
     "pages/profile/index",
     "pages/help-center/index",
     "pages/about-us/index",

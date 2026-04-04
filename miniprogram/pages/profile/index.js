@@ -39,7 +39,7 @@ const PROFILE_PAGE_ROUTE_MAP = {
   设置: "/pages/settings/index",
   帮助中心: "/pages/help-center/index",
   关于我们: "/pages/about-us/index",
-  我的食养计划: "/pages/my-plan/index",
+  我的食养计划: "/pages/my-week-plan/index",
   我的体质报告: "/pages/analysis-report/index?logged=1&from=profile"
 }
 

@@ -1,7 +1,7 @@
 {
   "navigationStyle": "custom",
   "usingComponents": {
-    "agreement-popup": "/components/agreement-popup/index",
+    "my-progress-bar": "/components/my-progress-bar/index",
     "my-checkbox": "/components/my-checkbox/index"
   }
 }

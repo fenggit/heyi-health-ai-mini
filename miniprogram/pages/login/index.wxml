@@ -23,9 +23,7 @@
       >微信授权登录</button>
 
       <view class="login-agreement" bindtap="toggleAgreed">
-        <view class="login-checkbox {{agreed ? 'login-checkbox--checked' : ''}}">
-          <text wx:if="{{agreed}}" class="login-checkbox-tick">✓</text>
-        </view>
+        <my-checkbox checked="{{agreed}}" shape="square" />
         <text class="login-agreement-text">我已阅读并接受<text class="login-link" catchtap="openUserAgreement">《用户协议》</text>、<text class="login-link" catchtap="openPrivacyPolicy">《隐私协议》</text></text>
       </view>
     </view>

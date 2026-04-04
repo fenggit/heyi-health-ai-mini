@@ -103,17 +103,9 @@
                 bindtap="chooseConstitution"
               >
                 <text class="constitution-item__name">{{item}}</text>
-                <image
-                  wx:if="{{selectedConstitution === item}}"
-                  class="constitution-item__check-icon"
-                  src="/assets/icons/checkbox-check_icon.png"
-                  mode="aspectFit"
-                />
-                <image
-                  wx:else
-                  class="constitution-item__check-icon"
-                  src="/assets/icons/checkbox-unchecked_icon.png"
-                  mode="aspectFit"
+                <my-checkbox
+                  checked="{{selectedConstitution === item}}"
+                  shape="circle"
                 />
               </view>
             </block>

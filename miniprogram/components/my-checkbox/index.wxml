@@ -1,0 +1,14 @@
+<view class="my-checkbox my-checkbox--{{shape}} {{checked ? 'my-checkbox--checked' : ''}} {{disabled ? 'my-checkbox--disabled' : ''}}" bindtap="handleTap">
+  <image
+    wx:if="{{checked}}"
+    class="my-checkbox__icon"
+    src="/assets/icons/checkbox-check_icon.png"
+    mode="aspectFit"
+  />
+  <image
+    wx:else
+    class="my-checkbox__icon"
+    src="/assets/icons/checkbox-unchecked_icon.png"
+    mode="aspectFit"
+  />
+</view>

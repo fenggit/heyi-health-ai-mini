@@ -274,7 +274,7 @@ Page({
 
     setTimeout(() => {
       wx.redirectTo({
-        url: "/pages/my-plan/index"
+        url: "/pages/my-week-plan/index"
       })
     }, 350)
   }

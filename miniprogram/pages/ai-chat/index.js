@@ -23,7 +23,7 @@ const MOCK_PAGE_DATA = {
     {
       id: "diet",
       label: "查看我的计划",
-      path: "/pages/my-plan/index",
+      path: "/pages/my-week-plan/index",
       routeType: "navigate"
     },
     {
