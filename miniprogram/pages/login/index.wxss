@@ -74,10 +74,11 @@
   text-align: center;
 }
 
-/* 底部操作区，左右 48rpx */
+/* 底部操作区，左右 40rpx */
 .login-footer {
-  width: 750rpx;
-  padding: 0 48rpx;
+  align-self: stretch;
+  width: 100%;
+  padding: 0 40rpx;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -87,9 +88,9 @@
 /* 登录按钮 */
 .login-btn {
   display: block;
-  width: 100%;
+  width: 100% !important;
   height: 96rpx;
-  margin: 0;
+  margin: 0 !important;
   padding: 0;
   border: none;
   border-radius: 24rpx;

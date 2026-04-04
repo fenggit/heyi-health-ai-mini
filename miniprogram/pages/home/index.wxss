@@ -137,8 +137,8 @@
 
 .health-metrics {
   display: flex;
-  margin-top: 18rpx;
-  padding-top: 13rpx;
+  margin-top: 40rpx;
+  padding-top: 28rpx;
   border-top: 2rpx dashed rgba(0, 201, 80, 0.5);
 }
 

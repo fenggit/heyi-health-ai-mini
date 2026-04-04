@@ -1,3 +1,5 @@
+const request = require('../../utils/request')
+
 const AGREEMENT_CONTENT = '基于中医体质理论和现代营养学，运用AI技术为每一位用户提供个性化的食养方案，帮助大家通过科学饮食改善体质，实现健康生活。\n\n基于中医体质理论和现代营养学，运用AI技术为每一位用户提供个性化的食养方案，帮助大家通过科学饮食改善体质，实现健康生活。基于中医体质理论和现代营养学，运用AI技术为每一位用户提供个性化的食养方案，帮助大家通过科学饮食改善体质，实现健康生活。'
 
 const PRIVACY_CONTENT = '基于中医体质理论和现代营养学，运用AI技术为每一位用户提供个性化的食养方案，帮助大家通过科学饮食改善体质，实现健康生活。\n\n基于中医体质理论和现代营养学，运用AI技术为每一位用户提供个性化的食养方案，帮助大家通过科学饮食改善体质，实现健康生活。基于中医体质理论和现代营养学，运用AI技术为每一位用户提供个性化的食养方案，帮助大家通过科学饮食改善体质，实现健康生活。'
@@ -52,7 +54,7 @@ Page({
 
         // 模拟登录成功，存储 token 后跳转首页
         // 实际项目中 token 由后端返回，此处用 loginRes.code 占位
-        wx.setStorageSync('token', loginRes.code)
+        request.setAuthToken(loginRes.code)
         const app = getApp()
         if (app) app.globalData.isLoggedIn = true
         this._goHome()

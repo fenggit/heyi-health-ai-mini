@@ -1,3 +1,5 @@
+const request = require('./utils/request')
+
 App({
   globalData: {
     layout: {
@@ -9,12 +11,13 @@ App({
     isLoggedIn: false
   },
   onLaunch() {
+    request.initAuthToken()
     this.globalData.layout = this.computeLayout()
     this.checkLogin()
   },
   checkLogin() {
     // 检查本地是否有 token，有则视为已登录直接进首页
-    const token = wx.getStorageSync('token')
+    const token = request.getAuthToken()
     if (!token) {
       // 未登录，跳转登录页（pages 第一项已是 login，默认启动即登录页，无需额外跳转）
       return

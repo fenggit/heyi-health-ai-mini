@@ -1,4 +1,5 @@
 const { initMiniNav, backWithFallback } = require('../../utils/mini-nav')
+const request = require('../../utils/request')
 
 Page({
   data: {
@@ -38,7 +39,7 @@ Page({
       content: '确认退出当前账号吗？',
       success: (res) => {
         if (res.confirm) {
-          wx.removeStorageSync('token')
+          request.clearAuthToken()
           const app = getApp()
           if (app) app.globalData.isLoggedIn = false
           wx.reLaunch({ url: '/pages/login/index' })
