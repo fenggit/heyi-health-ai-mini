@@ -17,8 +17,8 @@
 
   <view class="quiz-wrap">
     <view class="quiz-head">
-      <view class="quiz-head__title">{{subTitle}}</view>
-      <view class="quiz-head__subtitle">{{title}}</view>
+      <view class="quiz-head__title">{{name}}</view>
+      <view class="quiz-head__subtitle">{{desc}}</view>
       <view class="quiz-head__tag">趣味分析</view>
     </view>
 
@@ -67,13 +67,13 @@
       </view>
 
       <view class="quiz-options">
-        <block wx:for="{{questions[currentIndex].options}}" wx:key="*this">
+        <block wx:for="{{questions[currentIndex].options}}" wx:key="id">
           <view
             class="quiz-option {{answers[currentIndex] === index ? 'quiz-option--active' : ''}}"
             data-index="{{index}}"
             bindtap="chooseOption"
           >
-            <text class="quiz-option__text">{{item}}</text>
+            <text class="quiz-option__text">{{item.optionText}}</text>
             <view class="quiz-option__indicator {{answers[currentIndex] === index ? 'quiz-option__indicator--active' : ''}}">
               <text wx:if="{{answers[currentIndex] === index}}" class="quiz-option__check">✓</text>
             </view>
@@ -83,7 +83,7 @@
 
       <view class="quiz-actions {{currentIndex === 0 ? 'quiz-actions--single' : ''}}">
         <view wx:if="{{currentIndex > 0}}" class="quiz-btn quiz-btn--ghost" bindtap="prevQuestion">上一题</view>
-        <view class="quiz-btn quiz-btn--primary {{answers[currentIndex] < 0 ? 'quiz-btn--disabled' : ''}}" bindtap="nextQuestion">
+        <view class="quiz-btn quiz-btn--primary {{!questions[currentIndex].requiredFlag && answers[currentIndex] < 0 ? 'quiz-btn--disabled' : ''}}" bindtap="nextQuestion">
           {{currentIndex === questions.length - 1 ? "下一步" : "下一题"}}
         </view>
       </view>

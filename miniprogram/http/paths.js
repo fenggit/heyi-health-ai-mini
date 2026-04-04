@@ -6,6 +6,10 @@ const paths = {
   auth: {
     // 微信小程序手机号登录
     miniPhoneLogin: '/auth/mini/phone/login'
+  },
+  assessment: {
+    // 获取问卷详情
+    questionnaireDetail: '/assessment/app/questionnaire/detail'
   }
 }
 

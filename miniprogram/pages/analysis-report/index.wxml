@@ -154,8 +154,21 @@
         <view class="report-guest-auth-desc">{{guestAuthDesc}}</view>
       </view>
 
+      <view class="report-agreement" bindtap="toggleAgreed">
+        <my-checkbox checked="{{agreed}}" shape="square" />
+        <text class="report-agreement-text">我已阅读并接受<text class="report-agreement-link" catchtap="openUserAgreement">《用户协议》</text>、<text class="report-agreement-link" catchtap="openPrivacyPolicy">《隐私协议》</text></text>
+      </view>
+
       <view class="report-primary-btn report-primary-btn--guest" bindtap="goLogin">{{guestPrimaryButton}}</view>
       <view class="report-link-btn report-link-btn--guest" bindtap="goHome">{{guestBackText}}</view>
     </block>
   </view>
 </view>
+
+<!-- 协议弹窗 -->
+<agreement-popup
+  show="{{popupShow}}"
+  title="{{popupTitle}}"
+  content="{{popupContent}}"
+  bind:confirm="onPopupConfirm"
+/>

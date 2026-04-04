@@ -1,5 +1,7 @@
 {
   "pages": [
+    "pages/analysis-report/index",
+    "pages/analysis-quiz/index",
     "pages/login/index",
     "pages/home/index",
     "pages/activity-detail/index",
@@ -20,10 +22,10 @@
     "pages/ai-chat/index",
     "pages/analysis/index",
     "pages/constitution-assessment/index",
-    "pages/analysis-quiz/index",
+
     "pages/analysis-auth/index",
     "pages/analysis-upload/index",
-    "pages/analysis-report/index",
+    
     "pages/food-detail/index"
 
   ],

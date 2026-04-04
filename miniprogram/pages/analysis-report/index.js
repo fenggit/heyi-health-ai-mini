@@ -1,5 +1,9 @@
 const { getLayoutMetrics } = require("../../utils/layout")
 
+const AGREEMENT_CONTENT = '基于中医体质理论和现代营养学，运用AI技术为每一位用户提供个性化的食养方案，帮助大家通过科学饮食改善体质，实现健康生活。\n\n基于中医体质理论和现代营养学，运用AI技术为每一位用户提供个性化的食养方案，帮助大家通过科学饮食改善体质，实现健康生活。'
+
+const PRIVACY_CONTENT = '基于中医体质理论和现代营养学，运用AI技术为每一位用户提供个性化的食养方案，帮助大家通过科学饮食改善体质，实现健康生活。\n\n基于中医体质理论和现代营养学，运用AI技术为每一位用户提供个性化的食养方案，帮助大家通过科学饮食改善体质，实现健康生活。'
+
 const MOCK_REPORT_DATA = {
   navTitle: "趣味分析",
   reportTitle: "体质报告",
@@ -138,7 +142,11 @@ Page({
     guestAuthTitle: "",
     guestAuthDesc: "",
     guestPrimaryButton: "",
-    guestBackText: ""
+    guestBackText: "",
+    agreed: false,
+    popupShow: false,
+    popupTitle: "",
+    popupContent: ""
   },
   onLoad(options) {
     this.syncLayout()
@@ -199,6 +207,18 @@ Page({
     wx.setStorageSync("isLogin", true)
     wx.setStorageSync("logged", true)
     wx.redirectTo({ url: "/pages/analysis-report/index?logged=1&from=report-login" })
+  },
+  toggleAgreed() {
+    this.setData({ agreed: !this.data.agreed })
+  },
+  openUserAgreement() {
+    this.setData({ popupShow: true, popupTitle: "用户协议", popupContent: AGREEMENT_CONTENT })
+  },
+  openPrivacyPolicy() {
+    this.setData({ popupShow: true, popupTitle: "隐私政策", popupContent: PRIVACY_CONTENT })
+  },
+  onPopupConfirm() {
+    this.setData({ popupShow: false })
   },
   openDietPlan() {
     wx.switchTab({ url: "/pages/diet/index" })

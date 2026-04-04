@@ -1,3 +1,7 @@
 {
-  "navigationStyle": "custom"
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "my-checkbox": "/components/my-checkbox/index",
+    "agreement-popup": "/components/agreement-popup/index"
+  }
 }

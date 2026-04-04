@@ -1,5 +1,5 @@
 const STORAGE_TOKEN_KEY = 'token'
-const DEFAULT_TIMEOUT = 15000
+const DEFAULT_TIMEOUT = 10000
 const HOST = 'https://api.tyhctech.com'
 
 let authToken = ''

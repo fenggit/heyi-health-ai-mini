@@ -1,41 +1,48 @@
 const { getLayoutMetrics } = require("../../utils/layout")
+const { get } = require("../../utils/request")
+const paths = require("../../http/paths")
 
-const MOCK_QUIZ_DATA = {
-  title: "趣味分析，个性化建议",
-  subTitle: "AI生活状态趋势分析",
-  tips: "请根据您最近一个月的实际情况作答，以便获得更准确的体质分析结果。",
-  questions: [
-    {
-      id: "q1",
-      title: "您的睡眠质量如何？",
-      options: ["很好，很少失眠", "一般，偶尔失眠", "较差，经常失眠", "很差，长期失眠"]
-    },
-    {
-      id: "q2",
-      title: "您最近是否感觉容易疲劳？",
-      options: ["几乎没有", "偶尔会", "经常会", "持续明显"]
-    },
-    {
-      id: "q3",
-      title: "平时手脚怕冷的情况？",
-      options: ["从不怕冷", "偶尔怕冷", "经常怕冷", "一年四季都怕冷"]
-    },
-    {
-      id: "q4",
-      title: "消化状态（胃口/腹胀）如何？",
-      options: ["状态稳定", "轻微波动", "经常不适", "明显影响日常"]
-    },
-    {
-      id: "q5",
-      title: "最近情绪与压力状态？",
-      options: ["轻松平稳", "偶尔焦虑", "经常紧张", "持续压力很大"]
+/**
+ * 获取问卷详情
+ * @param {number|string} [questionnaireId] 问卷ID，可选
+ */
+function fetchQuizData(questionnaireId) {
+  const data = questionnaireId ? { questionnaireId } : {}
+  return get(paths.assessment.questionnaireDetail, data).then((res) => {
+    const detail = (res && res.data) || {}
+    // 将接口数据映射为页面所需结构
+    const questions = (detail.questions || []).map((q) => ({
+      id: q.id,
+      questionCode: q.questionCode,
+      questionType: q.questionType,
+      title: q.title,
+      dimensionCode: q.dimensionCode,
+      sortNo: q.sortNo,
+      requiredFlag: q.requiredFlag,
+      adaptiveFlag: q.adaptiveFlag,
+      options: (q.options || [])
+        .slice()
+        .sort((a, b) => (a.sortNo || 0) - (b.sortNo || 0))
+        .map((opt) => ({
+          id: opt.id,
+          optionCode: opt.optionCode,
+          optionText: opt.optionText,
+          scoreJson: opt.scoreJson,
+          nextRuleJson: opt.nextRuleJson,
+          sortNo: opt.sortNo
+        }))
+    }))
+    return {
+      questionnaireId: detail.questionnaireId,
+      questionnaireCode: detail.questionnaireCode,
+      name: detail.name || "",
+      desc: detail.description || "",
+      version: detail.version || "",
+      modelYear: detail.modelYear || "",
+      tips: "请根据您最近一个月的实际情况作答，以便获得更准确的体质分析结果。",
+      questions
     }
-  ]
-}
-
-function fetchQuizData() {
-  // TODO: 后续替换为问卷题目接口
-  return Promise.resolve(JSON.parse(JSON.stringify(MOCK_QUIZ_DATA)))
+  })
 }
 
 Page({
@@ -48,14 +55,15 @@ Page({
     menuHeight: 32,
     menuTop: 26,
     menuRight: 12,
-    title: "",
-    subTitle: "",
+    name: "",
+    desc: "",
     tips: "",
     currentIndex: 0,
     questions: [],
     answers: []
   },
-  onLoad() {
+  onLoad(options) {
+    this._questionnaireId = options && options.questionnaireId ? options.questionnaireId : undefined
     this.syncLayout()
     this.loadPageData()
   },
@@ -89,11 +97,18 @@ Page({
     })
   },
   async loadPageData() {
-    const payload = await fetchQuizData()
-    this.setData({
-      ...payload,
-      answers: new Array(payload.questions.length).fill(-1)
-    })
+    wx.showLoading({ title: "加载中", mask: true })
+    try {
+      const payload = await fetchQuizData(this._questionnaireId)
+      this.setData({
+        ...payload,
+        answers: new Array(payload.questions.length).fill(-1)
+      })
+    } catch (err) {
+      console.error("[analysis-quiz] 加载问卷失败", err)
+    } finally {
+      wx.hideLoading()
+    }
   },
   chooseOption(e) {
     const { index } = e.currentTarget.dataset
@@ -120,7 +135,9 @@ Page({
   nextQuestion() {
     const { currentIndex, questions, answers } = this.data
     if (!questions.length) return
-    if (answers[currentIndex] < 0) {
+    const currentQuestion = questions[currentIndex]
+    const isOptional = currentQuestion && currentQuestion.requiredFlag === true
+    if (!isOptional && answers[currentIndex] < 0) {
       wx.showToast({
         title: "请先选择一个答案",
         icon: "none"

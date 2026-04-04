@@ -347,13 +347,15 @@
 }
 
 .quiz-btn--ghost {
-  border: 2rpx solid rgba(255, 255, 255, 0.95);
-  background: rgba(255, 255, 255, 0.75);
+  border: none;
+  background: linear-gradient(129deg, #E9FBF1 0%, #ECFDF8 54.4%, #DEFEFD 100%);
+  border-radius: 24rpx 24rpx 24rpx 24rpx;
   color: #1e293b;
 }
 
 .quiz-btn--primary {
-  background: linear-gradient(90deg, #45e7cf 0%, #c7ec49 100%);
+  background: linear-gradient(126deg, #4EFFE2 0%, #CEF94C 100%);
+  border-radius: 24rpx 24rpx 24rpx 24rpx;
   color: #1e293b;
 }
 
