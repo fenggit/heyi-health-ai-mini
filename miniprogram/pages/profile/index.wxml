@@ -14,8 +14,7 @@
           <view class="profile-id">ID：{{user.userId}}</view>
         </view>
       </view>
-      <view class="card-panel profile-quick-entry" data-name="{{quickEntry.name}}" bindtap="openItem">
-        <image class="profile-quick-entry__icon" src="{{quickEntry.icon}}" mode="aspectFit" />
+      <view class="profile-quick-entry" data-name="{{quickEntry.name}}" bindtap="openItem">
         <text>{{quickEntry.name}}</text>
       </view>
     </view>
@@ -30,7 +29,7 @@
       </view>
       <view class="profile-member__divider"></view>
       <view class="profile-stats-head">
-        <text class="section-title">我的数据</text>
+        <title-view text="我的数据" />
       </view>
       <view class="profile-stats">
         <block wx:for="{{stats}}" wx:key="label">
@@ -44,7 +43,7 @@
 
     <view class="card-panel profile-section">
       <view class="profile-section__head">
-        <text class="section-title">全部功能</text>
+        <title-view text="全部功能" />
       </view>
       <block wx:for="{{featureMenus}}" wx:key="name">
         <view class="profile-item" data-name="{{item.name}}" bindtap="openItem">

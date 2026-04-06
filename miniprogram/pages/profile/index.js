@@ -9,7 +9,7 @@ const MOCK_PROFILE_DATA = {
     points: 1280
   },
   quickEntry: {
-    name: "我的主页",
+    name: "会员签到",
     icon: "/assets/profile/home.png"
   },
   stats: [
@@ -21,6 +21,7 @@ const MOCK_PROFILE_DATA = {
   featureMenus: [
     { name: "我的食养计划", icon: "/assets/profile/plan.png" },
     { name: "我的体质报告", icon: "/assets/profile/report.png" },
+    { name: "视觉AI分析报告", icon: "/assets/profile/report.png" },
     { name: "我的订单", icon: "/assets/profile/order.png" },
     { name: "我的收藏", icon: "/assets/profile/collection.png" },
     { name: "积分兑换", icon: "/assets/profile/points.png" },
@@ -40,7 +41,8 @@ const PROFILE_PAGE_ROUTE_MAP = {
   帮助中心: "/pages/help-center/index",
   关于我们: "/pages/about-us/index",
   我的食养计划: "/pages/my-week-plan/index",
-  我的体质报告: "/pages/analysis-report/index?logged=1&from=profile"
+  我的体质报告: "/pages/analysis-report/index?logged=1&from=profile",
+  视觉AI分析报告: "/pages/analysis-report/index?logged=1&from=profile&type=visual"
 }
 
 function fetchProfileData() {

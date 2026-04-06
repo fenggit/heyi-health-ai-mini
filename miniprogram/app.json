@@ -1,7 +1,5 @@
 {
-  "pages": [
-    "pages/analysis/index",
-    
+  "pages": [  
     "pages/login/index",
     "pages/home/index",
     "pages/activity-detail/index",
@@ -20,8 +18,8 @@
     "pages/my-favorites/index",
     "pages/invite-friends/index",
     "pages/ai-chat/index",
-
     "pages/qr-page/index",
+    "pages/analysis/index",
     "pages/analysis-quiz/index",
     "pages/analysis-report/index",
     "pages/analysis-auth/index",
