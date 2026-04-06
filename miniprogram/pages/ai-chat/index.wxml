@@ -1,5 +1,5 @@
 <view class="analysis-page design-page">
-  <image class="analysis-page-bg" src="/assets/analysis/chat/bg_ai.png" mode="widthFix" />
+  <image class="analysis-page-bg" src="/assets/bg_img.png" mode="widthFix" />
 
   <view class="mini-nav" style="padding-top: {{statusBarHeight}}px;">
     <view class="mini-nav__inner" style="height: {{navBarHeight}}px;">
