@@ -202,8 +202,16 @@
   justify-content: center;
 }
 
-.constitution-qr-canvas {
+.constitution-qr {
+  width: 320rpx;
+  height: 320rpx;
   display: block;
+}
+
+.constitution-qr-placeholder {
+  color: #64748b;
+  font-size: 24rpx;
+  line-height: 1.5;
 }
 
 .constitution-scan-hint {

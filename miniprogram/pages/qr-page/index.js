@@ -1,11 +1,9 @@
 const { getMiniNavData, backWithFallback } = require("../../utils/mini-nav")
-const QRCode = require("../../utils/weapp-qrcode")
+const { generateMiniCode } = require("../../http/qrcode")
 
-// 二维码内容：扫码后跳转到 analysis 页，scene 参数会透传
-// 微信小程序码的 scene 最大 32 字节，这里用 source=qr 作为标识
+// 小程序码 scene 最大 32 字节
 const QR_SCENE = "source=qr"
-// canvas 绘制尺寸（px），与 wxml 中 canvas 的 width/height 保持一致
-const QR_SIZE = 200
+const ANALYSIS_PAGE_PATH = "pages/analysis/index"
 
 const PAGE_DATA = {
   navTitle: "体质测评",
@@ -47,8 +45,8 @@ Page({
     benefits: [],
     scanTitle: "",
     scanHint: "",
-    qrSize: QR_SIZE,
-    // canvas 渲染完成后导出的临时图片路径，用于长按保存
+    qrImage: "",
+    qrLoading: true,
     qrTempPath: ""
   },
 
@@ -57,49 +55,104 @@ Page({
       ...getMiniNavData(),
       ...PAGE_DATA
     })
-    // 等 canvas 节点渲染完成后再绘制
-    wx.nextTick(() => this._drawQrCode())
+    this._loadMiniCode()
   },
 
-  _drawQrCode() {
-    const self = this
-    new QRCode("qr-canvas", {
-      usingIn: self,
-      text: QR_SCENE,
-      width: QR_SIZE,
-      height: QR_SIZE,
-      colorDark: "#000000",
-      colorLight: "#ffffff",
-      correctLevel: QRCode.CorrectLevel.H
-    })
-    // canvas 绘制是同步的，nextTick 后导出临时路径
-    wx.nextTick(() => {
-      wx.canvasToTempFilePath({
-        canvasId: "qr-canvas",
-        width: QR_SIZE,
-        height: QR_SIZE,
-        destWidth: QR_SIZE * 3,
-        destHeight: QR_SIZE * 3,
-        success: (res) => {
-          self.setData({ qrTempPath: res.tempFilePath })
-          console.log("[qr-page] 二维码生成成功, scene:", QR_SCENE)
-        },
-        fail: (err) => {
-          console.warn("[qr-page] 导出二维码图片失败:", err)
-        }
-      }, self)
+  _loadMiniCode() {
+    this.setData({ qrLoading: true })
+    generateMiniCode({
+      scene: QR_SCENE,
+      page: ANALYSIS_PAGE_PATH
+    }).then((res) => {
+      const rawImage = this._extractQrImage(res && res.data)
+      if (!rawImage) {
+        throw new Error("二维码返回为空")
+      }
+      return this._toTempImagePath(rawImage).then((tempPath) => {
+        this.setData({
+          qrImage: tempPath,
+          qrTempPath: tempPath,
+          qrLoading: false
+        })
+        console.log("[qr-page] 小程序码生成成功, scene:", QR_SCENE)
+      })
+    }).catch((err) => {
+      console.error("[qr-page] 小程序码生成失败:", err)
+      this.setData({ qrLoading: false })
+      wx.showToast({
+        title: "二维码生成失败，请稍后重试",
+        icon: "none"
+      })
     })
   },
 
-  // 长按保存二维码到相册
-  saveQrCode() {
-    const { qrTempPath } = this.data
-    if (!qrTempPath) {
-      wx.showToast({ title: "二维码生成中，请稍候", icon: "none" })
-      return
+  _extractQrImage(rawData) {
+    if (!rawData) return ""
+    if (typeof rawData === "string") return rawData.trim()
+    if (typeof rawData !== "object") return ""
+
+    const candidates = [
+      rawData.data,
+      rawData.result,
+      rawData.base64,
+      rawData.imageBase64,
+      rawData.qrBase64,
+      rawData.qrcodeBase64,
+      rawData.image,
+      rawData.url,
+      rawData.imageUrl,
+      rawData.qrcodeUrl,
+      rawData.qrCodeUrl
+    ]
+    const hit = candidates.find((item) => typeof item === "string" && item.trim())
+    return hit ? hit.trim() : ""
+  },
+
+  _toTempImagePath(rawImage) {
+    if (/^wxfile:\/\//.test(rawImage)) return Promise.resolve(rawImage)
+    if (/^https?:\/\//.test(rawImage)) return this._downloadToTemp(rawImage)
+    if (/^\/\//.test(rawImage)) return this._downloadToTemp(`https:${rawImage}`)
+
+    const dataUriMatch = rawImage.match(/^data:image\/[a-zA-Z+]+;base64,(.+)$/)
+    const base64Body = dataUriMatch ? dataUriMatch[1] : rawImage
+    if (!/^[A-Za-z0-9+/=\r\n]+$/.test(base64Body)) {
+      return Promise.reject(new Error("无法识别二维码图片格式"))
     }
+    return this._writeBase64ToTemp(base64Body)
+  },
+
+  _downloadToTemp(url) {
+    return new Promise((resolve, reject) => {
+      wx.downloadFile({
+        url,
+        success: (res) => {
+          if (res.statusCode !== 200 || !res.tempFilePath) {
+            reject(new Error(`下载二维码失败: ${res.statusCode}`))
+            return
+          }
+          resolve(res.tempFilePath)
+        },
+        fail: reject
+      })
+    })
+  },
+
+  _writeBase64ToTemp(base64Data) {
+    return new Promise((resolve, reject) => {
+      const filePath = `${wx.env.USER_DATA_PATH}/mini-code-${Date.now()}.png`
+      wx.getFileSystemManager().writeFile({
+        filePath,
+        data: base64Data,
+        encoding: "base64",
+        success: () => resolve(filePath),
+        fail: reject
+      })
+    })
+  },
+
+  _saveImage(filePath) {
     wx.saveImageToPhotosAlbum({
-      filePath: qrTempPath,
+      filePath,
       success: () => wx.showToast({ title: "已保存到相册", icon: "success" }),
       fail: (err) => {
         if (err.errMsg && err.errMsg.includes("auth deny")) {
@@ -114,6 +167,15 @@ Page({
         }
       }
     })
+  },
+
+  saveQrCode() {
+    const { qrLoading, qrTempPath } = this.data
+    if (qrLoading || !qrTempPath) {
+      wx.showToast({ title: "二维码生成中，请稍候", icon: "none" })
+      return
+    }
+    this._saveImage(qrTempPath)
   },
 
   handleBack() {
