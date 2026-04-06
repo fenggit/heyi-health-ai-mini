@@ -3,3 +3,29 @@
 .analysis-auth-page .report-wrap {
   margin-top: 0;
 }
+
+.analysis-auth-page .mini-nav__back {
+  width: 16rpx;
+  height: auto;
+  padding-right: 0;
+}
+
+.auth-primary-btn {
+  width: 638rpx !important;
+  height: 80rpx !important;
+  margin: 40rpx auto 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 24rpx !important;
+  background: linear-gradient(90deg, #45e7cf 0%, #c7ec49 100%) !important;
+  color: #1e293b !important;
+  font-size: 32rpx !important;
+  line-height: 80rpx !important;
+  text-align: center !important;
+  font-weight: 700 !important;
+  box-sizing: border-box !important;
+}
+
+.auth-primary-btn::after {
+  border: none;
+}

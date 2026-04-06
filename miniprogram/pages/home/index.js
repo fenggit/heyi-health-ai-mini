@@ -1,4 +1,5 @@
 const { getLayoutMetrics } = require("../../utils/layout")
+const { getGuestToken } = require("../../http/auth")
 
 function createProgressSegments(filled, total) {
   return Array.from({ length: total }, (_, index) => ({
@@ -68,7 +69,7 @@ const MOCK_HOME_DATA = {
       bgImage: "/assets/home/shortcut_bg_right.png",
       checkCircle: "/assets/home/shortcut_icon_circle_right.png",
       checkTick: "/assets/home/shortcut_icon_tick_right.png",
-      path: "/pages/constitution-assessment/index"
+      path: "/pages/qr-page/index"
     }
   ],
   recommendation: {
@@ -141,6 +142,29 @@ Page({
   openShortcut(e) {
     const { path } = e.currentTarget.dataset
     if (!path) return
+
+    // analysis 入口：未登录时先确保拿到 guestToken 再跳转
+    if (path.indexOf('/pages/analysis/') !== -1) {
+      const app = getApp()
+      const isLogin = !!(app && app.globalData.isLogin)
+      console.log('[home] 点击 analysis，当前登录状态:', isLogin ? '已登录' : '未登录')
+      if (!isLogin) {
+        wx.showLoading({ title: '准备中...', mask: true })
+        getGuestToken({
+          success: () => {
+            wx.hideLoading()
+            wx.navigateTo({ url: path })
+          },
+          fail: (err) => {
+            wx.hideLoading()
+            console.error('[home] 获取 guestToken 失败:', err)
+            wx.showToast({ title: '网络异常，请重试', icon: 'none' })
+          }
+        })
+        return
+      }
+    }
+
     wx.navigateTo({ url: path })
   },
   openIngredientPackDetail() {

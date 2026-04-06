@@ -1,0 +1,19 @@
+.webview-page {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+}
+
+.webview-page__bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 750rpx;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.webview-page__webview {
+  position: relative;
+  z-index: 1;
+}

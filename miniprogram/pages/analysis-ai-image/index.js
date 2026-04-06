@@ -40,9 +40,7 @@ Page({
   },
   _generateTimer: null,
   _isGenerating: false,
-  onLoad(options) {
-    this._guestToken = (options && options.guestToken) || ''
-    console.log('[analysis-upload] onLoad, guestToken:', this._guestToken)
+  onLoad() {
     this.syncLayout()
     this.loadPageData()
   },
@@ -123,8 +121,7 @@ Page({
       wx.navigateTo({ url: "/pages/analysis-report/index?logged=1&from=upload" })
       return
     }
-    console.log('[analysis-upload] 跳转 analysis-auth, guestToken:', this._guestToken)
-    wx.navigateTo({ url: `/pages/analysis-auth/index?from=upload&guestToken=${this._guestToken}` })
+    wx.navigateTo({ url: "/pages/analysis-auth/index?from=upload" })
   },
   clearGenerateTimer() {
     if (this._generateTimer) {

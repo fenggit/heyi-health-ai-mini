@@ -15,7 +15,7 @@
 | --- | --- | --- |
 | 登录 | `pages/login/index` | 微信授权登录入口，含协议阅读弹窗。 |
 | 购物车 | `pages/cart/index` | 购物车结算页，含优惠券、金额明细、地址管理弹窗。 |
-| 体质评估 | `pages/constitution-assessment/index` | 体质评估流程页面。 |
+| 体质评估 | `pages/qr-page/index` | 体质评估流程页面。 |
 | AI 分析授权 | `pages/analysis-auth/index` | AI 分析的授权确认页。 |
 | AI 分析报告 | `pages/analysis-report/index` | AI 分析结果报告页。 |
 | 商品详情 | `pages/food-detail/index` | 商品详情与规格展示页。 |
@@ -46,10 +46,11 @@
 | 邀请好友 | `pages/invite-friends/index` | 查看推荐码、邀请奖励和好友邀请记录。 | 我的页功能入口 |
 | AI 聊天 | `pages/ai-chat/index` | 文本/语音聊天输入与消息展示（演示版）。 | 底部自定义 Tab 中间 AI 按钮 |
 | AI 趣味分析 | `pages/analysis/index` | 分析说明页，阅读声明并进入测评。 | 首页 AI 趣味分析入口 |
-| 体质评估 | `pages/constitution-assessment/index` | AI 分析前的体质评估入口/说明页。 | AI 分析流程入口 |
+| 体质评估 | `pages/qr-page/index` | AI 分析前的体质评估入口/说明页。 | AI 分析流程入口 |
 | AI 测评问答 | `pages/analysis-quiz/index` | 多题问答流程，提交后可进入上传步骤。 | AI 趣味分析页 |
 | AI 分析授权 | `pages/analysis-auth/index` | 授权提示与登录引导。 | AI 分析流程中间页 |
 | AI 图片上传 | `pages/analysis-upload/index` | 上传舌苔/面色样本图片，后续生成报告（待接入）。 | AI 测评问答页 |
+| AI 视觉分析 | `pages/analysis-ai-image/index` | 上传舌苔/面色图片进行 AI 视觉分析，生成体质报告。 | AI 趣味分析页 |
 | AI 分析报告 | `pages/analysis-report/index` | 展示 AI 分析结果与建议。 | AI 图片上传页 |
 | 商品详情 | `pages/food-detail/index` | 展示商品详情、规格、推荐信息。 | 商城页商品卡片 |
 
@@ -58,6 +59,7 @@
 2. `首页活动轮播 -> 活动详情`
 3. `商城 -> 商品详情 -> 购物车 -> 结算`
 4. `首页 -> AI 趣味分析 -> AI 测评问答 -> AI 分析授权 -> AI 图片上传 -> AI 分析报告`
+5. `AI 趣味分析页 -> AI视觉分析按钮 -> AI 视觉分析（analysis-ai-image）`
 5. `食养 -> 定制计划 -> 我的计划`
 6. `我的 -> 会员升级 / 积分兑换 / 设置 / 我的订单 / 我的收藏 / 邀请好友 / 帮助中心 / 关于我们`
 7. `任意页面底部中间 AI 按钮 -> AI 聊天`

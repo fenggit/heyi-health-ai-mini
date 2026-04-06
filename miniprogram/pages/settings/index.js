@@ -41,7 +41,7 @@ Page({
         if (res.confirm) {
           request.clearAuthToken()
           const app = getApp()
-          if (app) app.globalData.isLoggedIn = false
+          if (app) app.globalData.isLogin = false
           wx.reLaunch({ url: '/pages/login/index' })
         }
       }

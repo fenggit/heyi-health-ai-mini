@@ -1,0 +1,43 @@
+.my-header {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.my-header__inner {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  padding-left: 24rpx;
+}
+
+.my-header__back {
+  width: 16rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  pointer-events: auto;
+  margin-right: 4rpx;
+  flex-shrink: 0;
+}
+
+.my-header__back-icon {
+  width: 12rpx;
+  height: 20rpx;
+}
+
+.my-header__title {
+  color: #1e293b;
+  font-size: 28rpx;
+  line-height: 30rpx;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.my-header__capsule {
+  position: absolute;
+  pointer-events: none;
+}

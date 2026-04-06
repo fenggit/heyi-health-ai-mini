@@ -1,15 +1,20 @@
 const { getLayoutMetrics } = require("../../utils/layout")
-const { get } = require("../../utils/request")
+const { post } = require("../../utils/request")
 const paths = require("../../http/paths")
 
 /**
- * 获取问卷详情
- * @param {number|string} [questionnaireId] 问卷ID，可选
+ * 初始化问卷（POST /assessment/app/questionnaire/init）
+ * @param {object} params
+ * @param {number|string} [params.questionnaireId]
+ * @param {string} [params.guestToken]
  */
-function fetchQuizData(questionnaireId) {
-  const data = questionnaireId ? { questionnaireId } : {}
-  return get(paths.assessment.questionnaireDetail, data).then((res) => {
-    const detail = (res && res.data) || {}
+function fetchQuizData({ questionnaireId, guestToken } = {}) {
+  const body = {}
+  if (questionnaireId) body.questionnaireId = questionnaireId
+  if (guestToken) body.guestToken = guestToken
+  return post(paths.assessment.questionnaireInit, body).then((res) => {
+    const record = (res && res.data && res.data.record) || {}
+    const detail = (res && res.data && res.data.detail) || {}
     // 将接口数据映射为页面所需结构
     const questions = (detail.questions || []).map((q) => ({
       id: q.id,
@@ -33,6 +38,7 @@ function fetchQuizData(questionnaireId) {
         }))
     }))
     return {
+      recordId: record.id,
       questionnaireId: detail.questionnaireId,
       questionnaireCode: detail.questionnaireCode,
       name: detail.name || "",
@@ -43,6 +49,31 @@ function fetchQuizData(questionnaireId) {
       questions
     }
   })
+}
+
+/**
+ * 提交问卷答案
+ * @param {object} params
+ * @param {number} params.recordId
+ * @param {string} [params.guestToken]
+ * @param {Array} params.questions  - 问题列表
+ * @param {Array} params.answers    - 每题选中的选项 index（与 questions 对应）
+ */
+function submitQuiz({ recordId, guestToken, questions, answers }) {
+  const answerList = questions
+    .map((q, i) => {
+      const optIndex = answers[i]
+      if (optIndex < 0 || !q.options[optIndex]) return null
+      return { questionId: q.id, optionId: q.options[optIndex].id }
+    })
+    .filter(Boolean)
+
+  const body = { recordId, answers: answerList }
+  const app = getApp()
+  if (!(app && app.globalData.isLogin) && guestToken) {
+    body.guestToken = guestToken
+  }
+  return post(paths.assessment.questionnaireSubmit, body)
 }
 
 Page({
@@ -64,6 +95,8 @@ Page({
   },
   onLoad(options) {
     this._questionnaireId = options && options.questionnaireId ? options.questionnaireId : undefined
+    this._guestToken = (options && options.guestToken) || ''
+    console.log('[analysis-quiz] onLoad, guestToken:', this._guestToken)
     this.syncLayout()
     this.loadPageData()
   },
@@ -99,7 +132,11 @@ Page({
   async loadPageData() {
     wx.showLoading({ title: "加载中", mask: true })
     try {
-      const payload = await fetchQuizData(this._questionnaireId)
+      const payload = await fetchQuizData({
+        questionnaireId: this._questionnaireId,
+        guestToken: this._guestToken
+      })
+      this._recordId = payload.recordId
       this.setData({
         ...payload,
         answers: new Array(payload.questions.length).fill(-1)
@@ -114,9 +151,12 @@ Page({
     const { index } = e.currentTarget.dataset
     const nextAnswers = [...this.data.answers]
     nextAnswers[this.data.currentIndex] = Number(index)
-    this.setData({
-      answers: nextAnswers
-    })
+    this.setData({ answers: nextAnswers })
+
+    const { questions, currentIndex } = this.data
+    const q = questions[currentIndex]
+    const opt = q && q.options[Number(index)]
+    console.log('[analysis-quiz] 当前选择:', JSON.stringify({ questionId: q && q.id, title: q && q.title, optionId: opt && opt.id, optionText: opt && opt.optionText }))
   },
   handleBack() {
     const pages = getCurrentPages()
@@ -145,11 +185,35 @@ Page({
       return
     }
     if (currentIndex >= questions.length - 1) {
-      wx.navigateTo({ url: "/pages/analysis-upload/index" })
+      this._submitQuiz()
       return
     }
     this.setData({
       currentIndex: currentIndex + 1
     })
+  },
+  async _submitQuiz() {
+    const { questions, answers } = this.data
+    wx.showLoading({ title: '提交中', mask: true })
+    try {
+      const res = await submitQuiz({
+        recordId: this._recordId,
+        guestToken: this._guestToken,
+        questions,
+        answers
+      })
+      console.log('[analysis-quiz] 提交成功', res)
+      const app = getApp()
+      const isLogin = !!(app && app.globalData.isLogin)
+      if (isLogin) {
+        wx.redirectTo({ url: `/pages/analysis-report/index?recordId=${this._recordId}` })
+      } else {
+        wx.redirectTo({ url: `/pages/analysis-auth/index?recordId=${this._recordId}&guestToken=${this._guestToken}` })
+      }
+    } catch (err) {
+      console.error('[analysis-quiz] 提交失败', err)
+    } finally {
+      wx.hideLoading()
+    }
   }
 })

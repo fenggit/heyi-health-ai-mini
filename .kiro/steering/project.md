@@ -33,7 +33,7 @@ miniprogram/
 - profile — 我的（TabBar）
 - analysis-quiz — 体质问卷
 - analysis / analysis-auth / analysis-upload / analysis-report — 分析流程
-- constitution-assessment — 体质评估
+- qr-page — 体质评估
 - diet-plan / my-week-plan — 饮食计划
 - ai-chat — AI 对话
 - food-detail — 食物详情

@@ -47,7 +47,7 @@ function normalizeUrl(url, baseUrl = '') {
 }
 
 function buildHeaders(header = {}, withAuth = true) {
-  const nextHeader = Object.assign({}, header)
+  const nextHeader = Object.assign({ 'X-App-Source': 'miniapp' }, header)
   const token = withAuth ? getAuthToken() : ''
 
   if (withAuth && token && !nextHeader.Authorization && !nextHeader.authorization) {

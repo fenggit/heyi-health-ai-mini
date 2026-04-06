@@ -1,4 +1,5 @@
 const { getLayoutMetrics } = require("../../utils/layout")
+const { getGuestToken } = require("../../http/auth")
 
 const MOCK_ANALYSIS_INTRO = {
   introTitle: "开始前，请仔细阅读以下重要说明",
@@ -48,6 +49,38 @@ Page({
   onLoad() {
     this.syncLayout()
     this.loadPageData()
+    const app = getApp()
+    const isLogin = !!(app && app.globalData.isLogin)
+    console.log('[analysis] 当前登录状态:', isLogin ? '已登录' : '未登录')
+  },
+  // 未登录时获取游客 token，失败时静默记录，按钮点击时会重试
+  _fetchGuestToken() {
+    const app = getApp()
+    if (app && app.globalData.isLogin) return
+    getGuestToken({
+      success: () => console.log('[analysis] guestToken 获取成功'),
+      fail: (err) => console.warn('[analysis] guestToken 获取失败:', err)
+    })
+  },
+  // 已登录直接放行；未登录确保 guestSession 存在，否则重新获取；返回 Promise<boolean>
+  _ensureGuestToken() {
+    const app = getApp()
+    if (app && app.globalData.isLogin) return Promise.resolve(true)
+    if (app && app.globalData.guestSession && app.globalData.guestSession.guestToken) {
+      return Promise.resolve(true)
+    }
+    return new Promise((resolve) => {
+      wx.showLoading({ title: '准备中...', mask: true })
+      getGuestToken({
+        success: () => { wx.hideLoading(); resolve(true) },
+        fail: (err) => {
+          wx.hideLoading()
+          console.error('[analysis] guestToken 重试失败:', err)
+          wx.showToast({ title: '网络异常，请重试', icon: 'none' })
+          resolve(false)
+        }
+      })
+    })
   },
   syncLayout() {
     const { statusBarHeight, navBarHeight, headerHeight } = getLayoutMetrics()
@@ -88,7 +121,14 @@ Page({
     })
   },
   backHome() {
-    wx.switchTab({ url: "/pages/home/index" })
+    this._ensureGuestToken().then((ok) => {
+      if (!ok) return
+      const app = getApp()
+      const guestToken = (!app.globalData.isLogin && app.globalData.guestSession)
+        ? app.globalData.guestSession.guestToken : ''
+      console.log('[analysis] 跳转 analysis-ai-image, guestToken:', guestToken)
+      wx.navigateTo({ url: `/pages/analysis-ai-image/index?guestToken=${guestToken}` })
+    })
   },
   handleBack() {
     const pages = getCurrentPages()
@@ -106,6 +146,13 @@ Page({
       })
       return
     }
-    wx.navigateTo({ url: "/pages/analysis-quiz/index" })
+    this._ensureGuestToken().then((ok) => {
+      if (!ok) return
+      const app = getApp()
+      const guestToken = (!app.globalData.isLogin && app.globalData.guestSession)
+        ? app.globalData.guestSession.guestToken : ''
+      console.log('[analysis] 跳转 analysis-quiz, guestToken:', guestToken)
+      wx.navigateTo({ url: `/pages/analysis-quiz/index?guestToken=${guestToken}` })
+    })
   }
 })

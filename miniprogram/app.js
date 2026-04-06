@@ -1,6 +1,29 @@
 const request = require('./utils/request')
 
 App({
+  /**
+   * 全局数据
+   *
+   * layout — 布局尺寸，onLaunch 时计算写入
+   *   statusBarHeight {number}  状态栏高度（px）
+   *   navBarHeight    {number}  导航栏高度（px）
+   *   headerHeight    {number}  顶部总高度 = statusBarHeight + navBarHeight（px）
+   *   safeBottom      {number}  底部安全区高度（px）
+   *
+   * isLogin {boolean}  是否已登录；登录成功 true，登录失败/退出登录 false
+   *
+   * userInfo — 登录成功后的用户信息（来自 wxPhoneLogin 响应 data.userInfo）
+   *   userId   {number}  用户 ID
+   *   phone    {string}  手机号
+   *   fullReport {object} 完整体测报告
+   *   client_id  {string}
+   *
+   * guestSession — 游客 session 信息（来自 getGuestToken 响应 data）
+   *   guestToken     {string}  游客令牌
+   *   expireTime     {string}  令牌过期时间（date-time）
+   *   maxExpireTime  {string}  最大过期时间（date-time）
+   *   newSession     {boolean} 是否为新会话
+   */
   globalData: {
     layout: {
       statusBarHeight: 20,
@@ -8,7 +31,9 @@ App({
       headerHeight: 64,
       safeBottom: 0
     },
-    isLoggedIn: false
+    isLogin: false,
+    userInfo: null,
+    guestSession: null
   },
   onLaunch() {
     request.initAuthToken()
@@ -22,7 +47,7 @@ App({
       // 未登录，跳转登录页（pages 第一项已是 login，默认启动即登录页，无需额外跳转）
       return
     }
-    this.globalData.isLoggedIn = true
+    this.globalData.isLogin = true
     wx.switchTab({ url: '/pages/home/index' })
   },
   computeLayout() {

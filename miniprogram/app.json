@@ -1,7 +1,7 @@
 {
   "pages": [
-    "pages/analysis-report/index",
-    "pages/analysis-quiz/index",
+    "pages/analysis/index",
+    
     "pages/login/index",
     "pages/home/index",
     "pages/activity-detail/index",
@@ -20,13 +20,15 @@
     "pages/my-favorites/index",
     "pages/invite-friends/index",
     "pages/ai-chat/index",
-    "pages/analysis/index",
-    "pages/constitution-assessment/index",
 
+    "pages/qr-page/index",
+    "pages/analysis-quiz/index",
+    "pages/analysis-report/index",
     "pages/analysis-auth/index",
     "pages/analysis-upload/index",
-    
-    "pages/food-detail/index"
+    "pages/analysis-ai-image/index",
+    "pages/food-detail/index",
+    "pages/webview-page/index"
 
   ],
   "window": {
