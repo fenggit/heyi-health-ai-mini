@@ -46,9 +46,17 @@ Page({
     extras: [],
     agreementText: ""
   },
-  onLoad() {
+  onLoad(options) {
     this.syncLayout()
     this.loadPageData()
+
+    // 小程序码扫码进入时，scene 会经过 URL encode，需要 decode
+    // 普通路由跳转时 scene 为 undefined
+    const rawScene = options.scene
+    const sceneCode = rawScene ? decodeURIComponent(rawScene) : null
+    this._sceneCode = sceneCode
+    console.log('[analysis] scene code:', sceneCode || '（非扫码进入）')
+
     const app = getApp()
     const isLogin = !!(app && app.globalData.isLogin)
     console.log('[analysis] 当前登录状态:', isLogin ? '已登录' : '未登录')
@@ -58,6 +66,7 @@ Page({
     const app = getApp()
     if (app && app.globalData.isLogin) return
     getGuestToken({
+      source: this._sceneCode,
       success: () => console.log('[analysis] guestToken 获取成功'),
       fail: (err) => console.warn('[analysis] guestToken 获取失败:', err)
     })
@@ -72,6 +81,7 @@ Page({
     return new Promise((resolve) => {
       wx.showLoading({ title: '准备中...', mask: true })
       getGuestToken({
+        source: this._sceneCode,
         success: () => { wx.hideLoading(); resolve(true) },
         fail: (err) => {
           wx.hideLoading()

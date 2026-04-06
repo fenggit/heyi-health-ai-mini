@@ -51,7 +51,7 @@ function buildHeaders(header = {}, withAuth = true) {
   const token = withAuth ? getAuthToken() : ''
 
   if (withAuth && token && !nextHeader.Authorization && !nextHeader.authorization) {
-    nextHeader.Authorization = token
+    nextHeader.Authorization = `Bearer ${token}`
   }
 
   return nextHeader

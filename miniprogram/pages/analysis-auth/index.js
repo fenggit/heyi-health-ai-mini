@@ -2,6 +2,7 @@ const { getLayoutMetrics } = require("../../utils/layout")
 const { get } = require("../../utils/request")
 const paths = require("../../http/paths")
 const { login } = require("../../http/auth")
+const { navigateToReport } = require("../../utils/navigateReport")
 
 const STATIC_DATA = {
   navTitle: "趣味分析",
@@ -112,9 +113,7 @@ Page({
     login({ phoneCode: e.detail.code, guestToken: this._guestToken })
       .then(() => {
         wx.hideLoading()
-        wx.redirectTo({
-          url: '/pages/webview-page/index?title=' + encodeURIComponent('测评报告') + '&url=' + encodeURIComponent('https://www.baidu.com/')
-        })
+        navigateToReport()
       })
       .catch(() => {
         wx.hideLoading()

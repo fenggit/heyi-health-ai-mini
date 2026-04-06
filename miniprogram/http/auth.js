@@ -145,13 +145,14 @@ function loginAndGetGuestToken(deviceId, scene, source, { success, fail, complet
 /**
  * 游客 session — 使用默认参数，一键获取
  * @param {object} [callbacks]
+ * @param {string} [callbacks.source]   - 可选，来源标识（如扫码 scene code）
  * @param {function} [callbacks.success]
  * @param {function} [callbacks.fail]
  * @param {function} [callbacks.complete]
  * @returns {Promise}
  */
-function getGuestToken({ success, fail, complete } = {}) {
-  return loginAndGetGuestToken('device_001', 'qr_scene_001', 'miniapp', { success, fail, complete })
+function getGuestToken({ source, success, fail, complete } = {}) {
+  return loginAndGetGuestToken('device_001', 'qr_scene_001', source || 'miniapp', { success, fail, complete })
 }
 
 /**

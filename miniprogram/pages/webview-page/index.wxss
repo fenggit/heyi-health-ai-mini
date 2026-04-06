@@ -12,8 +12,3 @@
   z-index: 0;
   pointer-events: none;
 }
-
-.webview-page__webview {
-  position: relative;
-  z-index: 1;
-}

@@ -197,12 +197,13 @@
   border: 4rpx solid #00c950;
   box-sizing: border-box;
   background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.constitution-qr {
+.constitution-qr-canvas {
   display: block;
-  width: 100%;
-  height: 100%;
 }
 
 .constitution-scan-hint {

@@ -1,5 +1,1 @@
-<view class="webview-page">
-  <image class="webview-page__bg" src="/assets/bg_img.png" mode="widthFix" />
-  <my-header title="{{title}}" />
-  <web-view wx:if="{{url}}" src="{{url}}" class="webview-page__webview" />
-</view>
+<web-view wx:if="{{url}}" src="{{url}}" bindmessage="onWebviewMessage" />

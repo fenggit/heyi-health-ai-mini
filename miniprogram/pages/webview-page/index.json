@@ -1,6 +1,5 @@
 {
-  "navigationStyle": "custom",
-  "usingComponents": {
-    "my-header": "/components/my-header/index"
-  }
+  "navigationStyle": "default",
+  "navigationBarTitleText": "",
+  "usingComponents": {}
 }

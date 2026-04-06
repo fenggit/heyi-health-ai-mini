@@ -9,6 +9,10 @@ const paths = {
     // 游客 session
     guestSession: '/auth/mini/guest/session'
   },
+  qrcode: {
+    // 生成带 scene 参数的小程序码（返回 base64 图片）
+    generateMiniCode: '/wechat/mini/qrcode/generate'
+  },
   assessment: {
     // 获取问卷详情
     questionnaireDetail: '/assessment/app/questionnaire/detail',

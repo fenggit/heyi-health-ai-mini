@@ -1,6 +1,7 @@
 const { getLayoutMetrics } = require("../../utils/layout")
 const { post } = require("../../utils/request")
 const paths = require("../../http/paths")
+const { navigateToReport } = require("../../utils/navigateReport")
 
 /**
  * 初始化问卷（POST /assessment/app/questionnaire/init）
@@ -206,7 +207,7 @@ Page({
       const app = getApp()
       const isLogin = !!(app && app.globalData.isLogin)
       if (isLogin) {
-        wx.redirectTo({ url: `/pages/analysis-report/index?recordId=${this._recordId}` })
+        navigateToReport()
       } else {
         wx.redirectTo({ url: `/pages/analysis-auth/index?recordId=${this._recordId}&guestToken=${this._guestToken}` })
       }
