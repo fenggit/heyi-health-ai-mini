@@ -1,4 +1,5 @@
 const { getLayoutMetrics } = require("../../utils/layout")
+const { navigateToReport } = require("../../utils/navigateReport")
 
 const MOCK_PROFILE_DATA = {
   pageTitle: "个人中心",
@@ -40,9 +41,12 @@ const PROFILE_PAGE_ROUTE_MAP = {
   设置: "/pages/settings/index",
   帮助中心: "/pages/help-center/index",
   关于我们: "/pages/about-us/index",
-  我的食养计划: "/pages/my-week-plan/index",
-  我的体质报告: "/pages/analysis-report/index?logged=1&from=profile",
-  视觉AI分析报告: "/pages/analysis-report/index?logged=1&from=profile&type=visual"
+  我的食养计划: "/pages/my-week-plan/index"
+}
+
+const PROFILE_REPORT_MENU_MAP = {
+  我的体质报告: { title: "我的体质报告", key: "questionnaireReportUrl" },
+  视觉AI分析报告: { title: "视觉AI分析报告", key: "aiReportUrl" }
 }
 
 function fetchProfileData() {
@@ -116,6 +120,7 @@ Page({
     this.loadPageData()
   },
   onShow() {
+    this.syncUserInfo()
     if (typeof this.getTabBar === "function" && this.getTabBar()) {
       this.getTabBar().setData({ selected: 3 })
     }
@@ -129,6 +134,11 @@ Page({
   async loadPageData() {
     const payload = await fetchProfileData()
     this.setData(payload)
+    this.syncUserInfo()
+  },
+  syncUserInfo() {
+    const app = getApp()
+    this._userInfo = (app && app.globalData && app.globalData.userInfo) || {}
   },
   openItem(e) {
     const { name } = e.currentTarget.dataset
@@ -136,6 +146,22 @@ Page({
       this.openMemberSheet()
       return
     }
+
+    const reportConfig = PROFILE_REPORT_MENU_MAP[name]
+    if (reportConfig) {
+      const userInfo = this._userInfo || {}
+      const reportUrl = userInfo[reportConfig.key] || ""
+      if (!reportUrl) {
+        wx.showToast({
+          title: "报告地址为空",
+          icon: "none"
+        })
+        return
+      }
+      navigateToReport(reportConfig.title, reportUrl)
+      return
+    }
+
     const url = PROFILE_PAGE_ROUTE_MAP[name]
     if (url) {
       wx.navigateTo({ url })

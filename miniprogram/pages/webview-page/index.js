@@ -1,4 +1,13 @@
 const { getLayoutMetrics } = require("../../utils/layout")
+const { HOST } = require("../../utils/request")
+
+function normalizeWebviewUrl(rawUrl) {
+  if (!rawUrl) return ''
+  if (/^https?:\/\//i.test(rawUrl)) return rawUrl
+  const base = HOST.endsWith('/') ? HOST.slice(0, -1) : HOST
+  const path = rawUrl.startsWith('/') ? rawUrl : `/${rawUrl}`
+  return `${base}${path}`
+}
 
 Page({
   data: {
@@ -8,7 +17,10 @@ Page({
   },
   onLoad(options) {
     const title = options.title ? decodeURIComponent(options.title) : ''
-    const url = options.url ? decodeURIComponent(options.url) : ''
+    const sourceUrl = options.url ? decodeURIComponent(options.url) : ''
+    const url = normalizeWebviewUrl(sourceUrl)
+    console.log('[webview-page] 接收到参数', JSON.stringify({ title, url: sourceUrl }))
+    console.log('[webview-page] 最终加载 URL', url)
     const { headerHeight } = getLayoutMetrics()
     this.setData({ title, url, headerHeight })
     if (title) {

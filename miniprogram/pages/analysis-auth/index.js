@@ -22,6 +22,15 @@ const STATIC_DATA = {
   guestBackText: "返回首页"
 }
 
+function safeDecode(value) {
+  if (!value) return ''
+  try {
+    return decodeURIComponent(value)
+  } catch (e) {
+    return value
+  }
+}
+
 Page({
   data: {
     topInset: 32,
@@ -38,8 +47,9 @@ Page({
     ...STATIC_DATA
   },
   onLoad(options) {
-    this._recordId = (options && options.recordId) || ''
-    this._guestToken = (options && options.guestToken) || ''
+    this._recordId = safeDecode((options && options.recordId) || '')
+    this._guestToken = safeDecode((options && options.guestToken) || '')
+    this._reportUrl = safeDecode((options && options.reportUrl) || '')
     console.log('[analysis-auth] onLoad, recordId:', this._recordId, 'guestToken:', this._guestToken)
     this.syncLayout()
     this.loadResultDetail()
@@ -113,7 +123,7 @@ Page({
     login({ phoneCode: e.detail.code, guestToken: this._guestToken })
       .then(() => {
         wx.hideLoading()
-        navigateToReport()
+        navigateToReport('测试报告', this._reportUrl)
       })
       .catch(() => {
         wx.hideLoading()

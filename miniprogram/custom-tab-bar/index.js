@@ -1,3 +1,5 @@
+const { fetchUserInfo } = require("../http/auth")
+
 Component({
   data: {
     selected: 0,
@@ -21,9 +23,18 @@ Component({
     ]
   },
   methods: {
+    tryFetchUserInfo(path) {
+      if (path !== "/pages/profile/index") return
+      const app = getApp()
+      if (!app || !app.globalData || !app.globalData.isLogin) return
+      fetchUserInfo().catch((err) => {
+        console.error("[tabbar] 获取用户信息失败", err)
+      })
+    },
     switchTab(e) {
       const { path, index } = e.currentTarget.dataset
       const next = Number(index)
+      this.tryFetchUserInfo(path)
       if (next === this.data.selected || this.switching) return
       this.switching = true
       wx.switchTab({

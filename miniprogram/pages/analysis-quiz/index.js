@@ -77,6 +77,16 @@ function submitQuiz({ recordId, guestToken, questions, answers }) {
   return post(paths.assessment.questionnaireSubmit, body)
 }
 
+function extractReportUrl(submitRes) {
+  const data = (submitRes && submitRes.data) || {}
+  return (
+    data.reportUrl ||
+    (data.result && data.result.reportUrl) ||
+    (data.previewSnapshot && data.previewSnapshot.reportUrl) ||
+    ''
+  )
+}
+
 Page({
   data: {
     topInset: 32,
@@ -204,12 +214,19 @@ Page({
         answers
       })
       console.log('[analysis-quiz] 提交成功', res)
+      const reportUrl = extractReportUrl(res)
       const app = getApp()
       const isLogin = !!(app && app.globalData.isLogin)
       if (isLogin) {
-        navigateToReport()
+        navigateToReport('测试报告', reportUrl)
       } else {
-        wx.redirectTo({ url: `/pages/analysis-auth/index?recordId=${this._recordId}&guestToken=${this._guestToken}` })
+        const recordId = encodeURIComponent(this._recordId || '')
+        const guestToken = encodeURIComponent(this._guestToken || '')
+        let authUrl = `/pages/analysis-auth/index?recordId=${recordId}&guestToken=${guestToken}`
+        if (reportUrl) {
+          authUrl += `&reportUrl=${encodeURIComponent(reportUrl)}`
+        }
+        wx.redirectTo({ url: authUrl })
       }
     } catch (err) {
       console.error('[analysis-quiz] 提交失败', err)

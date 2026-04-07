@@ -10,18 +10,29 @@ const paths = require('./paths')
  *   code: number,          // 消息状态码
  *   msg: string,           // 消息内容
  *   data: {
- *     scope: string,       // 令牌权限范围
- *     openid: string,      // 微信小程序用户 openid
- *     userInfo: {
- *       userId: number,    // 用户 ID (int64)
- *       phone: string,     // 手机号
- *       fullReport: object,// 完整体测报告
- *       client_id: string
- *     },
+ *     scope: string,             // 令牌权限范围
+ *     openid: string,            // 微信小程序用户 openid
  *     access_token: string,      // 访问令牌
  *     refresh_token: string,     // 刷新令牌
  *     expire_in: number,         // 访问令牌有效期（秒）
  *     refresh_expire_in: number  // 刷新令牌有效期（秒）
+ *   }
+ * }
+ */
+
+/**
+ * 当前登录用户信息响应数据结构 (LoginUserInfoVo)
+ * {
+ *   code: number,
+ *   msg: string,
+ *   data: {
+ *     userId: number,               // 用户 ID (int64)
+ *     phone: string,                // 用户手机号
+ *     fullReport: object,           // 完整体测报告
+ *     questionnaireReportUrl: string, // 问卷体质测试报告页面地址
+ *     aiReportUrl: string,          // AI 体质测试报告页面地址
+ *     analysisQrCodeUrl: string,    // 分析页二维码图片地址
+ *     client_id: string             // 客户端 ID
  *   }
  * }
  */
@@ -156,7 +167,19 @@ function getGuestToken({ source, success, fail, complete } = {}) {
 }
 
 /**
- * 登录：调用 wxPhoneLogin 并在成功后设置 token、全局登录状态
+ * 获取当前登录用户信息，并写入全局 userInfo
+ * @returns {Promise<LoginUserInfoVo>}
+ */
+function fetchUserInfo() {
+  return request.get(paths.auth.currentUserProfile).then((res) => {
+    const app = getApp()
+    if (app) app.globalData.userInfo = (res && res.data) || null
+    return res
+  })
+}
+
+/**
+ * 登录：调用 wxPhoneLogin 并在成功后设置 token、全局登录状态，再拉取用户信息
  * @param {object} params
  * @param {string} params.phoneCode    - getPhoneNumber 回调中的 code
  * @param {string} [params.guestToken] - 可选，授权获取完整报告时传递
@@ -169,10 +192,9 @@ function login({ phoneCode, guestToken } = {}) {
     const app = getApp()
     if (app) {
       app.globalData.isLogin = true
-      app.globalData.userInfo = (res.data && res.data.userInfo) || null
     }
     console.log('[auth] 登录成功, token:', token)
-    return res
+    return fetchUserInfo().then(() => res)
   }).catch((err) => {
     const app = getApp()
     if (app) app.globalData.isLogin = false
@@ -182,6 +204,7 @@ function login({ phoneCode, guestToken } = {}) {
 
 module.exports = {
   login,
+  fetchUserInfo,
   requestGuestToken,
   loginAndGetGuestToken,
   getGuestToken

@@ -12,10 +12,13 @@ App({
    *
    * isLogin {boolean}  是否已登录；登录成功 true，登录失败/退出登录 false
    *
-   * userInfo — 登录成功后的用户信息（来自 wxPhoneLogin 响应 data.userInfo）
+   * userInfo — 当前登录用户信息（来自 fetchUserInfo 接口 /auth/user/profile/current 响应 data）
    *   userId   {number}  用户 ID
    *   phone    {string}  手机号
    *   fullReport {object} 完整体测报告
+   *   questionnaireReportUrl {string} 问卷体质测试报告页面地址
+   *   aiReportUrl            {string} AI 体质测试报告页面地址
+   *   analysisQrCodeUrl      {string} 分析页二维码图片地址
    *   client_id  {string}
    *
    * guestSession — 游客 session 信息（来自 getGuestToken 响应 data）

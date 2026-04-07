@@ -6,6 +6,8 @@ const paths = {
   auth: {
     // 微信小程序手机号登录
     miniPhoneLogin: '/auth/mini/phone/login',
+    // 当前登录用户信息
+    currentUserProfile: '/auth/user/profile/current',
     // 游客 session
     guestSession: '/auth/mini/guest/session'
   },
