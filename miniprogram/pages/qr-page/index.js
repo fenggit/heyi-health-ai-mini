@@ -50,19 +50,23 @@ Page({
       ...getMiniNavData(),
       ...PAGE_DATA
     })
-    this._loadQrFromUserInfo()
+    this._loadQrImage()
   },
 
   onShow() {
-    this._loadQrFromUserInfo(true)
+    this._loadQrImage(true)
   },
 
-  _loadQrFromUserInfo(silent = false) {
+  _loadQrImage(silent = false) {
     this.setData({ qrLoading: true })
     const app = getApp()
     const userInfo = (app && app.globalData && app.globalData.userInfo) || {}
     const rawImage = this._extractQrImage(userInfo.analysisQrCodeUrl)
     console.log("[qr-page] userInfo.analysisQrCodeUrl:", rawImage)
+    this._applyQrImage(rawImage, silent)
+  },
+
+  _applyQrImage(rawImage, silent = false) {
     if (rawImage && rawImage === this._lastQrSource && this.data.qrImage) {
       this.setData({ qrLoading: false })
       return
