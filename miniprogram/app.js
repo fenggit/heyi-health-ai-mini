@@ -39,14 +39,14 @@ App({
     userInfo: null,
     guestSession: null
   },
-  onLaunch() {
+  onLaunch(launchOptions = {}) {
     request.initAuthToken()
     this.globalData.layout = this.computeLayout()
     this.globalData.userInfo = loadUserInfoFromStorage()
-    this.checkLogin()
+    this.checkLogin(launchOptions)
   },
-  checkLogin() {
-    // 检查本地是否有 token，有则视为已登录直接进首页
+  checkLogin(launchOptions = {}) {
+    // 检查本地是否有 token，有则视为已登录
     const token = request.getAuthToken()
     if (!token) {
       // 未登录，跳转登录页（pages 第一项已是 login，默认启动即登录页，无需额外跳转）
@@ -54,7 +54,13 @@ App({
     }
     this.globalData.isLogin = true
     this.refreshUserInfoOnce()
-    wx.switchTab({ url: '/pages/home/index' })
+    if (this.shouldAutoGoHome(launchOptions)) {
+      wx.switchTab({ url: '/pages/home/index' })
+    }
+  },
+  shouldAutoGoHome(launchOptions = {}) {
+    const path = String(launchOptions.path || '').replace(/^\//, '')
+    return !path || path === 'pages/login/index'
   },
   refreshUserInfoOnce() {
     fetchUserInfo()

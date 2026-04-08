@@ -35,6 +35,25 @@ function decodeSafe(value) {
   }
 }
 
+function parseSourceAndCode(rawSource, rawCode) {
+  const sourceText = decodeSafe(rawSource || '').trim()
+  const codeText = decodeSafe(rawCode || '').trim()
+  if (!sourceText || !sourceText.includes('=')) {
+    return { source: sourceText, code: codeText }
+  }
+
+  let parsedSource = sourceText
+  let parsedCode = codeText
+  sourceText.split('&').forEach((pair) => {
+    const [k, ...rest] = pair.split('=')
+    const key = (k || '').trim()
+    const val = decodeSafe(rest.join('=')).trim()
+    if (key === 'source' && val) parsedSource = val
+    if (key === 'code' && val && !parsedCode) parsedCode = val
+  })
+  return { source: parsedSource, code: parsedCode }
+}
+
 Page({
   data: {
     topInset: 32,
@@ -59,12 +78,14 @@ Page({
     this.syncLayout()
     this.loadPageData()
 
-    // 约定：source 直接使用 scene 参数
-    const sourceParam = decodeSafe(options.scene || '').trim()
-    const optionCode = decodeSafe(options.code || '').trim()
-    const codeParam = optionCode || ''
+    // 约定：source 来自 scene；若 source 中含 source/code 结构则拆分
+    const sourceRaw = options.scene || options.source || ''
+    const parsed = parseSourceAndCode(sourceRaw, options.code || '')
+    const sourceParam = parsed.source
+    const codeParam = parsed.code
 
     this._source = sourceParam
+    this._code = codeParam
     console.log('[analysis] 扫码参数 source:', sourceParam || '（无）', 'code:', codeParam || '（无）')
 
     const app = getApp()
