@@ -26,6 +26,15 @@ function fetchAnalysisIntro() {
   return Promise.resolve(JSON.parse(JSON.stringify(MOCK_ANALYSIS_INTRO)))
 }
 
+function decodeSafe(value) {
+  if (!value) return ''
+  try {
+    return decodeURIComponent(value)
+  } catch (e) {
+    return value
+  }
+}
+
 Page({
   data: {
     topInset: 32,
@@ -46,16 +55,17 @@ Page({
     extras: [],
     agreementText: ""
   },
-  onLoad(options) {
+  onLoad(options = {}) {
     this.syncLayout()
     this.loadPageData()
 
-    // 小程序码扫码进入时，scene 会经过 URL encode，需要 decode
-    // 普通路由跳转时 scene 为 undefined
-    const rawScene = options.scene
-    const sceneCode = rawScene ? decodeURIComponent(rawScene) : null
-    this._sceneCode = sceneCode
-    console.log('[analysis] scene code:', sceneCode || '（非扫码进入）')
+    // 约定：source 直接使用 scene 参数
+    const sourceParam = decodeSafe(options.scene || '').trim()
+    const optionCode = decodeSafe(options.code || '').trim()
+    const codeParam = optionCode || ''
+
+    this._source = sourceParam
+    console.log('[analysis] 扫码参数 source:', sourceParam || '（无）', 'code:', codeParam || '（无）')
 
     const app = getApp()
     const isLogin = !!(app && app.globalData.isLogin)
@@ -66,7 +76,7 @@ Page({
     const app = getApp()
     if (app && app.globalData.isLogin) return
     getGuestToken({
-      source: this._sceneCode,
+      source: this._source,
       success: () => console.log('[analysis] guestToken 获取成功'),
       fail: (err) => console.warn('[analysis] guestToken 获取失败:', err)
     })
@@ -81,7 +91,7 @@ Page({
     return new Promise((resolve) => {
       wx.showLoading({ title: '准备中...', mask: true })
       getGuestToken({
-        source: this._sceneCode,
+        source: this._source,
         success: () => { wx.hideLoading(); resolve(true) },
         fail: (err) => {
           wx.hideLoading()
