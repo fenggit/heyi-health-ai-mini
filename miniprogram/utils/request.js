@@ -3,6 +3,7 @@ const DEFAULT_TIMEOUT = 10000
 const HOST = 'https://api.tyhctech.com'
 
 let authToken = ''
+let unauthorizedRedirecting = false
 
 function initAuthToken() {
   const token = wx.getStorageSync(STORAGE_TOKEN_KEY) || ''
@@ -34,6 +35,45 @@ function getAuthToken() {
 function clearAuthToken() {
   authToken = ''
   wx.removeStorageSync(STORAGE_TOKEN_KEY)
+}
+
+function handleUnauthorized(message = '登录已失效，请重新登录') {
+  clearAuthToken()
+  const app = typeof getApp === 'function' ? getApp() : null
+  if (app && app.globalData) {
+    app.globalData.isLogin = false
+    app.globalData.userInfo = null
+  }
+
+  if (unauthorizedRedirecting) return
+  unauthorizedRedirecting = true
+
+  setTimeout(() => {
+    wx.showToast({ title: message, icon: 'none', duration: 2000 })
+  }, 300)
+
+  let alreadyOnLogin = false
+  try {
+    const pages = typeof getCurrentPages === 'function' ? getCurrentPages() : []
+    const current = pages && pages.length ? pages[pages.length - 1] : null
+    alreadyOnLogin = !!(current && current.route === 'pages/login/index')
+  } catch (e) {
+    alreadyOnLogin = false
+  }
+
+  if (alreadyOnLogin) {
+    unauthorizedRedirecting = false
+    return
+  }
+
+  wx.reLaunch({
+    url: '/pages/login/index',
+    complete: () => {
+      setTimeout(() => {
+        unauthorizedRedirecting = false
+      }, 500)
+    }
+  })
 }
 
 function normalizeUrl(url, baseUrl = '') {
@@ -116,9 +156,13 @@ function request(options = {}) {
           if (body && body.code !== undefined && body.code !== 200) {
             const msg = body.msg || body.message || '请求失败'
             console.warn(`[request:${requestId}] 业务错误 code=${body.code} msg=${msg}`)
-            setTimeout(() => {
-              wx.showToast({ title: `${msg}(${body.code})`, icon: 'none', duration: 3000 })
-            }, 300)
+            if (Number(body.code) === 401) {
+              handleUnauthorized(msg || '登录已失效，请重新登录')
+            } else {
+              setTimeout(() => {
+                wx.showToast({ title: `${msg}(${body.code})`, icon: 'none', duration: 3000 })
+              }, 300)
+            }
             reject(Object.assign(new Error(msg), { code: body.code, data: body }))
             return
           }
@@ -127,9 +171,13 @@ function request(options = {}) {
         }
 
         console.error(`[request:${requestId}] HTTP错误 statusCode=${res.statusCode}`)
-        setTimeout(() => {
-          wx.showToast({ title: `请求失败(${res.statusCode})`, icon: 'none', duration: 3000 })
-        }, 300)
+        if (res.statusCode === 401) {
+          handleUnauthorized()
+        } else {
+          setTimeout(() => {
+            wx.showToast({ title: `请求失败(${res.statusCode})`, icon: 'none', duration: 3000 })
+          }, 300)
+        }
         reject(createHttpError(res, finalUrl, upperMethod))
       },
       fail: (error) => {

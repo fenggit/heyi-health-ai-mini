@@ -20,14 +20,16 @@
     </view>
 
     <view class="card-panel profile-member">
-      <view class="profile-member__head">
-        <view class="profile-member__info">
-          <image class="profile-member__icon" src="/assets/profile/vip.png" mode="aspectFit" />
-          <text>{{user.memberLevel}}：{{user.points}} 积分</text>
+      <image class="profile-member__bg" src="/assets/profile/vip_img.png" mode="scaleToFill" />
+      <view class="profile-member__vip-section">
+        <view class="profile-member__head">
+          <view class="profile-member__info">
+            <image class="profile-member__icon" src="/assets/profile/vip.png" mode="aspectFit" />
+            <text>{{user.memberLevel}}：{{user.points}} 积分</text>
+          </view>
+          <view class="profile-member__action" data-name="会员升级" bindtap="openItem">会员升级</view>
         </view>
-        <view class="profile-member__action" data-name="会员升级" bindtap="openItem">会员升级</view>
       </view>
-      <view class="profile-member__divider"></view>
       <view class="profile-stats-head">
         <title-view text="我的数据" />
       </view>

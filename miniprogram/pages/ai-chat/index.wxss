@@ -357,8 +357,8 @@
 
 .analysis-record-overlay {
   position: fixed;
-  left: 24rpx;
-  right: 24rpx;
+  left: 0;
+  right: 0;
   bottom: calc(16rpx + env(safe-area-inset-bottom));
   height: 190rpx;
   z-index: 42;

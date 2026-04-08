@@ -1,4 +1,5 @@
 const { login } = require('../../http/auth')
+const { getAuthToken } = require('../../utils/request')
 
 const AGREEMENT_CONTENT = '基于中医体质理论和现代营养学，运用AI技术为每一位用户提供个性化的食养方案，帮助大家通过科学饮食改善体质，实现健康生活。\n\n基于中医体质理论和现代营养学，运用AI技术为每一位用户提供个性化的食养方案，帮助大家通过科学饮食改善体质，实现健康生活。基于中医体质理论和现代营养学，运用AI技术为每一位用户提供个性化的食养方案，帮助大家通过科学饮食改善体质，实现健康生活。'
 
@@ -10,6 +11,14 @@ Page({
     popupShow: false,
     popupTitle: '',
     popupContent: ''
+  },
+
+  onLoad() {
+    this._redirectIfLoggedIn()
+  },
+
+  onShow() {
+    this._redirectIfLoggedIn()
   },
 
   toggleAgreed() {
@@ -52,6 +61,18 @@ Page({
 
   _goHome() {
     wx.switchTab({ url: '/pages/home/index' })
+  },
+
+  _redirectIfLoggedIn() {
+    const app = getApp()
+    const hasToken = !!getAuthToken()
+    const isLogin = !!(app && app.globalData && app.globalData.isLogin)
+    if (!isLogin && hasToken && app && app.globalData) {
+      app.globalData.isLogin = true
+    }
+    if (isLogin || hasToken) {
+      this._goHome()
+    }
   },
 
   openUserAgreement() {

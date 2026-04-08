@@ -1,9 +1,4 @@
 const { getMiniNavData, backWithFallback } = require("../../utils/mini-nav")
-const { generateMiniCode } = require("../../http/qrcode")
-
-// 小程序码 scene 最大 32 字节
-const QR_SCENE = "source=qr"
-const ANALYSIS_PAGE_PATH = "pages/analysis/index"
 
 const PAGE_DATA = {
   navTitle: "体质测评",
@@ -55,34 +50,51 @@ Page({
       ...getMiniNavData(),
       ...PAGE_DATA
     })
-    this._loadMiniCode()
+    this._loadQrFromUserInfo()
   },
 
-  _loadMiniCode() {
+  onShow() {
+    this._loadQrFromUserInfo(true)
+  },
+
+  _loadQrFromUserInfo(silent = false) {
     this.setData({ qrLoading: true })
-    generateMiniCode({
-      scene: QR_SCENE,
-      page: ANALYSIS_PAGE_PATH
-    }).then((res) => {
-      const rawImage = this._extractQrImage(res && res.data)
-      if (!rawImage) {
-        throw new Error("二维码返回为空")
-      }
-      return this._toTempImagePath(rawImage).then((tempPath) => {
-        this.setData({
-          qrImage: tempPath,
-          qrTempPath: tempPath,
-          qrLoading: false
+    const app = getApp()
+    const userInfo = (app && app.globalData && app.globalData.userInfo) || {}
+    const rawImage = this._extractQrImage(userInfo.analysisQrCodeUrl)
+    console.log("[qr-page] userInfo.analysisQrCodeUrl:", rawImage)
+    if (rawImage && rawImage === this._lastQrSource && this.data.qrImage) {
+      this.setData({ qrLoading: false })
+      return
+    }
+    if (!rawImage) {
+      this._lastQrSource = ""
+      this.setData({ qrImage: "", qrTempPath: "", qrLoading: false })
+      if (!silent) {
+        wx.showToast({
+          title: "暂无二维码",
+          icon: "none"
         })
-        console.log("[qr-page] 小程序码生成成功, scene:", QR_SCENE)
+      }
+      return
+    }
+
+    this._toTempImagePath(rawImage).then((tempPath) => {
+      this._lastQrSource = rawImage
+      this.setData({
+        qrImage: tempPath,
+        qrTempPath: tempPath,
+        qrLoading: false
       })
     }).catch((err) => {
-      console.error("[qr-page] 小程序码生成失败:", err)
+      console.error("[qr-page] 二维码加载失败:", err)
       this.setData({ qrLoading: false })
-      wx.showToast({
-        title: "二维码生成失败，请稍后重试",
-        icon: "none"
-      })
+      if (!silent) {
+        wx.showToast({
+          title: "二维码加载失败",
+          icon: "none"
+        })
+      }
     })
   },
 

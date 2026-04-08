@@ -35,9 +35,8 @@ function normalizeReportNavParams(arg1, arg2) {
 
 function navigateToReport(arg1, arg2) {
   const { title, url } = normalizeReportNavParams(arg1, arg2)
-  wx.redirectTo({
-    url: '/pages/webview-page/index?title=' + encodeURIComponent(title) + '&url=' + encodeURIComponent(url)
-  })
+  const targetUrl = '/pages/webview-page/index?title=' + encodeURIComponent(title) + '&url=' + encodeURIComponent(url)
+  wx.navigateTo({ url: targetUrl })
 }
 
 module.exports = { navigateToReport }
