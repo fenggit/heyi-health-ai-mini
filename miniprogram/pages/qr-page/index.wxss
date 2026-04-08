@@ -42,9 +42,10 @@
 
 .constitution-main-card {
   position: relative;
-  margin-top: 18rpx;
-  padding: 14rpx 0 20rpx;
+  margin-top: 32rpx;
+  padding: 0;
   background: rgba(255, 255, 255, 0.38);
+  overflow: hidden;
 }
 
 .constitution-head {
@@ -85,10 +86,20 @@
 }
 
 .constitution-metrics {
+  margin-top: 32rpx;
   padding: 0 24rpx;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+}
+
+.constitution-benefits-panel {
+  margin: 32rpx 0 0;
+  padding: 0 0 22rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx 24rpx 24rpx 24rpx;
+  border: 2rpx solid #FFFFFF;
+  box-sizing: border-box;
 }
 
 .constitution-metric {
@@ -121,8 +132,7 @@
 .constitution-benefits-title {
   position: relative;
   display: inline-block;
-  margin-top: 28rpx;
-  margin-left: 32rpx;
+  margin: 32rpx 0 32rpx 32rpx;
   color: #1e293b;
   font-size: 28rpx;
   line-height: 30rpx;
@@ -141,10 +151,14 @@
 }
 
 .constitution-benefit-item {
-  margin-top: 18rpx;
+  margin-top: 0;
   padding: 0 32rpx;
   display: flex;
   align-items: center;
+}
+
+.constitution-benefit-item + .constitution-benefit-item {
+  margin-top: 24rpx;
 }
 
 .constitution-benefit-item__icon {
@@ -162,16 +176,17 @@
 }
 
 .constitution-scan-card {
-  margin: 24rpx 16rpx 0;
+  margin: 40rpx 16rpx 0;
   border-radius: 24rpx;
   background: rgba(231, 247, 239, 0.5);
-  padding: 16rpx 0 22rpx;
+  padding: 32rpx;
 }
 
 .constitution-scan-head {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: 40rpx;
 }
 
 .constitution-scan-head__line {
@@ -191,7 +206,7 @@
 .constitution-qr-frame {
   width: 400rpx;
   height: 400rpx;
-  margin: 24rpx auto 0;
+  margin: 0 auto;
   padding: 24rpx;
   border-radius: 32rpx;
   border: 4rpx solid #00c950;
@@ -215,7 +230,7 @@
 }
 
 .constitution-scan-hint {
-  margin-top: 24rpx;
+  margin-top: 32rpx;
   color: #00674a;
   font-size: 28rpx;
   line-height: 30rpx;

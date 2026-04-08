@@ -46,13 +46,7 @@ Component({
   },
   methods: {
     handleBack() {
-      const pages = getCurrentPages()
-      if (pages.length > 1) {
-        wx.navigateBack()
-      } else {
-        wx.switchTab({ url: '/pages/home/index' })
-      }
-      this.triggerEvent('back')
+      this.triggerEvent('back', { source: 'header' })
     }
   }
 })

@@ -162,34 +162,6 @@ Page({
     })
   },
 
-  _saveImage(filePath) {
-    wx.saveImageToPhotosAlbum({
-      filePath,
-      success: () => wx.showToast({ title: "已保存到相册", icon: "success" }),
-      fail: (err) => {
-        if (err.errMsg && err.errMsg.includes("auth deny")) {
-          wx.showModal({
-            title: "需要相册权限",
-            content: "请在设置中允许访问相册",
-            confirmText: "去设置",
-            success: (res) => { if (res.confirm) wx.openSetting() }
-          })
-        } else {
-          wx.showToast({ title: "保存失败", icon: "none" })
-        }
-      }
-    })
-  },
-
-  saveQrCode() {
-    const { qrLoading, qrTempPath } = this.data
-    if (qrLoading || !qrTempPath) {
-      wx.showToast({ title: "二维码生成中，请稍候", icon: "none" })
-      return
-    }
-    this._saveImage(qrTempPath)
-  },
-
   handleBack() {
     backWithFallback("/pages/home/index")
   }

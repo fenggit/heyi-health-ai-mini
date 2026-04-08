@@ -34,7 +34,10 @@
   font-size: 28rpx;
   line-height: 30rpx;
   font-weight: 700;
-  pointer-events: none;
+  height: 56rpx;
+  display: inline-flex;
+  align-items: center;
+  pointer-events: auto;
 }
 
 .my-header__capsule {
