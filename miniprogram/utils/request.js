@@ -1,4 +1,5 @@
 const STORAGE_TOKEN_KEY = 'token'
+const STORAGE_USER_INFO_KEY = 'userInfo'
 const DEFAULT_TIMEOUT = 10000
 const HOST = 'https://api.tyhctech.com'
 
@@ -44,6 +45,7 @@ function handleUnauthorized(message = '登录已失效，请重新登录') {
     app.globalData.isLogin = false
     app.globalData.userInfo = null
   }
+  wx.removeStorageSync(STORAGE_USER_INFO_KEY)
 
   if (unauthorizedRedirecting) return
   unauthorizedRedirecting = true

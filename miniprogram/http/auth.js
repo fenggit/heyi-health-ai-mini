@@ -3,6 +3,7 @@
  */
 const request = require('../utils/request')
 const paths = require('./paths')
+const STORAGE_USER_INFO_KEY = 'userInfo'
 
 /**
  * 登录响应数据结构 (RLoginVo)
@@ -166,14 +167,45 @@ function getGuestToken({ source, success, fail, complete } = {}) {
   return loginAndGetGuestToken('device_001', 'qr_scene_001', source || 'miniapp', { success, fail, complete })
 }
 
+function setCachedUserInfo(userInfo) {
+  const nextUserInfo = userInfo && typeof userInfo === 'object' ? userInfo : null
+  const app = getApp()
+  if (app && app.globalData) {
+    app.globalData.userInfo = nextUserInfo
+  }
+  if (nextUserInfo) {
+    wx.setStorageSync(STORAGE_USER_INFO_KEY, nextUserInfo)
+  } else {
+    wx.removeStorageSync(STORAGE_USER_INFO_KEY)
+  }
+  return nextUserInfo
+}
+
+function getCachedUserInfo() {
+  const cache = wx.getStorageSync(STORAGE_USER_INFO_KEY)
+  return cache && typeof cache === 'object' ? cache : null
+}
+
+function loadUserInfoFromStorage() {
+  const cached = getCachedUserInfo()
+  const app = getApp()
+  if (app && app.globalData) {
+    app.globalData.userInfo = cached
+  }
+  return cached
+}
+
+function clearUserInfoCache() {
+  return setCachedUserInfo(null)
+}
+
 /**
  * 获取当前登录用户信息，并写入全局 userInfo
  * @returns {Promise<LoginUserInfoVo>}
  */
 function fetchUserInfo() {
   return request.get(paths.auth.currentUserProfile).then((res) => {
-    const app = getApp()
-    if (app) app.globalData.userInfo = (res && res.data) || null
+    setCachedUserInfo((res && res.data) || null)
     return res
   })
 }
@@ -197,7 +229,7 @@ function login({ phoneCode, guestToken } = {}) {
     return fetchUserInfo().then(() => res)
   }).catch((err) => {
     const app = getApp()
-    if (app) app.globalData.isLogin = false
+    if (app && app.globalData) app.globalData.isLogin = false
     return Promise.reject(err)
   })
 }
@@ -205,6 +237,10 @@ function login({ phoneCode, guestToken } = {}) {
 module.exports = {
   login,
   fetchUserInfo,
+  setCachedUserInfo,
+  getCachedUserInfo,
+  loadUserInfoFromStorage,
+  clearUserInfoCache,
   requestGuestToken,
   loginAndGetGuestToken,
   getGuestToken

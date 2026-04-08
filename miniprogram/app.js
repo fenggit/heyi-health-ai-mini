@@ -1,4 +1,5 @@
 const request = require('./utils/request')
+const { fetchUserInfo, loadUserInfoFromStorage } = require('./http/auth')
 
 App({
   /**
@@ -12,7 +13,7 @@ App({
    *
    * isLogin {boolean}  是否已登录；登录成功 true，登录失败/退出登录 false
    *
-   * userInfo — 当前登录用户信息（来自 fetchUserInfo 接口 /auth/user/profile/current 响应 data）
+   * userInfo — 当前登录用户信息（启动先从本地缓存读取，再由 fetchUserInfo 接口刷新）
    *   userId   {number}  用户 ID
    *   phone    {string}  手机号
    *   fullReport {object} 完整体测报告
@@ -41,6 +42,7 @@ App({
   onLaunch() {
     request.initAuthToken()
     this.globalData.layout = this.computeLayout()
+    this.globalData.userInfo = loadUserInfoFromStorage()
     this.checkLogin()
   },
   checkLogin() {
@@ -51,7 +53,17 @@ App({
       return
     }
     this.globalData.isLogin = true
+    this.refreshUserInfoOnce()
     wx.switchTab({ url: '/pages/home/index' })
+  },
+  refreshUserInfoOnce() {
+    fetchUserInfo()
+      .then(() => {
+        console.log('[app] 启动后 userInfo 已刷新')
+      })
+      .catch((err) => {
+        console.warn('[app] 启动后刷新 userInfo 失败:', err)
+      })
   },
   computeLayout() {
     const windowInfo = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()

@@ -1,5 +1,6 @@
 const { initMiniNav, backWithFallback } = require('../../utils/mini-nav')
 const request = require('../../utils/request')
+const { clearUserInfoCache } = require('../../http/auth')
 
 Page({
   data: {
@@ -40,8 +41,9 @@ Page({
       success: (res) => {
         if (res.confirm) {
           request.clearAuthToken()
+          clearUserInfoCache()
           const app = getApp()
-          if (app) app.globalData.isLogin = false
+          if (app && app.globalData) app.globalData.isLogin = false
           wx.reLaunch({ url: '/pages/login/index' })
         }
       }
