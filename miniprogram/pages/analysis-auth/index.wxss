@@ -29,3 +29,26 @@
 .auth-primary-btn::after {
   border: none;
 }
+
+.auth-primary-btn--disabled {
+  opacity: 0.5;
+}
+
+.auth-agreement {
+  width: 638rpx;
+  margin: 24rpx auto 0;
+  display: flex;
+  align-items: flex-start;
+}
+
+.auth-agreement__text {
+  margin-left: 12rpx;
+  color: #475569;
+  font-size: 24rpx;
+  line-height: 34rpx;
+}
+
+.auth-agreement__link {
+  color: #1e293b;
+  font-weight: 700;
+}

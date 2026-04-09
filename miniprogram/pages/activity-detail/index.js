@@ -58,6 +58,11 @@ Page({
   onLoad(options) {
     this.syncLayout()
     this.loadPageData(options || {})
+    if (wx.showShareMenu) {
+      wx.showShareMenu({
+        menus: ["shareAppMessage", "shareTimeline"]
+      })
+    }
   },
   syncLayout() {
     const { statusBarHeight, navBarHeight, headerHeight } = getLayoutMetrics()

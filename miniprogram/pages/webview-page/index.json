@@ -1,7 +1,6 @@
 {
-  "navigationStyle": "default",
-  "navigationBarBackgroundColor": "#F4F5F8",
-  "navigationBarTextStyle": "black",
-  "navigationBarTitleText": "",
-  "usingComponents": {}
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "my-header": "/components/my-header/index"
+  }
 }

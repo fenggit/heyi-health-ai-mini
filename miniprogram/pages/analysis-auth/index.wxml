@@ -57,9 +57,22 @@
     </view>
 
     <button
-      class="report-primary-btn report-primary-btn--guest auth-primary-btn"
-      open-type="getPhoneNumber"
+      class="report-primary-btn report-primary-btn--guest auth-primary-btn {{agreed ? '' : 'auth-primary-btn--disabled'}}"
+      open-type="{{agreed ? 'getPhoneNumber' : ''}}"
+      bindtap="onAuthTap"
       bindgetphonenumber="onGetPhoneNumber"
     >{{guestPrimaryButton}}</button>
+
+    <view class="auth-agreement" bindtap="toggleAgreed">
+      <my-checkbox checked="{{agreed}}" shape="square" />
+      <text class="auth-agreement__text">我已阅读并接受<text class="auth-agreement__link" catchtap="openUserAgreement">《用户协议》</text>、<text class="auth-agreement__link" catchtap="openPrivacyPolicy">《隐私协议》</text></text>
+    </view>
   </view>
+
+  <agreement-popup
+    show="{{popupShow}}"
+    title="{{popupTitle}}"
+    content="{{popupContent}}"
+    bind:confirm="onPopupConfirm"
+  />
 </view>

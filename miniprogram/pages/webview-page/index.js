@@ -9,6 +9,15 @@ function normalizeWebviewUrl(rawUrl) {
   return `${base}${path}`
 }
 
+function decodeSafe(value) {
+  if (!value) return ''
+  try {
+    return decodeURIComponent(value)
+  } catch (e) {
+    return value
+  }
+}
+
 Page({
   data: {
     title: '',
@@ -16,16 +25,13 @@ Page({
     headerHeight: 64
   },
   onLoad(options) {
-    const title = options.title ? decodeURIComponent(options.title) : ''
-    const sourceUrl = options.url ? decodeURIComponent(options.url) : ''
+    const title = decodeSafe((options && (options.title || options.Title)) || '')
+    const sourceUrl = decodeSafe((options && options.url) || '')
     const url = normalizeWebviewUrl(sourceUrl)
     console.log('[webview-page] 接收到参数', JSON.stringify({ title, url: sourceUrl }))
     console.log('[webview-page] 最终加载 URL', url)
     const { headerHeight } = getLayoutMetrics()
     this.setData({ title, url, headerHeight })
-    if (title) {
-      wx.setNavigationBarTitle({ title })
-    }
   },
 
   // 接收网页通过 wx.miniProgram.postMessage 发来的消息
@@ -38,6 +44,15 @@ Page({
     if (msg && msg.type === 'download' && msg.url) {
       this._downloadFile(msg.url, msg.fileName || '')
     }
+  },
+
+  handleBack() {
+    const pages = getCurrentPages()
+    if (pages.length > 1) {
+      wx.navigateBack()
+      return
+    }
+    wx.switchTab({ url: '/pages/home/index' })
   },
 
   _downloadFile(fileUrl, fileName) {

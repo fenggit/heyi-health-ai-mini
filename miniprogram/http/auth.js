@@ -104,7 +104,11 @@ function wxPhoneLogin({ phoneCode, guestToken } = {}) {
  * @returns {Promise}
  */
 function requestGuestToken(code, deviceId, scene, source, { success, fail, complete } = {}) {
-  const p = request.post(paths.auth.guestSession, { code, deviceId, scene, source }, { withAuth: false })
+  const body = { code, deviceId, source }
+  if (scene !== undefined && scene !== null && scene !== '') {
+    body.scene = scene
+  }
+  const p = request.post(paths.auth.guestSession, body, { withAuth: false })
   p.then((res) => {
     const app = getApp()
     if (app) app.globalData.guestSession = res.data || null
@@ -157,14 +161,19 @@ function loginAndGetGuestToken(deviceId, scene, source, { success, fail, complet
 /**
  * 游客 session — 使用默认参数，一键获取
  * @param {object} [callbacks]
+ * @param {string} [callbacks.deviceId] - 可选，设备标识
+ * @param {string} [callbacks.scene]    - 可选，场景码（例如扫码 code）
  * @param {string} [callbacks.source]   - 可选，来源标识（如扫码 scene code）
  * @param {function} [callbacks.success]
  * @param {function} [callbacks.fail]
  * @param {function} [callbacks.complete]
  * @returns {Promise}
  */
-function getGuestToken({ source, success, fail, complete } = {}) {
-  return loginAndGetGuestToken('device_001', 'qr_scene_001', source || 'miniapp', { success, fail, complete })
+function getGuestToken({ deviceId, scene, source, success, fail, complete } = {}) {
+  const nextDeviceId = deviceId || 'device_001'
+  const nextSource = source || 'miniapp'
+  const nextScene = scene || ''
+  return loginAndGetGuestToken(nextDeviceId, nextScene, nextSource, { success, fail, complete })
 }
 
 function setCachedUserInfo(userInfo) {

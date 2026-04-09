@@ -2,7 +2,9 @@ const { getLayoutMetrics } = require("../../utils/layout")
 const { get } = require("../../utils/request")
 const paths = require("../../http/paths")
 const { login } = require("../../http/auth")
-const { navigateToReport } = require("../../utils/navigateReport")
+
+const AGREEMENT_CONTENT = "基于中医体质理论和现代营养学，运用AI技术为每一位用户提供个性化的食养方案，帮助大家通过科学饮食改善体质，实现健康生活。"
+const PRIVACY_CONTENT = "我们重视并保护您的个人隐私信息，授权信息仅用于生成个性化健康分析与服务体验。"
 
 const STATIC_DATA = {
   navTitle: "趣味分析",
@@ -41,6 +43,10 @@ Page({
     menuHeight: 32,
     menuTop: 26,
     menuRight: 12,
+    agreed: false,
+    popupShow: false,
+    popupTitle: "",
+    popupContent: "",
     mainType: "",
     mainTypeHint: "",
     mainScore: 0,
@@ -114,7 +120,64 @@ Page({
   goHome() {
     wx.switchTab({ url: "/pages/home/index" })
   },
+  goLogin() {
+    if (!this.data.agreed) {
+      wx.showToast({
+        title: "请先阅读并同意协议",
+        icon: "none"
+      })
+      return
+    }
+    wx.showToast({
+      title: "请点击下方按钮授权",
+      icon: "none"
+    })
+  },
+  toggleAgreed() {
+    this.setData({ agreed: !this.data.agreed })
+  },
+  onAuthTap() {
+    if (!this.data.agreed) {
+      wx.showToast({
+        title: "请先阅读并同意协议",
+        icon: "none"
+      })
+    }
+  },
+  openUserAgreement() {
+    this.setData({ popupShow: true, popupTitle: "用户协议", popupContent: AGREEMENT_CONTENT })
+  },
+  openPrivacyPolicy() {
+    this.setData({ popupShow: true, popupTitle: "隐私政策", popupContent: PRIVACY_CONTENT })
+  },
+  onPopupConfirm() {
+    this.setData({ popupShow: false })
+  },
+  goReportWithHomeBack(title, url) {
+    const reportTitle = title || "测试报告"
+    const reportUrl = url || this._reportUrl
+    if (!reportUrl) {
+      wx.switchTab({ url: "/pages/home/index" })
+      return
+    }
+    const targetUrl = "/pages/webview-page/index?title=" + encodeURIComponent(reportTitle) + "&url=" + encodeURIComponent(reportUrl)
+    wx.reLaunch({
+      url: "/pages/home/index",
+      success: () => {
+        setTimeout(() => {
+          wx.navigateTo({ url: targetUrl })
+        }, 50)
+      },
+      fail: () => {
+        wx.navigateTo({ url: targetUrl })
+      }
+    })
+  },
   onGetPhoneNumber(e) {
+    if (!this.data.agreed) {
+      wx.showToast({ title: "请先阅读并同意协议", icon: "none" })
+      return
+    }
     if (e.detail.errMsg !== 'getPhoneNumber:ok') {
       wx.showToast({ title: '授权失败，请重试', icon: 'none' })
       return
@@ -123,7 +186,7 @@ Page({
     login({ phoneCode: e.detail.code, guestToken: this._guestToken })
       .then(() => {
         wx.hideLoading()
-        navigateToReport('测试报告', this._reportUrl)
+        this.goReportWithHomeBack("测试报告", this._reportUrl)
       })
       .catch(() => {
         wx.hideLoading()

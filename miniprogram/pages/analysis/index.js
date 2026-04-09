@@ -35,25 +35,6 @@ function decodeSafe(value) {
   }
 }
 
-function parseSourceAndCode(rawSource, rawCode) {
-  const sourceText = decodeSafe(rawSource || '').trim()
-  const codeText = decodeSafe(rawCode || '').trim()
-  if (!sourceText || !sourceText.includes('=')) {
-    return { source: sourceText, code: codeText }
-  }
-
-  let parsedSource = sourceText
-  let parsedCode = codeText
-  sourceText.split('&').forEach((pair) => {
-    const [k, ...rest] = pair.split('=')
-    const key = (k || '').trim()
-    const val = decodeSafe(rest.join('=')).trim()
-    if (key === 'source' && val) parsedSource = val
-    if (key === 'code' && val && !parsedCode) parsedCode = val
-  })
-  return { source: parsedSource, code: parsedCode }
-}
-
 Page({
   data: {
     topInset: 32,
@@ -78,15 +59,9 @@ Page({
     this.syncLayout()
     this.loadPageData()
 
-    // 约定：source 来自 scene；若 source 中含 source/code 结构则拆分
-    const sourceRaw = options.scene || options.source || ''
-    const parsed = parseSourceAndCode(sourceRaw, options.code || '')
-    const sourceParam = parsed.source
-    const codeParam = parsed.code
-
-    this._source = sourceParam
-    this._code = codeParam
-    console.log('[analysis] 扫码参数 source:', sourceParam || '（无）', 'code:', codeParam || '（无）')
+    const sceneParam = decodeSafe(options.scene || options.source || '').trim()
+    this._scene = sceneParam
+    console.log('[analysis] 扫码参数 scene:', sceneParam || '（无）')
 
     const app = getApp()
     const isLogin = !!(app && app.globalData.isLogin)
@@ -97,7 +72,7 @@ Page({
     const app = getApp()
     if (app && app.globalData.isLogin) return
     getGuestToken({
-      source: this._source,
+      scene: this._scene,
       success: () => console.log('[analysis] guestToken 获取成功'),
       fail: (err) => console.warn('[analysis] guestToken 获取失败:', err)
     })
@@ -112,7 +87,7 @@ Page({
     return new Promise((resolve) => {
       wx.showLoading({ title: '准备中...', mask: true })
       getGuestToken({
-        source: this._source,
+        scene: this._scene,
         success: () => { wx.hideLoading(); resolve(true) },
         fail: (err) => {
           wx.hideLoading()
@@ -172,6 +147,13 @@ Page({
     })
   },
   handleBack() {
+    const app = getApp()
+    const isLogin = !!(app && app.globalData && app.globalData.isLogin)
+    if (!isLogin) {
+      wx.reLaunch({ url: "/pages/login/index" })
+      return
+    }
+
     const pages = getCurrentPages()
     if (pages.length > 1) {
       wx.navigateBack()
