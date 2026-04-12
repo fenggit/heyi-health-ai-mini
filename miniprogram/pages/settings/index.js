@@ -14,8 +14,10 @@ Page({
     menuRight: 12,
 
     navTitle: '设置',
+    avatarText: '合',
+    nickname: '西兰花护体专员',
     notifyEnabled: true,
-    darkModeEnabled: true
+    darkModeEnabled: false
   },
 
   onLoad() {
@@ -27,11 +29,17 @@ Page({
   },
 
   onNotifyChange(e) {
-    this.setData({ notifyEnabled: e.detail.value })
+    const notifyEnabled = e.detail.value
+    this.setData({ notifyEnabled })
   },
 
   onDarkModeChange(e) {
-    this.setData({ darkModeEnabled: e.detail.value })
+    const darkModeEnabled = e.detail.value
+    this.setData({ darkModeEnabled })
+  },
+
+  openAddressPage() {
+    wx.navigateTo({ url: '/pages/my-address/index' })
   },
 
   logout() {

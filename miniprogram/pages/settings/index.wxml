@@ -6,23 +6,59 @@
   <view class="page-top-gap" style="height: {{topInset}}px;"></view>
 
   <view class="page-wrap page-wrap--no-title">
-    <view class="glass-card setting-main-card">
-      <view class="setting-head">偏好设置</view>
+    <view class="glass-card setting-profile-card">
+      <view class="setting-section-head">
+        <title-view text="个人资料" />
+      </view>
 
-      <view class="setting-switch-row">
-        <view>
-          <view class="setting-switch-title">消息通知</view>
-          <view class="setting-switch-desc">接收健康提醒和活动通知</view>
+      <view class="setting-profile-row setting-profile-row--avatar">
+        <view class="setting-profile-label">头像</view>
+        <view class="setting-profile-value setting-profile-value--avatar">
+          <view class="setting-avatar">{{avatarText}}</view>
+          <text class="setting-arrow">></text>
         </view>
-        <switch color="#19bf55" checked="{{notifyEnabled}}" bindchange="onNotifyChange" />
+      </view>
+
+      <view class="setting-divider"></view>
+
+      <view class="setting-profile-row">
+        <view class="setting-profile-label">昵称</view>
+        <view class="setting-profile-value">
+          <text class="setting-profile-text">{{nickname}}</text>
+        </view>
+      </view>
+
+      <view class="setting-divider"></view>
+
+      <view class="setting-profile-row" bindtap="openAddressPage">
+        <view class="setting-profile-label">收货地址</view>
+        <view class="setting-profile-value">
+          <text class="setting-arrow">></text>
+        </view>
+      </view>
+    </view>
+
+    <view class="glass-card setting-main-card">
+      <view class="setting-section-head">
+        <title-view text="偏好设置" />
       </view>
 
       <view class="setting-switch-row">
-        <view>
+        <view class="setting-switch-copy">
+          <view class="setting-switch-title">消息通知</view>
+          <view class="setting-switch-desc">接收健康提醒和活动通知</view>
+        </view>
+        <switch class="setting-switch" color="#00c950" checked="{{notifyEnabled}}" bindchange="onNotifyChange" />
+      </view>
+
+      <view class="setting-divider"></view>
+
+      <view class="setting-switch-row">
+        <view class="setting-switch-copy">
           <view class="setting-switch-title">深色模式</view>
           <view class="setting-switch-desc">接收健康提醒和活动通知</view>
         </view>
-        <switch color="#19bf55" checked="{{darkModeEnabled}}" bindchange="onDarkModeChange" />
+        <switch class="setting-switch" color="#00c950" checked="{{darkModeEnabled}}" bindchange="onDarkModeChange" />
       </view>
 
       <view class="setting-tip">提示：开启消息通知后，您将及时收到体质调理建议、食养方案更新和专属优惠活动信息。</view>

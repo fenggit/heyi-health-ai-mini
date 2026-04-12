@@ -14,7 +14,7 @@ Component({
       },
       {
         text: "食养",
-        // path: "/pages/diet/index"
+        path: "/pages/diet/index"
       },
       {
         text: "我的",

@@ -1,57 +1,136 @@
 @import "../profile-sub/common.wxss";
 
+.page-wrap--no-title {
+  padding-top: 40rpx;
+  padding-bottom: calc(48rpx + env(safe-area-inset-bottom));
+}
+
+.setting-profile-card,
 .setting-main-card {
   margin-top: 6rpx;
-  padding: 20rpx 24rpx 24rpx;
+  padding: 20rpx 32rpx 24rpx;
 }
 
-.setting-head {
-  color: #1e293b;
-  font-size: 28rpx;
-  font-weight: 700;
+.setting-profile-card {
+  min-height: 428rpx;
 }
 
-.setting-switch-row {
+.setting-main-card {
+  margin-top: 16rpx;
+  min-height: 430rpx;
+}
+
+.setting-section-head {
+  margin-bottom: 8rpx;
+}
+
+.setting-profile-row {
   min-height: 112rpx;
-  border-bottom: 2rpx solid #e2e8f0;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
+.setting-profile-row--avatar {
+  min-height: 128rpx;
+}
+
+.setting-profile-label {
+  color: #1e293b;
+  font-size: 28rpx;
+  line-height: 36rpx;
+  font-weight: 500;
+}
+
+.setting-profile-value {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.setting-profile-value--avatar {
+  gap: 12rpx;
+}
+
+.setting-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background: linear-gradient(140deg, #4effe2 0%, #cef94c 100%);
+  color: #1e293b;
+  font-size: 32rpx;
+  line-height: 80rpx;
+  text-align: center;
+  font-weight: 700;
+}
+
+.setting-profile-text {
+  color: #1e293b;
+  font-size: 28rpx;
+  line-height: 36rpx;
+  font-weight: 500;
+}
+
+.setting-arrow {
+  margin-left: 12rpx;
+  color: #1e293b;
+  font-size: 28rpx;
+  line-height: 1;
+}
+
+.setting-divider {
+  border-top: 2rpx solid #f1f5f9;
+}
+
+.setting-switch-row {
+  min-height: 112rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.setting-switch-copy {
+  min-width: 0;
+}
+
 .setting-switch-title {
   color: #1e293b;
   font-size: 28rpx;
-  font-weight: 600;
+  line-height: 36rpx;
+  font-weight: 500;
 }
 
 .setting-switch-desc {
   margin-top: 6rpx;
   color: #94a3b8;
   font-size: 24rpx;
+  line-height: 34rpx;
+}
+
+.setting-switch {
+  transform: scale(0.78);
+  transform-origin: right center;
 }
 
 .setting-tip {
-  margin-top: 12rpx;
+  margin-top: 18rpx;
   color: #475569;
-  font-size: 24rpx;
-  line-height: 1.5;
+  font-size: 28rpx;
+  line-height: 42rpx;
 }
 
 .setting-bottom {
-  position: fixed;
-  left: 24rpx;
-  right: 24rpx;
-  bottom: calc(46rpx + env(safe-area-inset-bottom));
+  margin-top: 258rpx;
 }
 
 .setting-logout {
-  height: 82rpx;
-  border-radius: 20rpx;
+  height: 88rpx;
+  border-radius: 24rpx;
   background: rgba(255, 255, 255, 0.7);
-  color: #ff3b30;
+  color: #fb2c36;
   font-size: 28rpx;
-  line-height: 82rpx;
+  line-height: 88rpx;
   text-align: center;
-  font-weight: 600;
+  font-weight: 500;
 }
