@@ -29,7 +29,7 @@ Page({
     menuTop: 26,
     menuRight: 12,
 
-    navTitle: '积分兑换',
+    navTitle: '邀请好友',
     title: '邀请好友',
     subTitle: '分享给好友，双方都得积分奖励',
     inviteCount: 3,

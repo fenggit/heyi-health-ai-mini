@@ -1,18 +1,7 @@
 <view class="design-page my-plan-screen">
   <image class="my-plan-screen__bg" src="/assets/diet-plan/bg_my_plan.png" mode="widthFix" />
 
-  <view class="mini-nav" style="padding-top: {{statusBarHeight}}px;">
-    <view class="mini-nav__inner" style="height: {{navBarHeight}}px;">
-      <view class="mini-nav__back" bindtap="handleBack">
-        <image class="mini-nav__back-icon" src="/assets/analysis/nav_back.png" mode="aspectFit" />
-      </view>
-      <text class="my-plan-nav__title">定制计划</text>
-    </view>
-    <view
-      class="mini-nav__capsule-space"
-      style="width: {{menuWidth}}px; height: {{menuHeight}}px; right: {{menuRight}}px; top: {{menuTop}}px;"
-    ></view>
-  </view>
+  <my-header title="定制计划" bind:back="handleBack" />
 
   <view class="page-top-gap" style="height: {{topInset}}px;"></view>
 
