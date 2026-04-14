@@ -138,7 +138,15 @@ Page({
   },
   syncUserInfo() {
     const app = getApp()
-    this._userInfo = (app && app.globalData && app.globalData.userInfo) || {}
+    const userInfo = (app && app.globalData && app.globalData.userInfo) || {}
+    this._userInfo = userInfo
+
+    const memberInfo = userInfo.memberInfo || {}
+    this.setData({
+      'user.userId': userInfo.userId || '',
+      'user.memberLevel': memberInfo.currentLevelName || '普通会员',
+      'user.points': memberInfo.totalPoints != null ? memberInfo.totalPoints : 0
+    })
   },
   openItem(e) {
     const { name } = e.currentTarget.dataset

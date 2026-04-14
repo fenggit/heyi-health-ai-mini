@@ -29,6 +29,11 @@ const STORAGE_USER_INFO_KEY = 'userInfo'
  *   data: {
  *     userId: number,               // 用户 ID (int64)
  *     phone: string,                // 用户手机号
+ *     memberInfo: {                 // 会员信息
+ *       currentLevelId: number,     // 当前会员等级 ID (int64)
+ *       currentLevelName: string,   // 当前会员等级名称
+ *       totalPoints: number         // 总积分 (int32)
+ *     },
  *     fullReport: object,           // 完整体测报告
  *     questionnaireReportUrl: string, // 问卷体质测试报告页面地址
  *     aiReportUrl: string,          // AI 体质测试报告页面地址

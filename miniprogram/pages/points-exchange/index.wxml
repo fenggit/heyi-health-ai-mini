@@ -6,6 +6,7 @@
   <view class="page-top-gap" style="height: {{topInset}}px;"></view>
 
   <view class="page-wrap">
+    <!-- 标题行 -->
     <view class="points-head">
       <view>
         <view class="page-title">{{pageTitle}}</view>
@@ -14,30 +15,68 @@
       <view class="points-rule-btn" bindtap="openRules">积分获取规则</view>
     </view>
 
-    <view class="glass-card points-summary">
-      <view class="points-summary-top">
-        <view class="points-summary-title">我的积分：{{myPoints}}</view>
-        <view class="points-summary-member">{{memberLevel}}</view>
+    <!-- 积分概览卡片（参考 profile-member） -->
+    <view class="card-panel points-member">
+      <image class="points-member__bg-module" src="/assets/bg_module.png" mode="scaleToFill" />
+      <view class="points-member__vip-section">
+        <view class="points-member__head">
+          <view class="points-member__title">
+            <image class="points-member__icon" src="/assets/profile/vip.png" mode="aspectFit" />
+            我的积分：<text class="points-member__num">{{availablePoints}}</text>
+          </view>
+          <view class="points-summary-member">{{memberLevel}}</view>
+        </view>
       </view>
-      <view class="points-summary-bottom">
-        <view class="points-summary-label">本月获得</view>
-        <view class="points-summary-income">+{{monthlyIncome}}</view>
+      <view class="points-member__month-row">
+        <title-view text="本月获得" />
+        <view class="points-member__stat-val">+{{monthEarnedPoints || 0}}</view>
       </view>
     </view>
 
+    <!-- 可兑换礼品 -->
     <view class="glass-card points-list">
-      <view class="points-list-title">可兑换礼品</view>
+      <view class="points-list-title">
+        <title-view text="可兑换礼品" />
+      </view>
       <block wx:for="{{rewardItems}}" wx:key="id" wx:for-item="reward">
         <view class="points-item">
+          <!-- 左侧金额 -->
           <view class="points-item-left">
-            <view class="points-item-left__title">{{reward.leftTitle}}</view>
-            <view class="points-item-left__sub">{{reward.leftSub}}</view>
+            <view class="points-item-price">
+              <text class="points-item-price-symbol">￥</text>
+              <text class="points-item-price-num">{{reward.leftTitle}}</text>
+            </view>
+            <view class="points-item-score">{{reward.leftSub}}</view>
           </view>
+          <!-- 分隔线 -->
+          <view class="points-item-sep"></view>
+          <!-- 中间信息 -->
           <view class="points-item-main">
             <view class="points-item-main__name">{{reward.name}}</view>
             <view class="points-item-main__stock">库存 {{reward.stock}}</view>
           </view>
+          <!-- 兑换按钮 -->
           <view class="points-item-btn" data-id="{{reward.id}}" bindtap="redeem">立即兑换</view>
+        </view>
+      </block>
+    </view>
+
+    <!-- 最近积分流水 -->
+    <view wx:if="{{recentRecords.length > 0}}" class="glass-card points-list">
+      <view class="points-list-title">
+        <text>最近积分流水</text>
+        <view class="points-list-title-dec"></view>
+      </view>
+      <block wx:for="{{recentRecords}}" wx:key="occurTime" wx:for-item="record">
+        <view class="record-item">
+          <view class="record-item-left">
+            <view class="record-item-name">{{record.bizTypeName}}</view>
+            <view class="record-item-desc">{{record.sourceDesc}}</view>
+            <view class="record-item-time">{{record.occurTime}}</view>
+          </view>
+          <view class="record-item-points {{record.changeType === 'INCREASE' ? 'record-item-points--add' : 'record-item-points--sub'}}">
+            {{record.changeType === 'INCREASE' ? '+' : '-'}}{{record.changePoints}}
+          </view>
         </view>
       </block>
     </view>

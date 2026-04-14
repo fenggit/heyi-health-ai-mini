@@ -21,6 +21,10 @@ App({
    *   aiReportUrl            {string} AI 体质测试报告页面地址
    *   analysisQrCodeUrl      {string} 分析页二维码图片地址
    *   client_id  {string}
+   *   memberInfo {object} 会员信息
+   *     memberInfo.currentLevelId   {number} 当前会员等级 ID
+   *     memberInfo.currentLevelName {string} 当前会员等级名称
+   *     memberInfo.totalPoints      {number} 总积分
    *
    * guestSession — 游客 session 信息（来自 getGuestToken 响应 data）
    *   guestToken     {string}  游客令牌

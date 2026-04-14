@@ -1,10 +1,6 @@
 const { initMiniNav, backWithFallback } = require('../../utils/mini-nav')
-
-const REWARD_ITEMS = [
-  { id: 'r1', leftTitle: '¥ 5', leftSub: '500 积分', name: '5 元优惠券', stock: 100 },
-  { id: 'r2', leftTitle: '¥ 10', leftSub: '1000 积分', name: '10 元优惠券', stock: 100 },
-  { id: 'r3', leftTitle: '免运费', leftSub: '300 积分', name: '10 元优惠券', stock: 100 }
-]
+const { get } = require('../../utils/request')
+const paths = require('../../http/paths')
 
 Page({
   data: {
@@ -20,14 +16,54 @@ Page({
     navTitle: '积分兑换',
     pageTitle: '积分兑换',
     pageSubTitle: '用积分兑换优惠券和礼品',
-    myPoints: 1280,
+
+    // 接口数据
+    nickName: '',
+    avatarUrl: '',
     memberLevel: '普通会员',
-    monthlyIncome: 280,
-    rewardItems: REWARD_ITEMS
+    availablePoints: 0,
+    monthEarnedPoints: 0,
+    totalEarnedPoints: 0,
+    totalUsedPoints: 0,
+    totalExpiredPoints: 0,
+    todaySigned: false,
+    signInRewardPoints: 0,
+    recentRecords: [],
+
+    rewardItems: []
   },
 
   onLoad() {
     initMiniNav(this)
+  },
+
+  onShow() {
+    this._loadPointsCenter()
+  },
+
+  _loadPointsCenter() {
+    wx.showLoading({ title: '加载中', mask: true })
+    get(paths.member.pointsCenter)
+      .then((res) => {
+        const d = (res && res.data) || {}
+        this.setData({
+          nickName: d.nickName || '',
+          avatarUrl: d.avatarUrl || '',
+          memberLevel: d.currentLevelName || '普通会员',
+          availablePoints: d.availablePoints || 0,
+          monthEarnedPoints: d.monthEarnedPoints || 0,
+          totalEarnedPoints: d.totalEarnedPoints || 0,
+          totalUsedPoints: d.totalUsedPoints || 0,
+          totalExpiredPoints: d.totalExpiredPoints || 0,
+          todaySigned: !!d.todaySignedIn,
+          signInRewardPoints: d.signInRewardPoints || 0,
+          recentRecords: Array.isArray(d.recentRecords) ? d.recentRecords : []
+        })
+      })
+      .catch(() => {})
+      .finally(() => {
+        wx.hideLoading()
+      })
   },
 
   handleBack() {

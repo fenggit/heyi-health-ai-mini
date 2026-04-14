@@ -1,7 +1,13 @@
 @import "../profile-sub/common.wxss";
 
+/* ── 标题行 ── */
 .points-page .page-title {
   font-size: 48rpx;
+}
+
+.points-page .page-subtitle {
+  margin-top: 24rpx;
+  margin-bottom: 32rpx;
 }
 
 .points-head {
@@ -10,135 +16,263 @@
   align-items: center;
 }
 
+/* 积分获取规则按钮：w:108px h:32px radius:12px border:#008435 opacity:0.2 fontSize:14px */
 .points-rule-btn {
-  min-width: 166rpx;
-  height: 56rpx;
-  border-radius: 28rpx;
-  border: 2rpx solid #7fd3af;
-  color: #334155;
-  font-size: 24rpx;
-  line-height: 56rpx;
+  width: 216rpx;
+  height: 64rpx;
+  border-radius: 24rpx;
+  border: 2rpx solid rgba(0, 132, 53, 0.2);
+  color: #1e293b;
+  font-size: 28rpx;
+  font-weight: 500;
+  line-height: 64rpx;
   text-align: center;
 }
 
-.points-summary {
+/* ── 积分概览卡片（复用 profile-member 结构） ── */
+.points-page .card-panel.points-member {
+  position: relative;
   margin-top: 14rpx;
-  border: none;
+  padding: 0;
+  border: none !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   overflow: hidden;
 }
 
-.points-summary-top {
-  height: 92rpx;
-  background: linear-gradient(115deg, rgba(69, 231, 207, 0.72) 0%, rgba(199, 236, 73, 0.8) 100%);
+.points-member__bg-module {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
+}
+
+.points-member__vip-section {
+  position: relative;
+  z-index: 2;
+  height: 140rpx;
   padding: 0 20rpx;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  box-sizing: border-box;
+  background: transparent;
 }
 
-.points-summary-title {
-  color: #0f172a;
-  font-size: 32rpx;
-  font-weight: 700;
-}
-
-.points-summary-member {
-  min-width: 120rpx;
-  height: 52rpx;
-  border-radius: 22rpx;
-  background: #121212;
-  color: #cdff71;
-  font-size: 26rpx;
-  line-height: 52rpx;
-  text-align: center;
-  font-weight: 600;
-}
-
-.points-summary-bottom {
-  height: 82rpx;
-  padding: 0 20rpx;
+.points-member__head {
+  width: 100%;
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
 }
 
-.points-summary-label {
-  color: #334155;
-  font-size: 28rpx;
-  font-weight: 600;
-}
-
-.points-summary-income {
-  color: #1e293b;
+.points-member__title {
+  display: inline-flex;
+  align-items: center;
+  color: #131313;
   font-size: 30rpx;
   font-weight: 700;
 }
 
-.points-list {
-  margin-top: 14rpx;
-  padding: 20rpx;
+.points-member__icon {
+  width: 32rpx;
+  height: 32rpx;
+  margin-right: 10rpx;
 }
 
-.points-list-title {
-  color: #334155;
-  font-size: 28rpx;
+.points-member__num {
+  color: #131313;
+  font-size: 30rpx;
   font-weight: 700;
 }
 
-.points-item {
-  margin-top: 12rpx;
-  min-height: 108rpx;
-  border-radius: 20rpx;
-  background: #f5f2ef;
+/* 会员等级 badge */
+.points-summary-member {
+  height: 56rpx;
+  border-radius: 18rpx;
+  padding: 0 20rpx;
+  background: #131313;
+  color: #cdff71;
+  font-size: 24rpx;
+  line-height: 56rpx;
+  font-weight: 500;
+}
+
+.points-member__month-row {
+  position: relative;
+  z-index: 2;
+  height: 104rpx;
+  margin: 0 -2rpx -2rpx;
+  padding: 0 32rpx;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 24rpx;
+  border: 2rpx solid #ffffff;
   display: flex;
   align-items: center;
-  padding: 10rpx 14rpx;
+  justify-content: space-between;
 }
 
-.points-item-left {
-  width: 140rpx;
-  text-align: center;
-  border-right: 2rpx dashed #f08a8a;
-}
-
-.points-item-left__title {
-  color: #d97706;
-  font-size: 34rpx;
+.points-member__stat-val {
+  color: #1e293b;
+  font-size: 42rpx;
   font-weight: 700;
+  line-height: 1;
 }
 
-.points-item-left__sub {
+/* ── 可兑换礼品 / 流水 ── */
+.points-list {
+  margin-top: 14rpx;
+  padding: 20rpx 28rpx;
+}
+
+/* 标题 */
+.points-list-title {
+  margin-bottom: 8rpx;
+}
+
+/* 兑换 item：h:92px radius:12px bg:#E17100 5% */
+.points-item {
+  margin-top: 16rpx;
+  height: 184rpx;
+  border-radius: 24rpx;
+  background: rgba(225, 113, 0, 0.05);
+  display: flex;
+  align-items: center;
+  padding: 0 28rpx;
+}
+
+/* 左侧金额区 */
+.points-item-left {
+  width: 120rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ¥ + 数字组合：¥ fontSize:16px opacity:0.55, 数字 fontSize:32px bold */
+.points-item-price {
+  display: flex;
+  align-items: flex-end;
+  color: #e17100;
+}
+
+.points-item-price-symbol {
+  font-size: 32rpx;
+  font-weight: 700;
+  opacity: 0.55;
+  line-height: 1.2;
+  margin-bottom: 4rpx;
+}
+
+.points-item-price-num {
+  font-size: 64rpx;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* 积分子标题：fontSize:12px color:#E17100 */
+.points-item-score {
   margin-top: 4rpx;
-  color: #d97706;
+  color: #e17100;
   font-size: 24rpx;
-  font-weight: 600;
+  font-weight: 400;
+  text-align: center;
+}
+
+/* 虚线分隔：color:#FB2C36 opacity:0.5 */
+.points-item-sep {
+  width: 2rpx;
+  height: 104rpx;
+  margin: 0 24rpx;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(251, 44, 54, 0.5) 0,
+    rgba(251, 44, 54, 0.5) 8rpx,
+    transparent 8rpx,
+    transparent 16rpx
+  );
 }
 
 .points-item-main {
-  margin-left: 16rpx;
   flex: 1;
 }
 
+/* 商品名：fontSize:14px bold color:#1E293B */
 .points-item-main__name {
-  color: #334155;
+  color: #1e293b;
   font-size: 28rpx;
   font-weight: 700;
 }
 
+/* 库存：fontSize:12px color:#94A3B8 */
 .points-item-main__stock {
   margin-top: 8rpx;
   color: #94a3b8;
   font-size: 24rpx;
 }
 
+/* 兑换按钮：w:80px h:32px radius:12px bg:#E17100 fontSize:14px medium */
 .points-item-btn {
-  min-width: 124rpx;
-  height: 56rpx;
+  width: 160rpx;
+  height: 64rpx;
   border-radius: 24rpx;
-  background: #d97706;
+  background: #e17100;
   color: #ffffff;
-  font-size: 24rpx;
-  line-height: 56rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  line-height: 64rpx;
   text-align: center;
+}
+
+/* ── 积分流水 ── */
+.record-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #f1f5f9;
+}
+
+.record-item:last-child {
+  border-bottom: none;
+}
+
+.record-item-left {
+  flex: 1;
+}
+
+.record-item-name {
+  color: #1e293b;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.record-item-desc {
+  margin-top: 4rpx;
+  color: #94a3b8;
+  font-size: 22rpx;
+}
+
+.record-item-time {
+  margin-top: 4rpx;
+  color: #cbd5e1;
+  font-size: 22rpx;
+}
+
+.record-item-points {
+  font-size: 32rpx;
   font-weight: 700;
+  margin-left: 16rpx;
+}
+
+.record-item-points--add {
+  color: #16a34a;
+}
+
+.record-item-points--sub {
+  color: #dc2626;
 }
