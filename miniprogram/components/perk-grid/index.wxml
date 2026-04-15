@@ -1,0 +1,8 @@
+<view class="perk-grid">
+  <block wx:for="{{items}}" wx:for-index="idx" wx:key="idx">
+    <view class="perk-grid__item">
+      <image wx:if="{{item.icon}}" class="perk-grid__icon" src="{{item.icon}}" mode="aspectFit" />
+      <view class="perk-grid__text">{{item.label}}</view>
+    </view>
+  </block>
+</view>

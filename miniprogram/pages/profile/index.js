@@ -1,5 +1,37 @@
 const { getLayoutMetrics } = require("../../utils/layout")
 const { navigateToReport } = require("../../utils/navigateReport")
+const { get } = require("../../utils/request")
+const paths = require("../../http/paths")
+
+const CURRENT_PLAN_CHIP_BG = "/assets/profile-pages/vip/current_img@2x.png"
+const RECOMMEND_PLAN_CHIP_BG = "/assets/profile-pages/vip/recommend_img@2x.png"
+
+const DEFAULT_MEMBER_PLANS = [
+  {
+    id: "normal",
+    title: "当前：普通会员",
+    price: 0,
+    unit: "",
+    dark: false,
+    chipBg: CURRENT_PLAN_CHIP_BG
+  },
+  {
+    id: "gold",
+    title: "推荐：黄金会员",
+    price: 99,
+    unit: "/月",
+    dark: true,
+    chipBg: RECOMMEND_PLAN_CHIP_BG
+  },
+  {
+    id: "diamond",
+    title: "钻石会员",
+    price: 999,
+    unit: "/年",
+    dark: true,
+    chipBg: RECOMMEND_PLAN_CHIP_BG
+  }
+]
 
 const MOCK_PROFILE_DATA = {
   pageTitle: "个人中心",
@@ -49,9 +81,144 @@ const PROFILE_REPORT_MENU_MAP = {
   视觉AI分析报告: { title: "视觉AI分析报告", key: "aiReportUrl" }
 }
 
+function cloneDeep(value) {
+  return JSON.parse(JSON.stringify(value))
+}
+
 function fetchProfileData() {
   // TODO: 后续替换为个人中心接口
-  return Promise.resolve(JSON.parse(JSON.stringify(MOCK_PROFILE_DATA)))
+  return Promise.resolve(cloneDeep(MOCK_PROFILE_DATA))
+}
+
+function sortBySortField(list) {
+  return list.slice().sort((a, b) => {
+    const aSort = a && a.sort != null ? Number(a.sort) : 0
+    const bSort = b && b.sort != null ? Number(b.sort) : 0
+    return aSort - bSort
+  })
+}
+
+function toDisplayPrice(rawValue, fallback = 0) {
+  if (rawValue == null || rawValue === "") return fallback
+  const num = Number(rawValue)
+  if (!Number.isFinite(num)) return fallback
+  return Number.isInteger(num) ? num : Number(num.toFixed(2))
+}
+
+function normalizeBenefitItems(rawList) {
+  const source = Array.isArray(rawList) ? rawList : []
+  return sortBySortField(source)
+    .map((item) => {
+      if (typeof item === "string") return item
+      if (!item || typeof item !== "object") return ""
+      return item.text || item.name || item.title || ""
+    })
+    .filter(Boolean)
+}
+
+function normalizePerkItems(rawList) {
+  const source = Array.isArray(rawList) ? rawList : []
+  return sortBySortField(source)
+    .map((item) => {
+      if (!item || typeof item !== "object") return null
+      const label = item.text || item.name || item.title || ""
+      if (!label) return null
+      return {
+        icon: item.iconUrl || "",
+        label
+      }
+    })
+    .filter(Boolean)
+}
+
+function buildMemberPlansFromUpgradePage(payload, fallbackPlans) {
+  const upgradeData = payload && typeof payload === "object" ? payload : {}
+  const planSource = Array.isArray(upgradeData.levelList) ? upgradeData.levelList : []
+
+  if (!planSource.length) {
+    const currentName =
+      (upgradeData.currentLevelBenefits && upgradeData.currentLevelBenefits.levelName) ||
+      upgradeData.currentLevelName ||
+      ""
+    if (!currentName) return cloneDeep(fallbackPlans)
+    const nextPlans = cloneDeep(fallbackPlans)
+    if (nextPlans[0]) {
+      nextPlans[0].title = `当前：${currentName}`
+      nextPlans[0].chipBg = CURRENT_PLAN_CHIP_BG
+      nextPlans[0].dark = false
+    }
+    return nextPlans
+  }
+
+  const currentLevelCode = upgradeData.currentLevelCode != null ? String(upgradeData.currentLevelCode) : ""
+  const currentLevelId = upgradeData.currentLevelId != null ? String(upgradeData.currentLevelId) : ""
+
+  const plans = planSource.map((item, index) => {
+    const levelName = item.levelName || item.name || item.title || `会员等级${index + 1}`
+    const planId = item.levelCode != null
+      ? String(item.levelCode)
+      : (item.levelId != null ? String(item.levelId) : String(item.id || `plan_${index + 1}`))
+
+    const isCurrent =
+      item.currentLevel === true ||
+      (currentLevelCode && item.levelId != null && String(item.levelId) === currentLevelCode) ||
+      (currentLevelId && item.levelId != null && String(item.levelId) === currentLevelId)
+
+    const isRecommended = item.recommended === true || item.recommend === true || item.isRecommend === true
+
+    return {
+      id: planId,
+      levelId: item.levelId != null ? String(item.levelId) : "",
+      title: `${isCurrent ? "当前：" : (isRecommended ? "推荐：" : "")}${levelName}`,
+      price: toDisplayPrice(item.subscriptionPlan && item.subscriptionPlan.priceAmount, 0),
+      unit: item.unit || item.priceUnit || item.cycleUnit || "",
+      dark: !isCurrent,
+      chipBg: isCurrent ? CURRENT_PLAN_CHIP_BG : RECOMMEND_PLAN_CHIP_BG,
+      currentLevel: isCurrent,
+      benefitItems: normalizeBenefitItems(item.benefitItemList),
+      perkItems: normalizePerkItems(item.perkItemList)
+    }
+  })
+
+  return plans.length ? plans : cloneDeep(fallbackPlans)
+}
+
+function pickPlanDetails(plans, selectedPlanId) {
+  if (!Array.isArray(plans) || !plans.length) {
+    return {
+      memberBenefits: [],
+      memberWelfares: []
+    }
+  }
+  const matched = plans.find((item) => String(item.id) === String(selectedPlanId || "")) || plans[0]
+  return {
+    memberBenefits: Array.isArray(matched.benefitItems) ? matched.benefitItems : [],
+    memberWelfares: Array.isArray(matched.perkItems) ? matched.perkItems : []
+  }
+}
+
+function pickSelectedPlanId(plans, payload, fallbackSelectedPlanId) {
+  if (!Array.isArray(plans) || !plans.length) return fallbackSelectedPlanId || ""
+
+  const currentLevelCode = payload && payload.currentLevelCode != null ? String(payload.currentLevelCode) : ""
+  const currentLevelId = payload && payload.currentLevelId != null ? String(payload.currentLevelId) : ""
+
+  if (currentLevelCode) {
+    const matchedByCode = plans.find((item) => String(item.levelId) === currentLevelCode)
+    if (matchedByCode) return matchedByCode.id
+  }
+  if (currentLevelId) {
+    const matchedById = plans.find((item) => String(item.levelId || item.id) === currentLevelId)
+    if (matchedById) return matchedById.id
+  }
+
+  const currentPlan = plans.find((item) => item.currentLevel)
+  if (currentPlan) return currentPlan.id
+
+  const fallbackMatched = plans.find((item) => String(item.id) === String(fallbackSelectedPlanId || ""))
+  if (fallbackMatched) return fallbackMatched.id
+
+  return plans[0].id
 }
 
 Page({
@@ -64,39 +231,10 @@ Page({
     featureMenus: [],
     showMemberSheet: false,
     selectedMemberPlanId: "normal",
-    memberPlans: [
-      {
-        id: "normal",
-        title: "当前：普通会员",
-        price: 0,
-        unit: "",
-        dark: false,
-        chipBg: "/assets/profile-pages/vip/current_img@2x.png"
-      },
-      {
-        id: "gold",
-        title: "推荐：黄金会员",
-        price: 99,
-        unit: "/月",
-        dark: true,
-        chipBg: "/assets/profile-pages/vip/recommend_img@2x.png"
-      },
-      {
-        id: "diamond",
-        title: "钻石会员",
-        price: 999,
-        unit: "/年",
-        dark: true,
-        chipBg: "/assets/profile-pages/vip/recommend_img@2x.png"
-      }
-    ],
-    memberBenefits: ["基础体质测评", "查看食养配方", "购物积分累积", "客服咨询"],
-    memberWelfares: [
-      { icon: "/assets/profile-pages/vip/gift_icon.png", label: "生日礼包" },
-      { icon: "/assets/profile-pages/coupon_icon.png", label: "节日优惠" },
-      { icon: "/assets/profile-pages/vip/new_icon.png", label: "新品试用" },
-      { icon: "/assets/profile-pages/vip/activity_icon.png", label: "专属活动" }
-    ],
+    memberPlans: cloneDeep(DEFAULT_MEMBER_PLANS),
+    memberBenefits: [],
+    memberWelfares: [],
+    upgradePageFetchSuccess: false,
     memberFaqs: [
       {
         id: "f1",
@@ -121,6 +259,7 @@ Page({
   },
   onShow() {
     this.syncUserInfo()
+    this.loadUpgradePageData({ force: true }).catch(() => {})
     if (typeof this.getTabBar === "function" && this.getTabBar()) {
       this.getTabBar().setData({ selected: 3 })
     }
@@ -135,6 +274,9 @@ Page({
     const payload = await fetchProfileData()
     this.setData(payload)
     this.syncUserInfo()
+    if (this._upgradePagePayload) {
+      this.applyUpgradePageData(this._upgradePagePayload)
+    }
   },
   syncUserInfo() {
     const app = getApp()
@@ -142,11 +284,91 @@ Page({
     this._userInfo = userInfo
 
     const memberInfo = userInfo.memberInfo || {}
-    this.setData({
-      'user.userId': userInfo.userId || '',
-      'user.memberLevel': memberInfo.currentLevelName || '普通会员',
-      'user.points': memberInfo.totalPoints != null ? memberInfo.totalPoints : 0
-    })
+    const patch = {
+      "user.userId": userInfo.userId || "",
+      "user.memberLevel": memberInfo.currentLevelName || "普通会员",
+      "user.points": memberInfo.totalPoints != null ? memberInfo.totalPoints : 0
+    }
+
+    const nickName = userInfo.nickName || userInfo.nickname || ""
+    if (nickName) {
+      patch["user.nickname"] = nickName
+    }
+
+    this.setData(patch)
+  },
+  loadUpgradePageData({ force = false, showLoading = false } = {}) {
+    if (this._upgradePageRequestPromise) {
+      return this._upgradePageRequestPromise
+    }
+
+    if (!force && this.data.upgradePageFetchSuccess && this._upgradePagePayload) {
+      return Promise.resolve(this._upgradePagePayload)
+    }
+
+    if (showLoading) {
+      wx.showLoading({ title: "加载中", mask: true })
+    }
+
+    this._upgradePageRequestPromise = get(paths.member.upgradePage)
+      .then((res) => {
+        const payload = (res && res.data) || {}
+        this._upgradePagePayload = payload
+        this.applyUpgradePageData(payload)
+        this.setData({ upgradePageFetchSuccess: true })
+        return payload
+      })
+      .catch((err) => {
+        this.setData({ upgradePageFetchSuccess: false })
+        return Promise.reject(err)
+      })
+      .finally(() => {
+        if (showLoading) {
+          wx.hideLoading()
+        }
+        this._upgradePageRequestPromise = null
+      })
+
+    return this._upgradePageRequestPromise
+  },
+  applyUpgradePageData(payload) {
+    const upgradeData = payload && typeof payload === "object" ? payload : {}
+    const nextPlans = buildMemberPlansFromUpgradePage(upgradeData, this.data.memberPlans)
+    const nextSelectedPlanId = pickSelectedPlanId(nextPlans, upgradeData, this.data.selectedMemberPlanId)
+    const planDetails = pickPlanDetails(nextPlans, nextSelectedPlanId)
+
+    const patch = {
+      memberPlans: nextPlans,
+      selectedMemberPlanId: nextSelectedPlanId,
+      memberBenefits: planDetails.memberBenefits,
+      memberWelfares: planDetails.memberWelfares
+    }
+
+    if (upgradeData.userId != null) {
+      patch["user.userId"] = String(upgradeData.userId)
+    }
+    if (upgradeData.nickName) {
+      patch["user.nickname"] = upgradeData.nickName
+    }
+
+    const memberLevelName =
+      (upgradeData.currentLevelBenefits && upgradeData.currentLevelBenefits.levelName) ||
+      upgradeData.currentLevelName ||
+      ""
+    if (memberLevelName) {
+      patch["user.memberLevel"] = memberLevelName
+    }
+
+    const totalPoints =
+      upgradeData.totalPoints != null
+        ? upgradeData.totalPoints
+        : (upgradeData.availablePoints != null ? upgradeData.availablePoints : null)
+
+    if (totalPoints != null && totalPoints !== "") {
+      patch["user.points"] = Number(totalPoints) || 0
+    }
+
+    this.setData(patch)
   },
   openItem(e) {
     const { name } = e.currentTarget.dataset
@@ -181,14 +403,31 @@ Page({
     })
   },
   openMemberSheet() {
-    this.setData({ showMemberSheet: true })
+    if (this.data.upgradePageFetchSuccess) {
+      if (this._upgradePagePayload) {
+        this.applyUpgradePageData(this._upgradePagePayload)
+      }
+      this.setData({ showMemberSheet: true })
+      return
+    }
+
+    this.loadUpgradePageData({ force: true, showLoading: true })
+      .catch(() => {})
+      .finally(() => {
+        this.setData({ showMemberSheet: true })
+      })
   },
   closeMemberSheet() {
     this.setData({ showMemberSheet: false })
   },
   selectMemberPlan(e) {
     const { id } = e.currentTarget.dataset
-    this.setData({ selectedMemberPlanId: id })
+    const planDetails = pickPlanDetails(this.data.memberPlans, id)
+    this.setData({
+      selectedMemberPlanId: id,
+      memberBenefits: planDetails.memberBenefits,
+      memberWelfares: planDetails.memberWelfares
+    })
   },
   confirmMemberUpgrade() {
     const current = this.data.memberPlans.find((item) => item.id === this.data.selectedMemberPlanId)

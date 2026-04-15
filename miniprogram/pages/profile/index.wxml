@@ -99,15 +99,10 @@
           </view>
         </block>
 
-        <view class="member-sheet__section-title member-sheet__section-title--gap">会员专属福利</view>
-        <view class="member-sheet__welfare-grid">
-          <block wx:for="{{memberWelfares}}" wx:key="label">
-            <view class="member-sheet__welfare-item">
-              <image class="member-sheet__welfare-icon" src="{{item.icon}}" mode="aspectFit" />
-              <view class="member-sheet__welfare-text">{{item.label}}</view>
-            </view>
-          </block>
-        </view>
+        <block wx:if="{{memberWelfares.length}}">
+          <view class="member-sheet__section-title member-sheet__section-title--gap">会员专属福利</view>
+          <perk-grid items="{{memberWelfares}}" />
+        </block>
 
         <view class="member-sheet__section-title member-sheet__section-title--gap">常见问题</view>
         <block wx:for="{{memberFaqs}}" wx:key="id">

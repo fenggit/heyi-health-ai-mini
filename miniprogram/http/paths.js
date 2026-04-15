@@ -17,7 +17,9 @@ const paths = {
   },
   member: {
     // 积分中心
-    pointsCenter: '/uc/app/member/points/center'
+    pointsCenter: '/uc/app/member/points/center',
+    // 会员升级页
+    upgradePage: '/uc/app/member/points/upgrade-page'
   },
   assessment: {
     // 获取问卷详情
