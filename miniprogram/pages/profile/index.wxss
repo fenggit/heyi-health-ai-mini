@@ -135,7 +135,7 @@
   position: relative;
   margin-top: 12rpx;
   padding: 0;
-  border: 2rpx solid rgba(255, 255, 255, 0.96);
+  border: none;
   background: rgba(255, 255, 255, 0.72);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
