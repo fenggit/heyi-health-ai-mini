@@ -177,7 +177,10 @@ function buildMemberPlansFromUpgradePage(payload, fallbackPlans) {
       (currentLevelCode && item.levelId != null && String(item.levelId) === currentLevelCode) ||
       (currentLevelId && item.levelId != null && String(item.levelId) === currentLevelId)
 
-    const isRecommended = item.recommended === true || item.recommend === true || item.isRecommend === true
+    const isRecommended =
+      subscriptionPlan.recommended === true ||
+      subscriptionPlan.recommended === 1 ||
+      String(subscriptionPlan.recommended).toLowerCase() === "true"
 
     return {
       id: planId,
