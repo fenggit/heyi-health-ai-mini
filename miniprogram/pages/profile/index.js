@@ -105,6 +105,17 @@ function toDisplayPrice(rawValue, fallback = 0) {
   return Number.isInteger(num) ? num : Number(num.toFixed(2))
 }
 
+function toDisplayBillingCycle(rawCycle) {
+  if (rawCycle == null || rawCycle === "") return ""
+  const cycle = String(rawCycle)
+  const cycleMap = {
+    DAY: "日",
+    MONTH: "月",
+    YEAR: "年"
+  }
+  return cycleMap[cycle.toUpperCase()] || cycle
+}
+
 function normalizeBenefitItems(rawList) {
   const source = Array.isArray(rawList) ? rawList : []
   return sortBySortField(source)
@@ -158,6 +169,8 @@ function buildMemberPlansFromUpgradePage(payload, fallbackPlans) {
     const planId = item.levelCode != null
       ? String(item.levelCode)
       : (item.levelId != null ? String(item.levelId) : String(item.id || `plan_${index + 1}`))
+    const subscriptionPlan = item.subscriptionPlan && typeof item.subscriptionPlan === "object" ? item.subscriptionPlan : {}
+    const billingCycle = toDisplayBillingCycle(subscriptionPlan.billingCycle)
 
     const isCurrent =
       item.currentLevel === true ||
@@ -170,8 +183,8 @@ function buildMemberPlansFromUpgradePage(payload, fallbackPlans) {
       id: planId,
       levelId: item.levelId != null ? String(item.levelId) : "",
       title: `${isCurrent ? "当前：" : (isRecommended ? "推荐：" : "")}${levelName}`,
-      price: toDisplayPrice(item.subscriptionPlan && item.subscriptionPlan.priceAmount, 0),
-      unit: item.unit || item.priceUnit || item.cycleUnit || "",
+      price: toDisplayPrice(subscriptionPlan.priceAmount, 0),
+      unit: billingCycle ? `/${billingCycle}` : "",
       dark: !isCurrent,
       chipBg: isCurrent ? CURRENT_PLAN_CHIP_BG : RECOMMEND_PLAN_CHIP_BG,
       currentLevel: isCurrent,
