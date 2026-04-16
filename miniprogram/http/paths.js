@@ -18,8 +18,16 @@ const paths = {
   member: {
     // 积分中心
     pointsCenter: '/uc/app/member/points/center',
+    // 积分获取规则
+    pointsRules: '/uc/app/member/points/rules',
     // 会员升级页
-    upgradePage: '/uc/app/member/points/upgrade-page'
+    upgradePage: '/uc/app/member/points/upgrade-page',
+    // 积分兑换优惠券
+    exchangeCoupon: '/uc/app/member/points/exchange/coupon'
+  },
+  marketing: {
+    // 可兑换积分商品列表
+    pointsGoodsAvailable: '/marketing/app/points-goods/available'
   },
   assessment: {
     // 获取问卷详情

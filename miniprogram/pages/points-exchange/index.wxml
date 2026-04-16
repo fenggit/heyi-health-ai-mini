@@ -38,47 +38,62 @@
       <view class="points-list-title">
         <title-view text="可兑换礼品" />
       </view>
-      <block wx:for="{{rewardItems}}" wx:key="id" wx:for-item="reward">
-        <view class="points-item">
-          <!-- 左侧金额 -->
-          <view class="points-item-left">
-            <view class="points-item-price">
-              <text class="points-item-price-symbol">￥</text>
-              <text class="points-item-price-num">{{reward.leftTitle}}</text>
+      <block wx:if="{{rewardItems.length > 0}}">
+        <block wx:for="{{rewardItems}}" wx:key="id" wx:for-item="reward">
+          <view class="points-item">
+            <!-- 左侧金额 -->
+            <view class="points-item-left">
+              <view class="points-item-price">
+                <text class="points-item-price-symbol">￥</text>
+                <text class="points-item-price-num">{{reward.leftTitle}}</text>
+              </view>
+              <view class="points-item-score">{{reward.leftSub}}</view>
             </view>
-            <view class="points-item-score">{{reward.leftSub}}</view>
+            <!-- 分隔线 -->
+            <view class="points-item-sep"></view>
+            <!-- 中间信息 -->
+            <view class="points-item-main">
+              <view class="points-item-main__name">{{reward.name}}</view>
+              <view class="points-item-main__stock">库存 {{reward.stock}}</view>
+            </view>
+            <!-- 兑换按钮 -->
+            <view
+              class="points-item-btn {{(!reward.canRedeem || redeemingId) ? 'points-item-btn--disabled' : ''}}"
+              data-id="{{reward.id}}"
+              bindtap="redeem"
+            >
+              {{redeemingId === reward.id ? '兑换中...' : reward.buttonText}}
+            </view>
           </view>
-          <!-- 分隔线 -->
-          <view class="points-item-sep"></view>
-          <!-- 中间信息 -->
-          <view class="points-item-main">
-            <view class="points-item-main__name">{{reward.name}}</view>
-            <view class="points-item-main__stock">库存 {{reward.stock}}</view>
-          </view>
-          <!-- 兑换按钮 -->
-          <view class="points-item-btn" data-id="{{reward.id}}" bindtap="redeem">立即兑换</view>
-        </view>
+        </block>
       </block>
+      <view wx:else class="points-list-empty">暂无可兑换礼品</view>
     </view>
 
-    <!-- 最近积分流水 -->
-    <view wx:if="{{recentRecords.length > 0}}" class="glass-card points-list">
-      <view class="points-list-title">
-        <text>最近积分流水</text>
-        <view class="points-list-title-dec"></view>
-      </view>
-      <block wx:for="{{recentRecords}}" wx:key="occurTime" wx:for-item="record">
-        <view class="record-item">
-          <view class="record-item-left">
-            <view class="record-item-name">{{record.bizTypeName}}</view>
-            <view class="record-item-desc">{{record.sourceDesc}}</view>
-            <view class="record-item-time">{{record.occurTime}}</view>
-          </view>
-          <view class="record-item-points {{record.changeType === 'INCREASE' ? 'record-item-points--add' : 'record-item-points--sub'}}">
-            {{record.changeType === 'INCREASE' ? '+' : '-'}}{{record.changePoints}}
-          </view>
+  </view>
+
+  <view
+    wx:if="{{showRulesPopup}}"
+    class="points-rules-mask"
+    catchtap="closeRulesPopup"
+  ></view>
+  <view
+    wx:if="{{showRulesPopup}}"
+    class="points-rules-popup"
+    catchtap="stopRulesPopupTap"
+  >
+    <view class="points-rules-popup__title">积分获取规则</view>
+    <view wx:if="{{rulesLoading}}" class="points-rules-popup__loading">加载中...</view>
+    <view wx:elif="{{rulesItems.length > 0}}" class="points-rules-popup__list">
+      <block wx:for="{{rulesItems}}" wx:key="id" wx:for-item="rule">
+        <view class="points-rules-popup__item">
+          <text class="points-rules-popup__name">{{rule.title}}</text>
+          <text class="points-rules-popup__score">{{rule.pointsText}}</text>
         </view>
       </block>
     </view>
+    <view wx:elif="{{rulesError === 'load_failed'}}" class="points-rules-popup__empty">积分规则加载失败</view>
+    <view wx:else class="points-rules-popup__empty">暂无积分规则</view>
+    <view class="points-rules-popup__close" bindtap="closeRulesPopup">我知道了</view>
   </view>
 </view>

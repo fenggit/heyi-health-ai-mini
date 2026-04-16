@@ -1,6 +1,7 @@
 const { getLayoutMetrics } = require("../../utils/layout")
 const { navigateToReport } = require("../../utils/navigateReport")
 const { get } = require("../../utils/request")
+const { fetchUserInfo, loadUserInfoFromStorage } = require("../../http/auth")
 const paths = require("../../http/paths")
 
 const CURRENT_PLAN_CHIP_BG = "/assets/profile-pages/vip/current_img@2x.png"
@@ -274,11 +275,63 @@ Page({
     this.loadPageData()
   },
   onShow() {
-    this.syncUserInfo()
-    this.loadUpgradePageData({ force: true }).catch(() => {})
+    this.refreshProfileDataAndUI()
     if (typeof this.getTabBar === "function" && this.getTabBar()) {
       this.getTabBar().setData({ selected: 3 })
     }
+  },
+  refreshProfileDataAndUI() {
+    if (this._profileRefreshPromise) {
+      this._profileRefreshPending = true
+      return this._profileRefreshPromise
+    }
+
+    this.syncLayout()
+    this.syncUserInfo({ fallbackToStorage: true })
+
+    this._profileRefreshPromise = Promise.all([
+      // 基础 UI 数据（统计、菜单等）每次返回“我的”页都重新刷新
+      this.loadPageData().catch(() => {}),
+      fetchUserInfo()
+        .then(() => {
+          this.syncUserInfo({ fallbackToStorage: true })
+        })
+        .catch(() => {}),
+      this.loadUpgradePageData({ force: true }).catch(() => {})
+    ])
+      .then(() => {
+        // 以积分中心数据为准，避免“我的”页显示旧积分
+        return this.loadPointsCenterData().catch(() => {})
+      })
+      .finally(() => {
+        this._profileRefreshPromise = null
+        if (this._profileRefreshPending) {
+          this._profileRefreshPending = false
+          this.refreshProfileDataAndUI()
+        }
+      })
+
+    return this._profileRefreshPromise
+  },
+  loadPointsCenterData() {
+    return get(paths.member.pointsCenter).then((res) => {
+      const d = (res && res.data) || {}
+      const patch = {}
+      if (d.nickName) {
+        patch["user.nickname"] = d.nickName
+      }
+      if (d.currentLevelName) {
+        patch["user.memberLevel"] = d.currentLevelName
+      }
+      if (d.availablePoints != null && d.availablePoints !== "") {
+        patch["user.points"] = Number(d.availablePoints) || 0
+      }
+
+      if (Object.keys(patch).length) {
+        this.setData(patch)
+      }
+      return d
+    })
   },
   syncLayout() {
     const { statusBarHeight } = getLayoutMetrics()
@@ -294,9 +347,15 @@ Page({
       this.applyUpgradePageData(this._upgradePagePayload)
     }
   },
-  syncUserInfo() {
+  syncUserInfo({ fallbackToStorage = false } = {}) {
     const app = getApp()
-    const userInfo = (app && app.globalData && app.globalData.userInfo) || {}
+    let userInfo = (app && app.globalData && app.globalData.userInfo) || {}
+    if (
+      fallbackToStorage &&
+      (!userInfo || typeof userInfo !== "object" || !Object.keys(userInfo).length)
+    ) {
+      userInfo = loadUserInfoFromStorage() || {}
+    }
     this._userInfo = userInfo
 
     const memberInfo = userInfo.memberInfo || {}
