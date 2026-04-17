@@ -5,8 +5,10 @@ const paths = require("../../http/paths")
 const TAB_LIST = [
   { key: "all", label: "全部优惠券" },
   { key: "unused", label: "待使用" },
-  { key: "used", label: "已使用" }
+  { key: "used", label: "已使用" },
+  { key: "expired", label: "已过期" }
 ]
+const PERMANENT_VALID_TEXT = "永久有效"
 
 function toDisplayAmount(value) {
   const amount = Number(value || 0)
@@ -23,11 +25,21 @@ function normalizeCouponList(data) {
     if (Array.isArray(data[key])) return data[key]
   }
 
-  const groupedKeys = ["unusedList", "usedList", "expiredList"]
+  const groupedKeyMap = {
+    unusedList: "unused",
+    usedList: "used",
+    expiredList: "expired"
+  }
   const merged = []
-  groupedKeys.forEach((key) => {
+  Object.keys(groupedKeyMap).forEach((key) => {
     if (Array.isArray(data[key])) {
-      merged.push(...data[key])
+      const groupStatus = groupedKeyMap[key]
+      merged.push(
+        ...data[key].map((item) => ({
+          ...(item || {}),
+          __groupStatus: groupStatus
+        }))
+      )
     }
   })
   return merged
@@ -36,10 +48,14 @@ function normalizeCouponList(data) {
 function getCouponTabStatus(raw) {
   const status = String(raw.couponStatus || "").toUpperCase()
   const pageTabType = String(raw.pageTabType || "").toUpperCase()
+  if (status === "EXPIRED") return "expired"
+  if (status === "USED") return "used"
+  if (status === "UNUSED") return "unused"
+  if (raw.__groupStatus === "expired") return "expired"
+  if (raw.__groupStatus === "used") return "used"
+  if (raw.__groupStatus === "unused") return "unused"
   if (pageTabType === "UNUSED") return "unused"
   if (pageTabType === "USED") return "used"
-  if (status === "UNUSED") return "unused"
-  if (status === "USED" || status === "EXPIRED") return "used"
   return "unused"
 }
 
@@ -49,13 +65,43 @@ function buildThresholdText(raw) {
   return `满 ${toDisplayAmount(raw.thresholdAmount)} 可用`
 }
 
+function toExpireDateText(value) {
+  if (value == null || value === "") return PERMANENT_VALID_TEXT
+  const text = String(value).trim().replace(/\//g, "-")
+  const datePart = text.includes("T") ? text.split("T")[0] : text.split(" ")[0]
+  const m = datePart.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/)
+  if (m) {
+    const month = String(Number(m[2])).padStart(2, "0")
+    const day = String(Number(m[3])).padStart(2, "0")
+    return `${m[1]}.${month}.${day}`
+  }
+  const d = new Date(text)
+  if (!Number.isNaN(d.getTime())) {
+    const y = d.getFullYear()
+    const month = String(d.getMonth() + 1).padStart(2, "0")
+    const day = String(d.getDate()).padStart(2, "0")
+    return `${y}.${month}.${day}`
+  }
+  return PERMANENT_VALID_TEXT
+}
+
+function toCanUse(value) {
+  if (value === true || value === false) return value
+  if (typeof value === "number") return value === 1
+  if (typeof value === "string") {
+    const text = value.trim().toLowerCase()
+    return text === "1" || text === "true" || text === "yes"
+  }
+  return false
+}
+
 function mapCoupons(list) {
   return list.map((item, index) => {
     const raw = item && typeof item === "object" ? item : {}
     const statusRaw = String(raw.couponStatus || "").toUpperCase()
     const pageTabType = String(raw.pageTabType || "").toUpperCase()
     const status = getCouponTabStatus(raw)
-    const isInactive = statusRaw === "USED" || statusRaw === "EXPIRED" || pageTabType === "USED"
+    const isInactive = status === "used" || status === "expired" || pageTabType === "USED"
 
     return {
       id:
@@ -66,10 +112,11 @@ function mapCoupons(list) {
       name: raw.couponName || "优惠券",
       amountText: toDisplayAmount(raw.amount),
       thresholdText: buildThresholdText(raw),
+      expireDateText: toExpireDateText(raw.expireTime),
       status,
       statusRaw,
       isInactive,
-      canUse: raw.canUse === true
+      canUse: toCanUse(raw.canUse)
     }
   })
 }
@@ -168,7 +215,7 @@ Page({
     if (!current) return
     if (current.isInactive) {
       wx.showToast({
-        title: current.statusRaw === "EXPIRED" ? "优惠券已过期" : "该优惠券已使用",
+        title: current.status === "expired" ? "优惠券已过期" : "该优惠券已使用",
         icon: "none"
       })
       return

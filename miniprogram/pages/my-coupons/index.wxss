@@ -131,6 +131,14 @@
   font-weight: 700;
 }
 
+.points-item-main__stock {
+  margin-left: 48rpx;
+  margin-top: 8rpx;
+  color: #94a3b8;
+  font-size: 24rpx;
+  line-height: 34rpx;
+}
+
 .points-item-btn {
   width: 160rpx;
   height: 64rpx;
@@ -141,6 +149,11 @@
   font-weight: 500;
   line-height: 64rpx;
   text-align: center;
+}
+
+.points-item-btn--disabled {
+  background: #cbd5e1;
+  color: #64748b;
 }
 
 .coupon-item__used-img {
@@ -156,7 +169,8 @@
 
 .coupon-item--inactive .points-item-price,
 .coupon-item--inactive .points-item-score,
-.coupon-item--inactive .points-item-main__name {
+.coupon-item--inactive .points-item-main__name,
+.coupon-item--inactive .points-item-main__stock {
   color: #cbd5e1;
 }
 

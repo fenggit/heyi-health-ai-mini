@@ -29,11 +29,12 @@
 
             <view class="points-item-main">
               <view class="points-item-main__name">{{item.name}}</view>
+              <view wx:if="{{item.status !== 'used'}}" class="points-item-main__stock">有效期至：{{item.expireDateText}}</view>
             </view>
 
             <view
               wx:if="{{!item.isInactive}}"
-              class="points-item-btn"
+              class="points-item-btn {{!item.canUse ? 'points-item-btn--disabled' : ''}}"
               data-id="{{item.id}}"
               bindtap="useCoupon"
             >
@@ -42,7 +43,7 @@
             <image
               wx:else
               class="coupon-item__used-img"
-              src="/assets/icons/used_img.png"
+              src="{{item.status === 'expired' ? '/assets/icons/coupon_expired_img.png' : '/assets/icons/coupon_used_img.png'}}"
               mode="aspectFit"
             />
           </view>
