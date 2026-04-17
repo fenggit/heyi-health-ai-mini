@@ -1,0 +1,54 @@
+<view class="coupons-page design-page page-with-nav">
+  <image class="page-bg" src="/assets/bg_img.png" mode="widthFix" />
+
+  <my-header title="{{navTitle}}" bind:back="handleBack" />
+
+  <view class="page-top-gap" style="height: {{topInset}}px;"></view>
+
+  <view class="page-wrap page-wrap--no-title">
+    <view class="coupon-tabs">
+      <block wx:for="{{tabs}}" wx:key="key">
+        <view class="coupon-tab {{activeTab === item.key ? 'coupon-tab--active' : ''}}" data-tab="{{item.key}}" bindtap="selectTab">
+          <text class="coupon-tab__label">{{item.label}}</text>
+        </view>
+      </block>
+    </view>
+
+    <view class="glass-card points-list">
+      <block wx:if="{{filteredCoupons.length > 0}}">
+        <block wx:for="{{filteredCoupons}}" wx:key="id">
+          <view class="points-item coupon-item {{item.isInactive ? 'coupon-item--inactive' : ''}}">
+            <image class="points-item__bg {{item.isInactive ? 'points-item__bg--inactive' : ''}}" src="/assets/bg_coupon.png" mode="scaleToFill" />
+            <view class="points-item-left">
+              <view class="points-item-price">
+                <text class="points-item-price-symbol">￥</text>
+                <text class="points-item-price-num">{{item.amountText}}</text>
+              </view>
+              <view class="points-item-score">{{item.thresholdText}}</view>
+            </view>
+
+            <view class="points-item-main">
+              <view class="points-item-main__name">{{item.name}}</view>
+            </view>
+
+            <view
+              wx:if="{{!item.isInactive}}"
+              class="points-item-btn"
+              data-id="{{item.id}}"
+              bindtap="useCoupon"
+            >
+              去使用
+            </view>
+            <image
+              wx:else
+              class="coupon-item__used-img"
+              src="/assets/icons/used_img.png"
+              mode="aspectFit"
+            />
+          </view>
+        </block>
+      </block>
+      <view wx:else class="points-list-empty">暂无{{activeTabLabel}}优惠券</view>
+    </view>
+  </view>
+</view>

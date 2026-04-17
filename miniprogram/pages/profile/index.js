@@ -58,6 +58,7 @@ const MOCK_PROFILE_DATA = {
     { name: "视觉AI分析报告", icon: "/assets/profile/report.png" },
     { name: "我的订单", icon: "/assets/profile/order.png" },
     { name: "我的收藏", icon: "/assets/profile/collection.png" },
+    { name: "优惠券", icon: "/assets/profile-pages/coupon_icon.png" },
     { name: "积分兑换", icon: "/assets/profile/points.png" },
     { name: "邀请好友", icon: "/assets/profile/share.png" },
     { name: "设置", icon: "/assets/profile/settings.png" },
@@ -69,12 +70,22 @@ const MOCK_PROFILE_DATA = {
 const PROFILE_PAGE_ROUTE_MAP = {
   我的订单: "/pages/my-orders/index",
   我的收藏: "/pages/my-favorites/index",
+  优惠券: "/pages/my-coupons/index",
+  优惠卷: "/pages/my-coupons/index",
   积分兑换: "/pages/points-exchange/index",
   邀请好友: "/pages/invite-friends/index",
   设置: "/pages/settings/index",
   帮助中心: "/pages/help-center/index",
   关于我们: "/pages/about-us/index",
   我的食养计划: "/pages/my-week-plan/index"
+}
+
+const PROFILE_STAT_ROUTE_MAP = {
+  收藏配方: "/pages/my-favorites/index",
+  历史订单: "/pages/my-orders/index",
+  优惠券: "/pages/my-coupons/index",
+  优惠卷: "/pages/my-coupons/index",
+  推荐好友: "/pages/invite-friends/index"
 }
 
 const PROFILE_REPORT_MENU_MAP = {
@@ -474,6 +485,18 @@ Page({
     }
     wx.showToast({
       title: `${name}功能待接入`,
+      icon: "none"
+    })
+  },
+  openStatItem(e) {
+    const { label } = e.currentTarget.dataset
+    const url = PROFILE_STAT_ROUTE_MAP[label]
+    if (url) {
+      wx.navigateTo({ url })
+      return
+    }
+    wx.showToast({
+      title: `${label}功能待接入`,
       icon: "none"
     })
   },

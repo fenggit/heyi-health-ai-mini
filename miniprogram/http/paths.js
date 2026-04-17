@@ -27,7 +27,9 @@ const paths = {
   },
   marketing: {
     // 可兑换积分商品列表
-    pointsGoodsAvailable: '/marketing/app/points-goods/available'
+    pointsGoodsAvailable: '/marketing/app/points-goods/available',
+    // 我的优惠券列表
+    myCoupons: '/marketing/app/coupon/my'
   },
   assessment: {
     // 获取问卷详情

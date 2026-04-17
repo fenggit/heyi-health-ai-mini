@@ -35,7 +35,7 @@
       </view>
       <view class="profile-stats">
         <block wx:for="{{stats}}" wx:key="label">
-          <view class="profile-stat">
+          <view class="profile-stat profile-stat--link" data-label="{{item.label}}" bindtap="openStatItem">
             <text class="profile-stat__value">{{item.value}}</text>
             <text class="profile-stat__label">{{item.label}}</text>
           </view>

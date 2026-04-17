@@ -41,6 +41,7 @@
       <block wx:if="{{rewardItems.length > 0}}">
         <block wx:for="{{rewardItems}}" wx:key="id" wx:for-item="reward">
           <view class="points-item">
+            <image class="points-item__bg" src="/assets/bg_coupon.png" mode="scaleToFill" />
             <!-- 左侧金额 -->
             <view class="points-item-left">
               <view class="points-item-price">
@@ -49,8 +50,6 @@
               </view>
               <view class="points-item-score">{{reward.leftSub}}</view>
             </view>
-            <!-- 分隔线 -->
-            <view class="points-item-sep"></view>
             <!-- 中间信息 -->
             <view class="points-item-main">
               <view class="points-item-main__name">{{reward.name}}</view>
