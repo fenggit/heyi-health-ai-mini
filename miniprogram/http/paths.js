@@ -31,6 +31,12 @@ const paths = {
     // 我的优惠券列表
     myCoupons: '/marketing/app/coupon/my'
   },
+  mall: {
+    // 商城分类列表
+    categoryList: '/mall/app/category/list',
+    // 商城商品分页
+    spuPage: '/mall/app/spu/page'
+  },
   assessment: {
     // 获取问卷详情
     questionnaireDetail: '/assessment/app/questionnaire/detail',

@@ -280,18 +280,21 @@
   line-height: 30rpx;
 }
 
-.mall-product__score {
+.mall-product__meta-main {
   display: inline-flex;
   align-items: center;
 }
 
-.mall-product__star {
-  color: #ffb020;
-  font-size: 20rpx;
-  margin-right: 6rpx;
+.mall-product__score {
+  color: #f59e0b;
+  margin-right: 10rpx;
 }
 
 .mall-product__stock {
+  color: #94a3b8;
+}
+
+.mall-product__weight {
   color: #94a3b8;
 }
 
@@ -347,5 +350,14 @@
   color: #94a3b8;
   font-size: 24rpx;
   line-height: 34rpx;
+  text-align: center;
+}
+
+.mall-load-more {
+  width: 100%;
+  padding: 16rpx 0 36rpx;
+  color: #94a3b8;
+  font-size: 22rpx;
+  line-height: 30rpx;
   text-align: center;
 }

@@ -6,7 +6,7 @@
   <view class="mall-title">{{mallTitle}}</view>
 
   <view class="mall-header">
-    <view class="mall-location">
+    <view class="mall-location" bindtap="onTapLocation">
       <image class="mall-location__icon" src="/assets/mall/icon-location.png" mode="aspectFit" />
       <text class="mall-location__text">{{city}}</text>
     </view>
@@ -56,11 +56,12 @@
     </view>
 
     <view class="mall-tabs">
-      <block wx:for="{{categories}}" wx:key="key">
+      <block wx:for="{{categories}}" wx:key="id">
         <view
           class="mall-tab {{index === activeCategory ? 'mall-tab--active' : ''}}"
           data-index="{{index}}"
           data-key="{{item.key}}"
+          data-id="{{item.id}}"
           bindtap="selectCategory"
         >
           <text>{{item.label}}</text>
@@ -80,11 +81,11 @@
           </view>
           <view class="mall-product__name">{{item.name}}</view>
           <view class="mall-product__meta">
-            <view class="mall-product__score">
-              <text class="mall-product__star">★</text>
-              <text>{{item.score}}</text>
+            <view class="mall-product__meta-main">
+              <text class="mall-product__score" wx:if="{{item.scoreText}}">评分 {{item.scoreText}}</text>
+              <text class="mall-product__stock">{{item.stockText}}</text>
             </view>
-            <text class="mall-product__stock">库存 {{item.stock}}</text>
+            <text class="mall-product__weight">重量 {{item.weightText}}</text>
           </view>
           <view class="mall-product__foot">
             <view class="mall-product__price">
@@ -96,6 +97,7 @@
           </view>
         </view>
       </block>
+      <view class="mall-load-more" wx:if="{{sourceProducts.length > 0 || isLoadingProducts}}">{{loadMoreText}}</view>
       <view class="mall-empty" wx:if="{{products.length === 0}}">暂无符合条件的商品</view>
     </view>
   </view>

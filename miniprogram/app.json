@@ -60,6 +60,14 @@
   "usingComponents": {
     "title-view": "/components/title-view/index"
   },
+  "requiredPrivateInfos": [
+    "getFuzzyLocation"
+  ],
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于获取当前城市，便于展示同城商品信息"
+    }
+  },
   "style": "v2",
   "sitemapLocation": "sitemap.json"
 }
