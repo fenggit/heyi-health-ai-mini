@@ -43,7 +43,7 @@
       <view class="dp-price">
         <text class="dp-price__yen">￥</text>
         <text class="dp-price__num">{{packInfo.price}}</text>
-        <text class="dp-price__unit">/包</text>
+        <text class="dp-price__unit">{{packInfo.priceUnit}}</text>
       </view>
       <!-- 未选择：只有加购按钮 -->
       <view wx:if="{{!qtySelected}}" class="dp-btn-add" bindtap="onFirstAdd">
@@ -79,7 +79,7 @@
         <text class="dp-tip__text">{{packInfo.tipText}}</text>
       </view>
       <view class="dp-ingredients">
-        <block wx:for="{{packInfo.ingredients}}" wx:key="name">
+        <block wx:for="{{packInfo.ingredients}}" wx:key="id">
           <view class="dp-ing-row">
             <text class="dp-ing-row__name">{{item.name}}</text>
             <view class="dp-ing-row__line"></view>
@@ -121,10 +121,10 @@
     </view>
 
     <!-- 视频教程 -->
-    <view class="dp-section dp-section--last">
+    <view class="dp-section dp-section--last" wx:if="{{packInfo.videoUrl}}">
       <title-view text="视频教程" />
       <view class="dp-video" bindtap="playVideo">
-        <image class="dp-video__cover" src="{{packInfo.image}}" mode="aspectFill" />
+        <image class="dp-video__cover" src="{{packInfo.videoCover || packInfo.image}}" mode="aspectFill" />
         <view class="dp-video__mask"></view>
         <view class="dp-video__play">
           <view class="dp-video__play-icon"></view>

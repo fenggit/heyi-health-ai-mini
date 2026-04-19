@@ -45,6 +45,12 @@ const paths = {
     // 加入购物车
     cartAdd: '/mall/app/cart/add'
   },
+  recipe: {
+    // 首页聚合数据
+    homeIndex: '/recipe/app/home/index',
+    // 配方详情
+    formulaDetail: (recipeId) => `/recipe/app/formula/${encodeURIComponent(recipeId)}/detail`
+  },
   assessment: {
     // 获取问卷详情
     questionnaireDetail: '/assessment/app/questionnaire/detail',

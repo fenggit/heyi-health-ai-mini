@@ -4,6 +4,8 @@ const paths = require("../../http/paths")
 
 const DEFAULT_DELIVERY_ADDRESS = "请选择收货地址"
 const PERMANENT_VALID_TEXT = "永久有效"
+const DEFAULT_TAG_COLOR = "#008435"
+const DEFAULT_TAG_BG_COLOR = "rgba(0, 201, 80, 0.1)"
 const DEFAULT_ADDRESS_LIST = [
   {
     id: "addr-1",
@@ -186,39 +188,85 @@ function toRequestItemId(value) {
   return String(value)
 }
 
-function tryParseSpecJson(specJson) {
-  if (!specJson) return []
-  if (Array.isArray(specJson)) return specJson
-  if (typeof specJson === "object") return [specJson]
-  if (typeof specJson !== "string") return []
-  try {
-    const parsed = JSON.parse(specJson)
-    if (Array.isArray(parsed)) return parsed
-    if (parsed && typeof parsed === "object") return [parsed]
-    return []
-  } catch (e) {
-    return []
+function toTagColor(value) {
+  const text = String(value || "").trim()
+  if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(text)) return text
+  return DEFAULT_TAG_COLOR
+}
+
+function toTagBgColor(hexColor) {
+  const color = toTagColor(hexColor)
+  let hex = color.slice(1)
+  if (hex.length === 3) {
+    hex = hex
+      .split("")
+      .map((ch) => ch + ch)
+      .join("")
+  }
+  if (hex.length !== 6) return DEFAULT_TAG_BG_COLOR
+  const r = parseInt(hex.slice(0, 2), 16)
+  const g = parseInt(hex.slice(2, 4), 16)
+  const b = parseInt(hex.slice(4, 6), 16)
+  if (![r, g, b].every((n) => Number.isFinite(n))) return DEFAULT_TAG_BG_COLOR
+  return `rgba(${r}, ${g}, ${b}, 0.12)`
+}
+
+function toTagViewModel(rawTag, index, prefix = "tag") {
+  if (rawTag && typeof rawTag === "object") {
+    const tagName = String(rawTag.tagName || rawTag.name || "").trim()
+    if (!tagName) return null
+    const tagId = rawTag.tagId != null ? String(rawTag.tagId) : ""
+    const tagColor = toTagColor(rawTag.tagColor || rawTag.color)
+    return {
+      tagId,
+      tagName,
+      tagColor,
+      bgColor: toTagBgColor(tagColor),
+      tagKey: tagId || `${prefix}-${index}`
+    }
+  }
+
+  const tagName = String(rawTag || "").trim()
+  if (!tagName) return null
+  return {
+    tagId: "",
+    tagName,
+    tagColor: DEFAULT_TAG_COLOR,
+    bgColor: DEFAULT_TAG_BG_COLOR,
+    tagKey: `${prefix}-${index}`
   }
 }
 
-function extractTags(raw = {}) {
-  const tags = []
-  const spuName = String(raw.spuName || "").trim()
-  const skuName = String(raw.skuName || "").trim()
-  if (skuName && skuName !== spuName) tags.push(skuName)
+function normalizeCustomTags(value) {
+  if (Array.isArray(value)) {
+    return value
+      .map((tag, index) => toTagViewModel(tag, index, "custom"))
+      .filter((tag) => !!tag)
+      .slice(0, 8)
+  }
 
-  const specEntries = tryParseSpecJson(raw.specJson)
-  specEntries.forEach((entry) => {
-    if (!entry || typeof entry !== "object") return
-    Object.keys(entry).forEach((key) => {
-      const value = entry[key]
-      if (value == null || value === "") return
-      const text = `${key}:${value}`
-      if (!tags.includes(text)) tags.push(text)
-    })
-  })
+  if (typeof value === "string") {
+    const text = value.trim()
+    if (!text) return []
 
-  return tags.slice(0, 2)
+    try {
+      const parsed = JSON.parse(text)
+      if (Array.isArray(parsed)) {
+        return parsed
+          .map((tag, index) => toTagViewModel(tag, index, "custom"))
+          .filter((tag) => !!tag)
+          .slice(0, 8)
+      }
+    } catch (e) {}
+
+    return text
+      .split(/[，,|]/)
+      .map((tag, index) => toTagViewModel(tag, index, "custom"))
+      .filter((tag) => !!tag)
+      .slice(0, 8)
+  }
+
+  return []
 }
 
 function mapCartItems(list = []) {
@@ -228,6 +276,7 @@ function mapCartItems(list = []) {
     const salePrice = Number(raw.salePrice || 0)
     const buyQty = Math.max(1, Number(raw.buyQty || 1))
     const unitName = String(raw.unitName || "").trim()
+    const customTags = normalizeCustomTags(raw.customTags)
 
     return {
       id: String(itemId),
@@ -235,7 +284,7 @@ function mapCartItems(list = []) {
       spuId: raw.spuId != null ? String(raw.spuId) : "",
       skuId: raw.skuId != null ? String(raw.skuId) : "",
       name: raw.spuName || raw.skuName || "未命名商品",
-      tags: extractTags(raw),
+      customTags,
       price: salePrice,
       count: buyQty,
       selected: toBoolYes(raw.checkedFlag),

@@ -1,5 +1,7 @@
 const { getLayoutMetrics } = require("../../utils/layout")
 const { getGuestToken } = require("../../http/auth")
+const { get } = require("../../utils/request")
+const paths = require("../../http/paths")
 
 function createProgressSegments(filled, total) {
   return Array.from({ length: total }, (_, index) => ({
@@ -8,7 +10,7 @@ function createProgressSegments(filled, total) {
   }))
 }
 
-const MOCK_HOME_DATA = {
+const DEFAULT_HOME_DATA = {
   greetingTitle: "合一食养",
   greetingText: "早上好，开启健康新一天~",
   activityBanners: [
@@ -29,19 +31,19 @@ const MOCK_HOME_DATA = {
     {
       id: "heart-rate",
       label: "心率",
-      value: "72",
+      value: "0",
       icon: "/assets/icons/heart.png"
     },
     {
       id: "steps",
       label: "步数",
-      value: "6,842",
+      value: "0",
       icon: "/assets/icons/steps.png"
     },
     {
       id: "sleep",
       label: "睡眠",
-      value: "7.5h",
+      value: "0h",
       icon: "/assets/icons/sleep.png"
     }
   ],
@@ -73,6 +75,7 @@ const MOCK_HOME_DATA = {
     }
   ],
   recommendation: {
+    recipeId: "",
     title: "AI推荐：今日专属果蔬汁",
     actionText: "查看详情",
     image: "/assets/test/home-banner2.png",
@@ -86,50 +89,312 @@ const MOCK_HOME_DATA = {
   }
 }
 
-function fetchHomeData() {
-  // TODO: 后续替换为真实接口请求
-  return Promise.resolve(JSON.parse(JSON.stringify(MOCK_HOME_DATA)))
+function cloneDeep(value) {
+  return JSON.parse(JSON.stringify(value))
 }
 
-Page({
-  data: {
-    topInset: 32,
-    bannerCurrent: 0,
-    hydrationProgress: 0,
+function unwrapResponseData(res) {
+  if (res && Object.prototype.hasOwnProperty.call(res, "data") && res.data !== undefined && res.data !== null) {
+    return res.data
+  }
+  return res || {}
+}
+
+function toDisplayText(value, fallback = "") {
+  if (value === null || value === undefined) return fallback
+  const text = String(value).trim()
+  return text || fallback
+}
+
+function normalizeList(data) {
+  if (Array.isArray(data)) return data
+  if (!data || typeof data !== "object") return []
+
+  const listKeys = ["list", "items", "Items", "records", "rows", "result"]
+  for (const key of listKeys) {
+    if (Array.isArray(data[key])) return data[key]
+  }
+  return []
+}
+
+function normalizeHealthMetricValue(value, { sleep = false } = {}) {
+  const fallback = sleep ? "0h" : "0"
+  if (value === null || value === undefined || value === "") return fallback
+
+  const text = String(value).trim()
+  if (!text) return fallback
+  if (!sleep) return text
+
+  return /h$/i.test(text) ? text : `${text}h`
+}
+
+function parseTagList(rawTags) {
+  if (Array.isArray(rawTags)) {
+    return rawTags
+      .map((item) => {
+        if (typeof item === "string") return item
+        if (!item || typeof item !== "object") return ""
+        return item.name || item.label || item.tagName || ""
+      })
+      .map((item) => String(item || "").trim())
+      .filter(Boolean)
+  }
+
+  const text = String(rawTags || "").trim()
+  if (!text) return []
+
+  try {
+    const parsed = JSON.parse(text)
+    if (Array.isArray(parsed)) return parseTagList(parsed)
+  } catch (e) {
+    // ignore parse error, fallback split by separator below
+  }
+
+  return text
+    .split(/[，,、|]/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+}
+
+function mapBannerList(rawBannerList) {
+  const list = normalizeList(rawBannerList)
+  return list
+    .map((item, index) => {
+      const row = item && typeof item === "object" ? item : {}
+      const image = toDisplayText(row.imageUrl || row.image || row.coverUrl, "")
+      if (!image) return null
+
+      const idRaw = row.bannerId != null ? row.bannerId : row.id
+      const id = idRaw != null && idRaw !== "" ? String(idRaw) : `banner-${index + 1}`
+
+      return {
+        id,
+        image
+      }
+    })
+    .filter(Boolean)
+}
+
+function mapHealthStatus(payload = {}) {
+  const status = payload.healthStatus && typeof payload.healthStatus === "object" ? payload.healthStatus : {}
+  return {
+    title: toDisplayText(status.title || payload.healthStatusTitle, DEFAULT_HOME_DATA.healthStatus.title),
+    level: toDisplayText(status.level || payload.healthLevel || payload.healthStatusLevel, DEFAULT_HOME_DATA.healthStatus.level)
+  }
+}
+
+function mapHealthMetrics(payload = {}) {
+  const defaults = cloneDeep(DEFAULT_HOME_DATA.healthMetrics)
+  const metricMap = {
+    "heart-rate": defaults[0],
+    steps: defaults[1],
+    sleep: defaults[2]
+  }
+
+  const list = normalizeList(payload.healthMetrics || payload.healthMetricList || payload.todayHealthMetrics)
+  if (list.length) {
+    list.forEach((item) => {
+      const row = item && typeof item === "object" ? item : {}
+      const keyText = String(
+        row.id || row.metricKey || row.metricCode || row.name || row.label || ""
+      ).toLowerCase()
+
+      let key = ""
+      if (/heart|心率/.test(keyText)) key = "heart-rate"
+      if (/step|步数/.test(keyText)) key = "steps"
+      if (/sleep|睡眠/.test(keyText)) key = "sleep"
+      if (!key) return
+
+      const target = metricMap[key]
+      if (!target) return
+
+      if (row.label || row.metricName || row.name) {
+        target.label = toDisplayText(row.label || row.metricName || row.name, target.label)
+      }
+      if (row.iconUrl || row.icon) {
+        target.icon = toDisplayText(row.iconUrl || row.icon, target.icon)
+      }
+      target.value = normalizeHealthMetricValue(
+        row.value != null ? row.value : row.metricValue,
+        { sleep: key === "sleep" }
+      )
+    })
+  } else {
+    defaults[0].value = normalizeHealthMetricValue(
+      payload.heartRate != null ? payload.heartRate : payload.hr
+    )
+    defaults[1].value = normalizeHealthMetricValue(
+      payload.steps != null ? payload.steps : payload.stepCount
+    )
+    defaults[2].value = normalizeHealthMetricValue(
+      payload.sleepHours != null ? payload.sleepHours : payload.sleepDuration,
+      { sleep: true }
+    )
+  }
+
+  return defaults
+}
+
+function mapHydration(payload = {}) {
+  const hydration = payload.hydration && typeof payload.hydration === "object" ? payload.hydration : {}
+  const total = Number(hydration.totalSegments)
+  const filled = Number(hydration.filledSegments)
+
+  if (!Number.isFinite(total) || total <= 0 || !Number.isFinite(filled)) {
+    return {
+      data: {
+        title: toDisplayText(hydration.title, DEFAULT_HOME_DATA.hydration.title),
+        value: toDisplayText(hydration.value, DEFAULT_HOME_DATA.hydration.value),
+        segments: cloneDeep(DEFAULT_HOME_DATA.hydration.segments)
+      },
+      progress: 70
+    }
+  }
+
+  const totalSegments = total
+  const filledSegments = Math.max(0, Math.min(totalSegments, filled))
+  const segments = createProgressSegments(filledSegments, totalSegments)
+  const hydrationProgress = Math.round((filledSegments * 100) / totalSegments)
+
+  return {
+    data: {
+      title: toDisplayText(hydration.title, DEFAULT_HOME_DATA.hydration.title),
+      value: toDisplayText(hydration.value, DEFAULT_HOME_DATA.hydration.value),
+      segments
+    },
+    progress: hydrationProgress
+  }
+}
+
+function mapRecommendation(todayRecommend = {}) {
+  const source = todayRecommend && typeof todayRecommend === "object" ? todayRecommend : {}
+  const hasSource = Object.keys(source).length > 0
+  if (!hasSource) return {}
+
+  const tags = parseTagList(source.tagJson || source.tags || source.tagList)
+  const recipeIdRaw = source.recipeId != null ? source.recipeId : source.id
+  const recipeId = recipeIdRaw != null && recipeIdRaw !== "" ? String(recipeIdRaw) : ""
+  if (!recipeId) return {}
+
+  return {
+    recipeId,
+    title: "AI推荐：今日专属果蔬汁",
+    actionText: "查看详情",
+    image: toDisplayText(source.coverUrl || source.imageUrl || source.image, ""),
+    name: toDisplayText(source.recipeName || source.name, ""),
+    description: toDisplayText(source.recommendReason || source.intro || source.description, ""),
+    tags
+  }
+}
+
+function mapTip(payload = {}) {
+  const todayHealthTip = payload && payload.todayHealthTip
+  const tipContent = typeof todayHealthTip === "object" && todayHealthTip !== null
+    ? toDisplayText(todayHealthTip.content || todayHealthTip.tip || todayHealthTip.text, "")
+    : toDisplayText(todayHealthTip, "")
+
+  return {
+    title: DEFAULT_HOME_DATA.tip.title,
+    content: tipContent || DEFAULT_HOME_DATA.tip.content
+  }
+}
+
+function normalizeHomePayload(payload = {}) {
+  const source = payload && typeof payload === "object" ? payload : {}
+  const hydration = mapHydration(source)
+
+  return {
+    greetingTitle: DEFAULT_HOME_DATA.greetingTitle,
+    greetingText: DEFAULT_HOME_DATA.greetingText,
+    activityBanners: mapBannerList(source.bannerList || source.activityBanners),
+    healthStatus: mapHealthStatus(source),
+    healthMetrics: mapHealthMetrics(source),
+    hydration: hydration.data,
+    hydrationProgress: hydration.progress,
+    shortcuts: cloneDeep(DEFAULT_HOME_DATA.shortcuts),
+    recommendation: mapRecommendation(source.todayRecommend),
+    tip: mapTip(source)
+  }
+}
+
+function fetchHomeData() {
+  return get(paths.recipe.homeIndex).then((res) => normalizeHomePayload(unwrapResponseData(res)))
+}
+
+function createEmptyHomeData() {
+  return {
     greetingTitle: "",
     greetingText: "",
     activityBanners: [],
-    healthStatus: {},
-    healthMetrics: [],
-    hydration: {},
-    shortcuts: [],
+    healthStatus: {
+      title: DEFAULT_HOME_DATA.healthStatus.title,
+      level: ""
+    },
+    healthMetrics: cloneDeep(DEFAULT_HOME_DATA.healthMetrics),
+    hydration: {
+      title: DEFAULT_HOME_DATA.hydration.title,
+      value: "",
+      segments: createProgressSegments(0, 10)
+    },
+    hydrationProgress: 0,
+    shortcuts: cloneDeep(DEFAULT_HOME_DATA.shortcuts),
     recommendation: {},
-    tip: {}
-  },
+    tip: {
+      title: DEFAULT_HOME_DATA.tip.title,
+      content: ""
+    }
+  }
+}
+
+Page({
+  data: Object.assign({
+    topInset: 32,
+    bannerCurrent: 0
+  }, createEmptyHomeData()),
   onLoad() {
+    this._isPageAlive = true
+    this._loadReqId = 0
     this.syncLayout()
     this.loadPageData()
   },
   onShow() {
-    if (typeof this.getTabBar === "function" && this.getTabBar()) {
-      this.getTabBar().setData({ selected: 0 })
+    if (typeof this.getTabBar === "function") {
+      const tabBar = this.getTabBar()
+      if (tabBar) {
+        tabBar.setData({ selected: 0 })
+      }
     }
+  },
+  onUnload() {
+    this._isPageAlive = false
+  },
+  safeSetData(nextData) {
+    if (!this._isPageAlive) return
+    this.setData(nextData)
   },
   syncLayout() {
     const { statusBarHeight } = getLayoutMetrics()
-    this.setData({
+    this.safeSetData({
       topInset: Math.max(statusBarHeight + 12, 32)
     })
   },
   async loadPageData() {
-    const payload = await fetchHomeData()
-    this.setData({
-      ...payload,
-      hydrationProgress: 70
-    })
+    const reqId = (this._loadReqId || 0) + 1
+    this._loadReqId = reqId
+    try {
+      const payload = await fetchHomeData()
+      if (!this._isPageAlive || this._loadReqId !== reqId) return
+      this.safeSetData(payload)
+    } catch (err) {
+      console.warn("[home] 拉取首页接口失败，清空首页数据:", err)
+      if (!this._isPageAlive || this._loadReqId !== reqId) return
+      this.safeSetData(Object.assign({
+        bannerCurrent: 0
+      }, createEmptyHomeData()))
+    }
   },
   onBannerChange(e) {
-    this.setData({
+    this.safeSetData({
       bannerCurrent: e.detail.current
     })
   },
@@ -168,8 +433,10 @@ Page({
     wx.navigateTo({ url: path })
   },
   openIngredientPackDetail() {
+    const recipeId = this.data && this.data.recommendation ? this.data.recommendation.recipeId : ""
+    const query = recipeId ? `?recipeId=${encodeURIComponent(recipeId)}` : ""
     wx.navigateTo({
-      url: "/pages/food-detail/index"
+      url: `/pages/food-detail/index${query}`
     })
   }
 })
