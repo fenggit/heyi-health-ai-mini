@@ -4,27 +4,16 @@
   background: transparent;
 }
 
-.cart-page .mini-nav__title {
-  margin-left: 8rpx;
-  font-size: 28rpx;
-  line-height: 1;
-  font-weight: 700;
-}
-
-.cart-page .mini-nav__inner {
-  padding-left: 32rpx;
-}
-
 .cart-content {
   width: 702rpx;
   margin: 0 auto;
-  padding-top: 40rpx;
   padding-bottom: 198rpx;
   position: relative;
   z-index: 1;
 }
 
 .cart-address {
+  margin-top: 20rpx;
   height: 48rpx;
   display: flex;
   align-items: center;
@@ -71,10 +60,13 @@
 
 .cart-item {
   margin-top: 12rpx;
-  height: 212rpx;
-  padding: 0;
-  position: relative;
-  overflow: hidden;
+  min-height: 212rpx;
+  height: auto;
+  padding: 16rpx 22rpx 16rpx 16rpx;
+  display: flex;
+  align-items: flex-start;
+  box-sizing: border-box;
+  overflow: visible;
 }
 
 .cart-address + .cart-item {
@@ -83,13 +75,11 @@
 
 .cart-item__select {
   width: 48rpx;
-  height: 48rpx;
-  position: absolute;
-  left: 16rpx;
-  top: 82rpx;
+  min-height: 180rpx;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .cart-check {
@@ -117,20 +107,19 @@
 }
 
 .cart-item__image {
-  position: absolute;
-  left: 80rpx;
-  top: 16rpx;
+  margin-left: 16rpx;
   width: 160rpx;
   height: 180rpx;
   border-radius: 16rpx;
   background: #e2e8f0;
+  flex-shrink: 0;
 }
 
 .cart-item__content {
-  position: absolute;
-  left: 256rpx;
-  top: 16rpx;
-  width: 238rpx;
+  margin-left: 16rpx;
+  min-width: 0;
+  flex: 1;
+  padding-right: 16rpx;
 }
 
 .cart-item__name {
@@ -148,6 +137,7 @@
 }
 
 .cart-item__tag {
+  min-width: 72rpx;
   height: 40rpx;
   border-radius: 12rpx;
   padding: 0 12rpx;
@@ -157,6 +147,7 @@
   font-size: 24rpx;
   line-height: 40rpx;
   font-weight: 500;
+  text-align: center;
 }
 
 .cart-item__tag + .cart-item__tag {
@@ -194,13 +185,13 @@
 }
 
 .cart-item__stepper {
-  position: absolute;
-  right: 22rpx;
-  bottom: 18rpx;
+  margin-left: 8rpx;
   width: 142rpx;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  align-self: flex-end;
+  flex-shrink: 0;
 }
 
 .cart-stepper-btn {

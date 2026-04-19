@@ -35,7 +35,15 @@ const paths = {
     // 商城分类列表
     categoryList: '/mall/app/category/list',
     // 商城商品分页
-    spuPage: '/mall/app/spu/page'
+    spuPage: '/mall/app/spu/page',
+    // 购物车信息
+    cart: '/mall/app/cart',
+    // 勾选/取消勾选购物车商品
+    cartItemCheck: '/mall/app/cart/item/check',
+    // 修改购物车商品数量
+    cartItemQty: '/mall/app/cart/item/qty',
+    // 加入购物车
+    cartAdd: '/mall/app/cart/add'
   },
   assessment: {
     // 获取问卷详情

@@ -72,12 +72,12 @@
 
     <view class="mall-grid">
       <block wx:for="{{products}}" wx:key="id">
-        <view class="card-panel mall-product" data-id="{{item.id}}" bindtap="openProduct">
+        <view class="card-panel mall-product" data-id="{{item.id}}">
           <view wx:if="{{item.badge}}" class="mall-product__badge mall-product__badge--{{item.badgeType ? item.badgeType : 'new'}}">
             {{item.badge}}
           </view>
           <view class="mall-product__thumb-wrap">
-            <image class="mall-product__thumb" src="{{item.image}}" mode="aspectFit" />
+            <image class="mall-product__thumb" src="{{item.image}}" mode="aspectFill" />
           </view>
           <view class="mall-product__name">{{item.name}}</view>
           <view class="mall-product__meta">
@@ -93,7 +93,7 @@
               <text class="mall-product__price-main">{{item.price}}</text>
               <text class="mall-product__price-unit">{{item.unit}}</text>
             </view>
-            <view class="mall-product__add" data-id="{{item.id}}" catchtap="addToCart">+</view>
+            <view class="mall-product__add" data-id="{{item.id}}" data-sku-id="{{item.skuId}}" catchtap="addToCart">+</view>
           </view>
         </view>
       </block>

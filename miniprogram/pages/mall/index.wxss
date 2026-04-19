@@ -338,10 +338,12 @@
   height: 44rpx;
   border-radius: 50%;
   background: linear-gradient(135deg, #33d96f 0%, #22c75d 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: #ffffff;
   font-size: 34rpx;
-  line-height: 42rpx;
-  text-align: center;
+  line-height: 1;
 }
 
 .mall-empty {

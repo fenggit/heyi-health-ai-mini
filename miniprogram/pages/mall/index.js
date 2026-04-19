@@ -1,5 +1,5 @@
 const { getLayoutMetrics } = require("../../utils/layout")
-const { get } = require("../../utils/request")
+const { get, post } = require("../../utils/request")
 const paths = require("../../http/paths")
 
 const DEFAULT_PAGE_SIZE = 10
@@ -18,7 +18,7 @@ const STATIC_MALL_DATA = {
       image: "/assets/test/home-banner2.png"
     }
   ],
-  cartCount: 32
+  cartCount: 0
 }
 
 function unwrapResponseData(res) {
@@ -51,12 +51,20 @@ function toNumberOr(value, fallback = 0) {
   return Number.isFinite(num) ? num : fallback
 }
 
+function trimDecimalZero(text = "") {
+  return String(text).replace(/(\.\d*?[1-9])0+$/, "$1").replace(/\.0+$/, "")
+}
+
 function formatPriceValue(value) {
   if (value === null || value === undefined || value === "") return "0"
-  const num = Number(value)
+  const rawText = String(value).trim()
+  if (/^-?\d+(\.\d+)?$/.test(rawText)) {
+    return trimDecimalZero(rawText)
+  }
+  const num = Number(rawText)
   if (!Number.isFinite(num)) return String(value)
   if (Number.isInteger(num)) return String(num)
-  return num.toFixed(2).replace(/\.?0+$/, "")
+  return trimDecimalZero(num.toFixed(2))
 }
 
 function formatWeightText(weightValue, weightUnit) {
@@ -65,10 +73,17 @@ function formatWeightText(weightValue, weightUnit) {
   return `${weightValue}${unit}`
 }
 
+function normalizeWeightValueText(weightValue) {
+  const text = String(weightValue == null ? "" : weightValue).trim()
+  if (!text) return ""
+  return trimDecimalZero(text)
+}
+
 function buildPriceUnitText(weightValue, weightUnit, unitName) {
   if (weightValue !== null && weightValue !== undefined && weightValue !== "") {
     const unit = weightUnit == null ? "" : String(weightUnit)
-    return `/${weightValue}${unit}`
+    const weightText = normalizeWeightValueText(weightValue)
+    return `/${weightText}${unit}`
   }
   if (unitName) return `/${unitName}`
   return ""
@@ -162,6 +177,8 @@ function mapMallProduct(item, index) {
   const id = rawId !== "" ? String(rawId) : `spu-${index}`
 
   const stockQty = toNumberOr(sku.stockQty != null ? sku.stockQty : row.stockQty, 0)
+  const skuIdRaw = sku.skuId != null ? sku.skuId : (row.skuId != null ? row.skuId : row.defaultSkuId)
+  const skuId = skuIdRaw != null && skuIdRaw !== "" ? String(skuIdRaw) : ""
   const unitName = sku.unitName || row.unitName || ""
   const salePrice = sku.salePrice != null ? sku.salePrice : row.salePrice
   const weightValue = sku.weightValue != null ? sku.weightValue : row.weightValue
@@ -176,6 +193,7 @@ function mapMallProduct(item, index) {
   return {
     id,
     spuId: id,
+    skuId,
     name: row.spuName || row.spuTitle || row.name || "未命名商品",
     image: row.coverImage || sku.coverImage || "/assets/mall/product-apple.png",
     badge: toBoolYes(row.newFlag) ? "新品" : "",
@@ -245,6 +263,23 @@ function isLocationPermissionError(err) {
   return /auth deny|auth denied|authorize no response|permission denied|no permission|scope\./.test(message)
 }
 
+function resolveCartTotalQty(payload) {
+  if (payload == null) return 0
+  if (typeof payload === "number") return Math.max(0, toNumberOr(payload, 0))
+  if (typeof payload !== "object") return 0
+
+  const directQty = payload.totalQty
+  if (directQty !== undefined && directQty !== null && directQty !== "") {
+    return Math.max(0, toNumberOr(directQty, 0))
+  }
+
+  const nested =
+    (payload.cart && payload.cart.totalQty) ||
+    (payload.summary && payload.summary.totalQty) ||
+    (payload.result && payload.result.totalQty)
+  return Math.max(0, toNumberOr(nested, 0))
+}
+
 Page({
   data: {
     topInset: 32,
@@ -271,19 +306,24 @@ Page({
 
   onLoad() {
     this.syncLayout()
-    this.syncCurrentCity()
+    this.syncCurrentCity({ fromUserAction: false })
     this.loadMallData({ showLoading: true, keepActiveCategory: false })
+    this.syncCartCount()
   },
 
   onShow() {
     if (typeof this.getTabBar === "function" && this.getTabBar()) {
       this.getTabBar().setData({ selected: 1 })
     }
-    this.syncCurrentCity()
+    this.syncCurrentCity({ fromUserAction: false })
+    this.syncCartCount()
   },
 
   onPullDownRefresh() {
-    this.loadMallData({ showLoading: false, keepActiveCategory: true }).finally(() => {
+    Promise.all([
+      this.loadMallData({ showLoading: false, keepActiveCategory: true }),
+      this.syncCartCount()
+    ]).finally(() => {
       wx.stopPullDownRefresh()
     })
   },
@@ -318,6 +358,27 @@ Page({
     })
   },
 
+  syncCartCount() {
+    if (this._cartCountPromise) return this._cartCountPromise
+
+    this._cartCountPromise = get(paths.mall.cart)
+      .then((res) => {
+        const payload = unwrapResponseData(res)
+        const totalQty = resolveCartTotalQty(payload)
+        this.setData({
+          cartCount: totalQty
+        })
+      })
+      .catch((err) => {
+        console.warn("[mall] 获取购物车数量失败:", err)
+      })
+      .finally(() => {
+        this._cartCountPromise = null
+      })
+
+    return this._cartCountPromise
+  },
+
   loadMallData({ showLoading = false, keepActiveCategory = true } = {}) {
     if (this._mallDataPromise) return this._mallDataPromise
 
@@ -341,7 +402,6 @@ Page({
           city: cachedCity || STATIC_MALL_DATA.city,
           searchPlaceholder: STATIC_MALL_DATA.searchPlaceholder,
           activityBanners: STATIC_MALL_DATA.activityBanners,
-          cartCount: STATIC_MALL_DATA.cartCount,
           categories,
           activeCategory: activeCategory ? activeIndex : 0,
           activeCategoryKey: activeCategory ? activeCategory.key : "",
@@ -480,10 +540,26 @@ Page({
     }
 
     this.setData({ city: "定位中" })
-    this.syncCurrentCity()
+    this.syncCurrentCity({ fromUserAction: true })
   },
 
-  promptLocationPermission() {
+  shouldPromptLocationPermission(fromUserAction = false) {
+    if (fromUserAction) return true
+
+    const app = typeof getApp === "function" ? getApp() : null
+    if (app && app.globalData) {
+      if (app.globalData.mallAutoLocationPermissionPrompted) return false
+      app.globalData.mallAutoLocationPermissionPrompted = true
+      return true
+    }
+
+    if (this._mallAutoLocationPermissionPrompted) return false
+    this._mallAutoLocationPermissionPrompted = true
+    return true
+  },
+
+  promptLocationPermission({ fromUserAction = false } = {}) {
+    if (!this.shouldPromptLocationPermission(fromUserAction)) return
     if (this._locationPermissionModalVisible) return
     this._locationPermissionModalVisible = true
 
@@ -503,7 +579,7 @@ Page({
 
             if (hasLocationAuth) {
               this.setData({ city: "定位中" })
-              this.syncCurrentCity()
+              this.syncCurrentCity({ fromUserAction: true })
               return
             }
 
@@ -569,7 +645,7 @@ Page({
     })
   },
 
-  syncCurrentCity() {
+  syncCurrentCity({ fromUserAction = false } = {}) {
     if (this.isLocatingCity) return
     this.isLocatingCity = true
 
@@ -606,7 +682,7 @@ Page({
       fail: (err) => {
         console.warn("[mall] 获取当前城市失败:", err)
         if (isLocationPermissionError(err)) {
-          this.promptLocationPermission()
+          this.promptLocationPermission({ fromUserAction })
         }
         setFallbackIfNeeded()
       },
@@ -628,15 +704,36 @@ Page({
   },
 
   addToCart(e) {
-    const { id } = e.currentTarget.dataset
-    const nextCount = this.data.cartCount + 1
-    this.setData({
-      cartCount: nextCount
+    const { id, skuId } = e.currentTarget.dataset
+    const finalSkuId = String(skuId || "")
+    if (!finalSkuId) {
+      wx.showToast({
+        title: "SKU信息缺失",
+        icon: "none"
+      })
+      return
+    }
+    if (this._isAddingCart) return
+    this._isAddingCart = true
+
+    post(paths.mall.cartAdd, {
+      skuId: finalSkuId,
+      buyQty: 1
     })
-    wx.showToast({
-      title: "已加入购物车",
-      icon: "none"
-    })
-    this.lastAddedProduct = id
+      .then(() => {
+        const nextCount = toNumberOr(this.data.cartCount, 0) + 1
+        this.setData({
+          cartCount: nextCount
+        })
+        wx.showToast({
+          title: "已加入购物车",
+          icon: "none"
+        })
+        this.lastAddedProduct = id
+      })
+      .catch(() => {})
+      .finally(() => {
+        this._isAddingCart = false
+      })
   }
 })
