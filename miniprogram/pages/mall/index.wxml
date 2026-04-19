@@ -81,11 +81,10 @@
           </view>
           <view class="mall-product__name">{{item.name}}</view>
           <view class="mall-product__meta">
-            <view class="mall-product__meta-main">
+            <view class="mall-product__meta-left">
               <text class="mall-product__score" wx:if="{{item.scoreText}}">评分 {{item.scoreText}}</text>
-              <text class="mall-product__stock">{{item.stockText}}</text>
             </view>
-            <text class="mall-product__weight">重量 {{item.weightText}}</text>
+            <text class="mall-product__stock">{{item.stockText}}</text>
           </view>
           <view class="mall-product__foot">
             <view class="mall-product__price">
