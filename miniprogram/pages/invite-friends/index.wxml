@@ -5,27 +5,34 @@
 
   <view class="page-top-gap" style="height: {{topInset}}px;"></view>
 
-  <view class="page-wrap">
+  <view class="page-wrap invite-wrap">
     <view class="page-title">{{title}}</view>
-    <view class="page-subtitle">{{subTitle}}</view>
+    <view class="invite-subtitle-row">
+      <view class="page-subtitle invite-page-subtitle">{{subTitle}}</view>
+      <view class="invite-reward-tag">邀请有奖</view>
+    </view>
 
-    <view class="invite-reward-tag">邀请有奖</view>
-
-    <view class="glass-card invite-main-card">
-      <view class="invite-section-title">填写推荐码即可获得</view>
+    <view class="invite-panel invite-overview-card">
+      <title-view text="填写推荐码即可获得" />
       <view class="invite-summary-row">
-        <view class="invite-summary-item">
-          <view>推荐好友</view>
-          <view class="invite-summary-item__value">{{inviteCount}}</view>
-        </view>
-        <view class="invite-summary-item">
-          <view>获得积分</view>
-          <view class="invite-summary-item__value invite-summary-item__value--purple">{{totalPoints}}</view>
-        </view>
+        <block wx:for="{{summaryCards}}" wx:key="id">
+          <view class="invite-summary-item">
+            <view class="invite-summary-item__badge" style="background: {{item.badgeBg}};">
+              <image class="invite-summary-item__badge-icon" src="{{item.badgeIcon}}" mode="aspectFit" />
+            </view>
+            <view class="invite-summary-item__label">{{item.label}}</view>
+            <view class="invite-summary-item__value {{item.valueClassName}}">{{item.valueKey === 'inviteCount' ? inviteCount : totalPoints}}</view>
+          </view>
+        </block>
       </view>
+    </view>
 
+    <view class="invite-panel invite-reward-card">
       <view class="invite-reward-box">
-        <view class="invite-reward-box__title">✦ 邀请奖励</view>
+        <view class="invite-reward-box__head">
+          <view class="invite-reward-box__mark"></view>
+          <view class="invite-reward-box__title">邀请奖励</view>
+        </view>
         <block wx:for="{{rewardSteps}}" wx:key="title">
           <view class="invite-reward-row">
             <view>{{item.title}}</view>
@@ -33,34 +40,72 @@
           </view>
         </block>
       </view>
+    </view>
 
-      <view class="invite-code-title">您的推荐码</view>
+    <view class="invite-panel invite-main-card">
+      <title-view text="您的推荐码" />
       <view class="invite-code-row">
         <view class="invite-code">{{inviteCode}}</view>
-        <view class="invite-copy" bindtap="copyCode">⧉</view>
+        <view class="invite-copy" bindtap="copyCode">
+          <image class="invite-copy__icon" src="{{copyIcon}}" mode="aspectFit" />
+        </view>
       </view>
 
       <view class="invite-share-list">
         <block wx:for="{{channels}}" wx:key="id">
           <view class="invite-share-item" data-name="{{item.name}}" bindtap="shareByChannel">
-            <view class="invite-share-item__icon-wrap">
+            <view class="invite-share-item__tile" style="background: {{item.tileBg}};">
               <image class="invite-share-item__icon" src="{{item.icon}}" mode="aspectFit" />
+              <view class="invite-share-item__name">{{item.name}}</view>
             </view>
-            <view class="invite-share-item__name">{{item.name}}</view>
           </view>
         </block>
       </view>
 
-      <view class="invite-record-title">已邀请的好友</view>
-      <block wx:for="{{records}}" wx:key="id">
-        <view class="invite-record-row">
-          <view>
-            <view class="invite-record-row__user">用户 {{item.user}}</view>
-            <view class="invite-record-row__time">{{item.time}}</view>
+      <view class="invite-record-box">
+        <view class="invite-record-title">已邀请的好友</view>
+        <block wx:for="{{records}}" wx:key="id">
+          <view class="invite-record-row">
+            <view>
+              <view class="invite-record-row__user">用户 {{item.user}}</view>
+              <view class="invite-record-row__time">{{item.time}}</view>
+            </view>
+            <view class="invite-record-row__status">{{item.status}}</view>
           </view>
-          <view class="invite-record-row__status">{{item.status}}</view>
+        </block>
+      </view>
+    </view>
+  </view>
+
+  <view class="poster-layer {{showPosterModal ? 'poster-layer--show' : ''}}" catchtouchmove="noop">
+    <view wx:if="{{showPosterModal}}" class="poster-mask" bindtap="closePosterModal" catchtouchmove="noop"></view>
+
+    <view wx:if="{{showPosterModal}}" class="poster-modal" catchtap="noop" catchtouchmove="noop">
+      <view class="poster-card">
+        <view class="poster-hero">
+          <view class="poster-hero__glow poster-hero__glow--left"></view>
+          <view class="poster-hero__glow poster-hero__glow--right"></view>
+          <view class="poster-brand">{{posterBrand}}</view>
+          <view class="poster-subtitle">
+            <view class="poster-subtitle__line"></view>
+            <view>{{posterSubTitle}}</view>
+            <view class="poster-subtitle__line"></view>
+          </view>
         </view>
-      </block>
+
+        <view class="poster-card__body">
+          <view wx:if="{{posterQrImage}}" class="poster-qrcode">
+            <image class="poster-qrcode__image" src="{{posterQrImage}}" mode="aspectFill" />
+          </view>
+          <view wx:else class="poster-qrcode poster-qrcode--placeholder">
+            <view class="poster-qrcode__placeholder-text">二维码图片待接入</view>
+          </view>
+
+          <view class="poster-user-id">ID：{{posterUserId}}</view>
+        </view>
+
+        <view class="poster-save-btn" bindtap="savePoster">保存到手机</view>
+      </view>
     </view>
   </view>
 </view>

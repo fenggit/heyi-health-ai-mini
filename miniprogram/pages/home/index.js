@@ -280,7 +280,7 @@ function mapRecommendation(todayRecommend = {}) {
     recipeId,
     title: "AI推荐：今日专属果蔬汁",
     actionText: "查看详情",
-    image: toDisplayText(source.coverUrl || source.imageUrl || source.image, ""),
+    image: toDisplayText(source.coverImage || source.coverUrl || source.imageUrl || source.image, ""),
     name: toDisplayText(source.recipeName || source.name, ""),
     description: toDisplayText(source.recommendReason || source.intro || source.description, ""),
     tags

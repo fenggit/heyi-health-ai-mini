@@ -1,5 +1,5 @@
 const { getLayoutMetrics } = require("../../utils/layout")
-const { get } = require("../../utils/request")
+const { get, post, put } = require("../../utils/request")
 const paths = require("../../http/paths")
 
 const STATIC_DETAIL_DATA = {
@@ -9,14 +9,15 @@ const STATIC_DETAIL_DATA = {
 const DEFAULT_PACK_DATA = {
   id: "yang-wei-qi-xue",
   recipeId: "",
+  skuId: "",
   name: "养胃气血汁",
   description: "富含铁质和维生素C的配方，有助于补血养气，改善春季疲乏。",
   tags: ["补气血", "养脾胃", "春季养生"],
   price: "68",
   priceUnit: "/包",
-  kcal: "180",
+  kcal: "0",
   tipText: "所有食材已按比例配好，一包可制作2人份。",
-  image: "/assets/test/home-banner2.png",
+  image: "",
   videoUrl: "",
   videoCover: "",
   ingredients: [
@@ -34,12 +35,7 @@ const DEFAULT_PACK_DATA = {
     "过滤后加入柠檬汁和蜂蜜调味",
     "倒入杯中即可饮用"
   ],
-  effects: [
-    "补气养血：红枣和枸杞富含铁质",
-    "促进消化：胡萝卜有助于脾胃健康",
-    "增强免疫：维生素C提升抵抗力",
-    "美容养颜：抗氧化成分保护肌肤"
-  ]
+  effects: []
 }
 
 function cloneDeep(value) {
@@ -169,39 +165,29 @@ function mapSteps(rawSteps) {
   return mapped.length ? mapped : cloneDeep(DEFAULT_PACK_DATA.steps)
 }
 
-function splitEffectDesc(effectDesc) {
-  const text = toDisplayText(effectDesc, "")
+function parseEffectItems(rawItems) {
+  if (Array.isArray(rawItems)) {
+    return rawItems
+      .map((item) => {
+        if (typeof item === "string") return item
+        if (!item || typeof item !== "object") return ""
+        return item.effectDesc || item.name || item.label || item.text || ""
+      })
+      .map((item) => String(item || "").trim())
+      .filter(Boolean)
+  }
+
+  const text = String(rawItems || "").trim()
   if (!text) return []
-  return text
-    .split(/\r?\n|；|;|。/)
-    .map((item) => item.trim())
-    .filter(Boolean)
-}
 
-function buildNutritionEffects(rawNutritions) {
-  const list = normalizeList(rawNutritions)
-  const mapped = list
-    .map((item) => {
-      const row = item && typeof item === "object" ? item : {}
-      const nutrientName = toDisplayText(row.nutrientName || row.name, "")
-      if (!nutrientName) return ""
-      const nutrientValue = formatNumberText(row.nutrientValue, "")
-      const unit = toDisplayText(row.unit, "")
-      const valueText = nutrientValue || unit ? `${nutrientValue}${unit}` : ""
-      return valueText ? `${nutrientName}：${valueText}` : nutrientName
-    })
-    .filter(Boolean)
-  return mapped
-}
+  try {
+    const parsed = JSON.parse(text)
+    if (Array.isArray(parsed)) return parseEffectItems(parsed)
+  } catch (e) {
+    // ignore parse error
+  }
 
-function mapEffects(effectDesc, rawNutritions) {
-  const effectList = splitEffectDesc(effectDesc)
-  if (effectList.length) return effectList
-
-  const nutritionEffects = buildNutritionEffects(rawNutritions)
-  if (nutritionEffects.length) return nutritionEffects
-
-  return cloneDeep(DEFAULT_PACK_DATA.effects)
+  return []
 }
 
 function buildTipText(detail = {}) {
@@ -251,31 +237,67 @@ function resolveCartTotalQty(payload) {
   return Math.max(0, toNumberOr(nested, 0))
 }
 
+function normalizeCartPayload(payload) {
+  if (payload && typeof payload === "object") {
+    if (payload.result && typeof payload.result === "object") return payload.result
+    if (payload.cart && typeof payload.cart === "object") return payload.cart
+    return payload
+  }
+  return {}
+}
+
+function normalizeCartItemList(payload) {
+  if (!payload || typeof payload !== "object") return []
+  if (Array.isArray(payload.itemList)) return payload.itemList
+  if (payload.itemList && typeof payload.itemList === "object") {
+    if (Array.isArray(payload.itemList.items)) return payload.itemList.items
+    if (Array.isArray(payload.itemList.list)) return payload.itemList.list
+    if (Array.isArray(payload.itemList.records)) return payload.itemList.records
+  }
+  if (Array.isArray(payload.items)) return payload.items
+  if (Array.isArray(payload.list)) return payload.list
+  if (Array.isArray(payload.records)) return payload.records
+  return []
+}
+
+function toRequestItemId(value) {
+  const numeric = Number(value)
+  if (Number.isSafeInteger(numeric) && String(numeric) === String(value)) {
+    return numeric
+  }
+  return String(value)
+}
+
 function mapRecipeDetail(detail = {}, recipeId = "") {
   const source = detail && typeof detail === "object" ? detail : {}
+  const sku = source.sku && typeof source.sku === "object" ? source.sku : {}
   const recipeIdRaw = source.recipeId != null ? source.recipeId : recipeId
+  const skuIdRaw = sku.skuId != null ? sku.skuId : source.skuId
   const finalRecipeId = recipeIdRaw != null && recipeIdRaw !== "" ? String(recipeIdRaw) : ""
-  const tags = parseTagList(source.tagJson || source.tags || source.tagList)
+  const finalSkuId = skuIdRaw != null && skuIdRaw !== "" ? String(skuIdRaw) : ""
+  const tags = parseTagList(source.customTags || source.tagJson || source.tags || source.tagList)
   const unitName = toDisplayText(source.unitName, "")
+  const coverImage = toDisplayText(source.coverImage, "")
   const coverUrl = toDisplayText(source.coverUrl, "")
   const videoCoverUrl = toDisplayText(source.videoCoverUrl, "")
 
   return {
     id: finalRecipeId || DEFAULT_PACK_DATA.id,
     recipeId: finalRecipeId,
+    skuId: finalSkuId,
     name: toDisplayText(source.recipeName || source.name, DEFAULT_PACK_DATA.name),
     description: toDisplayText(source.intro || source.description, DEFAULT_PACK_DATA.description),
     tags: tags.length ? tags : cloneDeep(DEFAULT_PACK_DATA.tags),
     price: formatNumberText(source.priceAmount, DEFAULT_PACK_DATA.price),
     priceUnit: unitName ? `/${unitName}` : DEFAULT_PACK_DATA.priceUnit,
-    kcal: formatNumberText(source.calories, DEFAULT_PACK_DATA.kcal),
+    kcal: toDisplayText(source.calories, "0"),
     tipText: buildTipText(source),
-    image: coverUrl || videoCoverUrl || DEFAULT_PACK_DATA.image,
+    image: coverImage,
     videoUrl: toDisplayText(source.videoUrl, ""),
-    videoCover: videoCoverUrl || coverUrl || DEFAULT_PACK_DATA.image,
+    videoCover: videoCoverUrl || coverImage || coverUrl,
     ingredients: mapIngredients(source.ingredients),
     steps: mapSteps(source.steps),
-    effects: mapEffects(source.effectDesc, source.nutritions)
+    effects: parseEffectItems(source.effectItems)
   }
 }
 
@@ -416,22 +438,95 @@ Page({
     wx.switchTab({ url: "/pages/home/index" })
   },
 
+  addCurrentSkuToCart(onSuccess) {
+    const skuId = toDisplayText(this.data.packInfo && this.data.packInfo.skuId, "")
+    if (!skuId) {
+      wx.showToast({
+        title: "SKU信息缺失",
+        icon: "none"
+      })
+      return
+    }
+    if (this._isAddingCart) return
+
+    this._isAddingCart = true
+    return post(paths.mall.cartAdd, {
+      skuId,
+      buyQty: 1
+    })
+      .then(() => {
+        if (typeof onSuccess === "function") onSuccess()
+      })
+      .catch(() => {})
+      .finally(() => {
+        this._isAddingCart = false
+      })
+  },
+
+  findCurrentCartItem() {
+    const skuId = toDisplayText(this.data.packInfo && this.data.packInfo.skuId, "")
+    if (!skuId) return Promise.resolve(null)
+
+    return get(paths.mall.cart).then((res) => {
+      const payload = normalizeCartPayload(unwrapResponseData(res))
+      const items = normalizeCartItemList(payload)
+      return items.find((item) => String(item && item.skuId != null ? item.skuId : "") === skuId) || null
+    })
+  },
+
   // 第一次点击加购：切换到数量控制模式
   onFirstAdd() {
-    this.safeSetData({ qtySelected: true, qty: 1 })
+    this.addCurrentSkuToCart(() => {
+      const nextCount = toNumberOr(this.data.cartCount, 0) + 1
+      this.safeSetData({
+        qtySelected: true,
+        qty: 1,
+        cartCount: nextCount
+      })
+    })
   },
 
   increaseQty() {
-    this.safeSetData({ qty: this.data.qty + 1 })
+    this.addCurrentSkuToCart(() => {
+      const nextCount = toNumberOr(this.data.cartCount, 0) + 1
+      this.safeSetData({
+        qty: this.data.qty + 1,
+        cartCount: nextCount
+      })
+    })
   },
 
   decreaseQty() {
-    if (this.data.qty <= 1) {
-      // 减到0时退回未选择状态
-      this.safeSetData({ qty: 1, qtySelected: false })
-      return
-    }
-    this.safeSetData({ qty: this.data.qty - 1 })
+    if (this._isChangingCartQty) return
+
+    this._isChangingCartQty = true
+    this.findCurrentCartItem()
+      .then((item) => {
+        if (!item) return
+
+        const itemId = item.itemId != null && item.itemId !== "" ? item.itemId : item.id
+        if (itemId == null || itemId === "") return
+
+        const currentBuyQty = Math.max(0, toNumberOr(item.buyQty != null ? item.buyQty : item.count, 0))
+        if (currentBuyQty <= 0) return
+
+        const nextBuyQty = Math.max(0, currentBuyQty - 1)
+        return put(paths.mall.cartItemQty, {
+          itemId: toRequestItemId(itemId),
+          buyQty: nextBuyQty
+        }).then(() => {
+          const nextCartCount = Math.max(0, toNumberOr(this.data.cartCount, 0) - 1)
+          this.safeSetData({
+            qty: nextBuyQty > 0 ? nextBuyQty : 1,
+            qtySelected: nextBuyQty > 0,
+            cartCount: nextCartCount
+          })
+        })
+      })
+      .catch(() => {})
+      .finally(() => {
+        this._isChangingCartQty = false
+      })
   },
 
   toggleLike() {

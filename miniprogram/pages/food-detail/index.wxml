@@ -20,7 +20,7 @@
   <!-- 主图卡片 -->
   <view class="dp-hero-card">
     <view class="dp-hero-img-wrap">
-      <image class="dp-hero-img" src="{{packInfo.image}}" mode="aspectFill" />
+      <image wx:if="{{packInfo.image}}" class="dp-hero-img" src="{{packInfo.image}}" mode="aspectFill" />
     </view>
 
     <!-- 标题（title-view 组件） -->
@@ -40,26 +40,14 @@
 
     <!-- 价格区：未选择（qty===1且未展开）只显示价格+加购；已选择显示减-数字-加 -->
     <view class="dp-price-row">
-      <view class="dp-price">
+      <view wx:if="{{false}}" class="dp-price">
         <text class="dp-price__yen">￥</text>
         <text class="dp-price__num">{{packInfo.price}}</text>
         <text class="dp-price__unit">{{packInfo.priceUnit}}</text>
       </view>
-      <!-- 未选择：只有加购按钮 -->
-      <view wx:if="{{!qtySelected}}" class="dp-btn-add" bindtap="onFirstAdd">
+      <view class="dp-btn-add" bindtap="onFirstAdd">
         <view class="dp-btn-add__h"></view>
         <view class="dp-btn-add__v"></view>
-      </view>
-      <!-- 已选择：减 数字 加 -->
-      <view wx:else class="dp-qty">
-        <view class="dp-qty__minus" bindtap="decreaseQty">
-          <view class="dp-qty__minus-line"></view>
-        </view>
-        <text class="dp-qty__num">{{qty}}</text>
-        <view class="dp-qty__plus" bindtap="increaseQty">
-          <view class="dp-qty__plus-h"></view>
-          <view class="dp-qty__plus-v"></view>
-        </view>
       </view>
     </view>
   </view>
@@ -71,7 +59,7 @@
     <view class="dp-section">
       <view class="dp-section__head">
         <title-view text="食材包配比" />
-        <view class="dp-kcal">
+        <view wx:if="{{packInfo.kcal}}" class="dp-kcal">
           <text class="dp-kcal__text">{{packInfo.kcal}}Kcal</text>
         </view>
       </view>
@@ -106,7 +94,7 @@
     </view>
 
     <!-- 功效说明 -->
-    <view class="dp-section">
+    <view wx:if="{{packInfo.effects.length > 0}}" class="dp-section">
       <title-view text="功效说明" />
       <view class="dp-effects">
         <block wx:for="{{packInfo.effects}}" wx:key="*this">

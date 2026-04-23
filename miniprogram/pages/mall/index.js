@@ -532,6 +532,7 @@ Page({
 
   onTapLocation() {
     if (this.isLocatingCity) {
+      console.log("[mall] 点击定位时仍在定位中")
       wx.showToast({
         title: "正在定位中",
         icon: "none"
@@ -539,6 +540,7 @@ Page({
       return
     }
 
+    console.log("[mall] 用户手动触发定位")
     this.setData({ city: "定位中" })
     this.syncCurrentCity({ fromUserAction: true })
   },
@@ -562,6 +564,7 @@ Page({
     if (!this.shouldPromptLocationPermission(fromUserAction)) return
     if (this._locationPermissionModalVisible) return
     this._locationPermissionModalVisible = true
+    console.log("[mall] 弹出定位权限引导", { fromUserAction })
 
     wx.showModal({
       title: "需要定位权限",
@@ -569,13 +572,16 @@ Page({
       confirmText: "去设置",
       cancelText: "暂不",
       success: (res) => {
+        console.log("[mall] 定位权限弹窗返回", res)
         if (!res.confirm) return
         wx.openSetting({
           success: (settingRes) => {
             const authSetting = (settingRes && settingRes.authSetting) || {}
-            const hasLocationAuth = !!(
-              authSetting["scope.userLocation"] || authSetting["scope.userFuzzyLocation"]
-            )
+            const hasLocationAuth = !!authSetting["scope.userLocation"]
+            console.log("[mall] openSetting 返回", {
+              authSetting,
+              hasLocationAuth
+            })
 
             if (hasLocationAuth) {
               this.setData({ city: "定位中" })
@@ -591,6 +597,7 @@ Page({
         })
       },
       complete: () => {
+        console.log("[mall] 定位权限弹窗关闭")
         this._locationPermissionModalVisible = false
       }
     })
@@ -648,33 +655,62 @@ Page({
   syncCurrentCity({ fromUserAction = false } = {}) {
     if (this.isLocatingCity) return
     this.isLocatingCity = true
+    console.log("[mall] 开始获取定位", {
+      fromUserAction,
+      currentCity: this.data.city
+    })
 
     const applyCity = (city) => {
       const nextCity = formatCityName(city)
-      if (!nextCity) return false
+      if (!nextCity) {
+        console.log("[mall] 定位结果未解析出城市", { rawCity: city })
+        return false
+      }
+      console.log("[mall] 定位城市解析成功", {
+        rawCity: city,
+        nextCity
+      })
       this.setData({ city: nextCity })
       return true
     }
 
     const finalize = () => {
+      console.log("[mall] 定位流程结束", {
+        finalCity: this.data.city
+      })
       this.isLocatingCity = false
     }
 
     const setFallbackIfNeeded = () => {
       if (!this.data.city || this.data.city === "定位中") {
+        console.log("[mall] 定位失败，更新为兜底文案")
         this.setData({ city: "定位失败" })
       }
     }
 
-    if (typeof wx.getFuzzyLocation !== "function") {
+    if (typeof wx.getLocation !== "function") {
+      console.warn("[mall] 当前基础库不支持 wx.getLocation")
       setFallbackIfNeeded()
       finalize()
       return
     }
 
-    wx.getFuzzyLocation({
+    console.log("[mall] 调用 wx.getLocation")
+    wx.getLocation({
+      type: "gcj02",
+      isHighAccuracy: true,
+      highAccuracyExpireTime: 3000,
       success: (res) => {
+        console.log("[mall] wx.getLocation 成功", res)
         const city = extractCityFromLocationResult(res)
+        if (!city) {
+          console.log("[mall] wx.getLocation 仅返回经纬度，未直接返回城市信息", {
+            latitude: res.latitude,
+            longitude: res.longitude,
+            accuracy: res.accuracy,
+            note: "如需展示城市，需要再做逆地理解析"
+          })
+        }
         if (!applyCity(city)) {
           setFallbackIfNeeded()
         }

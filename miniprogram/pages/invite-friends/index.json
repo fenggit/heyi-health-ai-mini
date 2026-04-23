@@ -1,6 +1,7 @@
 {
   "navigationStyle": "custom",
   "usingComponents": {
-    "my-header": "/components/my-header/index"
+    "my-header": "/components/my-header/index",
+    "title-view": "/components/title-view/index"
   }
 }
