@@ -1,43 +1,47 @@
-<view class="dock-wrap">
-  <view class="dock-base">
-    <image class="dock-base__bg" src="/assets/tabbar_bg.png" mode="scaleToFill" />
-    <view class="dock-base__safe"></view>
-  </view>
-  <view class="dock-content">
-    <view class="dock-side dock-side--left">
+<view class="tabbar-wrap">
+  <view class="tabbar-panel">
+    <view class="tabbar-track">
       <block wx:for="{{tabs}}" wx:key="path" wx:for-item="tab" wx:for-index="index">
-        <view
-          wx:if="{{index < 2}}"
-          class="dock-tab {{selected === index ? 'dock-tab--active' : ''}}"
-          data-path="{{tab.path}}"
-          data-index="{{index}}"
-          bindtap="switchTab"
-        >
-          <view class="dock-tab__badge" wx:if="{{selected === index}}"></view>
-          <text class="dock-tab__text">{{tab.text}}</text>
-        </view>
+        <block wx:if="{{index < 2}}">
+          <view
+            class="tabbar-item {{selected === index ? 'tabbar-item--active' : ''}}"
+            data-path="{{tab.path}}"
+            data-index="{{index}}"
+            bindtap="switchTab"
+          >
+            <view class="tabbar-item__text-wrap">
+              <view class="tabbar-item__ball" wx:if="{{selected === index}}"></view>
+              <text class="tabbar-item__text">{{tab.text}}</text>
+            </view>
+          </view>
+        </block>
       </block>
-    </view>
 
-    <view class="dock-center" bindtap="openAiChat">
-      <view class="dock-center__button">
-        <image class="dock-center__icon" src="/assets/icons/ai.png" mode="aspectFit" />
+      <view class="tabbar-item tabbar-item--center" bindtap="openAiChat">
+        <view class="tabbar-item__text-wrap">
+          <text class="tabbar-item__text">AI问答</text>
+        </view>
       </view>
-    </view>
 
-    <view class="dock-side dock-side--right">
       <block wx:for="{{tabs}}" wx:key="path" wx:for-item="tab" wx:for-index="index">
-        <view
-          wx:if="{{index >= 2}}"
-          class="dock-tab {{selected === index ? 'dock-tab--active' : ''}}"
-          data-path="{{tab.path}}"
-          data-index="{{index}}"
-          bindtap="switchTab"
-        >
-          <view class="dock-tab__badge" wx:if="{{selected === index}}"></view>
-          <text class="dock-tab__text">{{tab.text}}</text>
-        </view>
+        <block wx:if="{{index >= 2}}">
+          <view
+            class="tabbar-item {{selected === index ? 'tabbar-item--active' : ''}}"
+            data-path="{{tab.path}}"
+            data-index="{{index}}"
+            bindtap="switchTab"
+          >
+            <view class="tabbar-item__text-wrap">
+              <view class="tabbar-item__ball" wx:if="{{selected === index}}"></view>
+              <text class="tabbar-item__text">{{tab.text}}</text>
+            </view>
+          </view>
+        </block>
       </block>
     </view>
+  </view>
+
+  <view class="tabbar-safe">
+    <view class="tabbar-home-indicator"></view>
   </view>
 </view>
