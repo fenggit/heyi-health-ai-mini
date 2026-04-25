@@ -383,7 +383,7 @@
 
 .home-content .tips-card {
   margin-top: 16rpx;
-  margin-bottom: 0;
+  margin-bottom: 30rpx;
   padding: 2rpx 16rpx 22rpx 2rpx;
   background: rgba(223, 249, 232, 0.7);
 }

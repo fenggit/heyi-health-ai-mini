@@ -69,27 +69,6 @@
   >
     <view class="cart-coupon-sheet__title">选择使用优惠券</view>
 
-    <view class="cart-coupon-sheet__tabs">
-      <view
-        class="cart-coupon-sheet__tab {{couponTab === 'available' ? 'cart-coupon-sheet__tab--active' : ''}}"
-        data-tab="available"
-        bindtap="switchCouponTab"
-      >
-        <text>可用优惠券</text>
-        <text class="cart-coupon-sheet__tab-count">({{availableCoupons.length}})</text>
-        <view wx:if="{{couponTab === 'available'}}" class="cart-coupon-sheet__tab-line"></view>
-      </view>
-      <view
-        class="cart-coupon-sheet__tab {{couponTab === 'unavailable' ? 'cart-coupon-sheet__tab--active' : ''}}"
-        data-tab="unavailable"
-        bindtap="switchCouponTab"
-      >
-        <text>不可用优惠券</text>
-        <text class="cart-coupon-sheet__tab-count">({{unavailableCoupons.length}})</text>
-        <view wx:if="{{couponTab === 'unavailable'}}" class="cart-coupon-sheet__tab-line"></view>
-      </view>
-    </view>
-
     <view class="cart-coupon-sheet__tip">
       <text>您已选中优惠券</text>
       <text class="cart-coupon-sheet__tip-red">{{couponPickedCount}}</text>
@@ -97,10 +76,7 @@
       <text class="cart-coupon-sheet__tip-red">￥{{couponPickedAmountFixed}}</text>
     </view>
 
-    <view
-      wx:if="{{couponTab === 'available'}}"
-      class="cart-coupon-sheet__list"
-    >
+    <view class="cart-coupon-sheet__list">
       <block wx:for="{{availableCoupons}}" wx:key="id">
         <view class="cart-picker-item" data-id="{{item.id}}" bindtap="chooseCoupon">
           <view class="cart-picker-item__amount">
@@ -129,30 +105,6 @@
           <text wx:if="{{!draftCouponId}}" class="cart-picker-item__check-mark">✓</text>
         </view>
       </view>
-    </view>
-
-    <view
-      wx:if="{{couponTab === 'unavailable'}}"
-      class="cart-coupon-sheet__list"
-    >
-      <block wx:for="{{unavailableCoupons}}" wx:key="id">
-        <view class="cart-picker-item cart-picker-item--disabled">
-          <view class="cart-picker-item__amount">
-            <view class="cart-picker-item__money">
-              <text class="cart-picker-item__money-symbol">￥</text>
-              <text class="cart-picker-item__money-main">{{item.amount}}</text>
-            </view>
-            <text class="cart-picker-item__amount-rule">满{{item.threshold}}元可用</text>
-          </view>
-          <view class="cart-picker-item__divider">
-            <view class="cart-picker-item__divider-line"></view>
-          </view>
-          <view class="cart-picker-item__info">
-            <text class="cart-picker-item__title">满{{item.threshold}}减{{item.amount}}元</text>
-            <text class="cart-picker-item__expire">有效期至 {{item.expireDate}}</text>
-          </view>
-        </view>
-      </block>
     </view>
 
     <view class="cart-coupon-sheet__actions">
@@ -271,7 +223,7 @@
           <text class="cart-addr-item__address">{{item.address}}</text>
           <view class="cart-addr-item__divider"></view>
           <view class="cart-addr-item__bottom">
-            <view class="cart-addr-item__default">
+            <view class="cart-addr-item__default" data-id="{{item.id}}" data-set-default="1" catchtap="selectAddress">
               <view class="cart-addr-check {{item.isDefault ? 'cart-addr-check--active' : ''}}">
                 <text wx:if="{{item.isDefault}}" class="cart-addr-check__mark">✓</text>
               </view>

@@ -159,13 +159,12 @@ function parseTagList(rawTags) {
 function mapBannerList(rawBannerList) {
   const list = normalizeList(rawBannerList)
   return list
-    .map((item, index) => {
+    .map((item) => {
       const row = item && typeof item === "object" ? item : {}
-      const image = toDisplayText(row.imageUrl || row.image || row.coverUrl, "")
+      const image = toDisplayText(row.bannerImage, "")
       if (!image) return null
 
-      const idRaw = row.bannerId != null ? row.bannerId : row.id
-      const id = idRaw != null && idRaw !== "" ? String(idRaw) : `banner-${index + 1}`
+      const id = toDisplayText(row.id, "")
 
       return {
         id,
@@ -400,8 +399,9 @@ Page({
   },
   openActivityDetail(e) {
     const { id } = e.currentTarget.dataset
+    if (id === undefined || id === null || id === "") return
     wx.navigateTo({
-      url: `/pages/activity-detail/index?id=${id || ""}`
+      url: `/pages/activity-detail/index?id=${encodeURIComponent(String(id))}`
     })
   },
   openShortcut(e) {

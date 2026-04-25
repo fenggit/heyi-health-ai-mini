@@ -291,45 +291,6 @@
   font-weight: 700;
 }
 
-.cart-coupon-sheet__tabs {
-  margin-top: 10rpx;
-  display: flex;
-}
-
-.cart-coupon-sheet__tab {
-  width: 50%;
-  height: 60rpx;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #334155;
-  font-size: 28rpx;
-  line-height: 40rpx;
-  font-weight: 400;
-}
-
-.cart-coupon-sheet__tab--active {
-  color: #1e293b;
-  font-weight: 700;
-}
-
-.cart-coupon-sheet__tab-count {
-  margin-left: 6rpx;
-  font-family: "DIN", "PingFang SC", sans-serif;
-}
-
-.cart-coupon-sheet__tab-line {
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  width: 96rpx;
-  height: 12rpx;
-  margin-left: -48rpx;
-  border-radius: 999rpx;
-  background: #ffde00;
-}
-
 .cart-coupon-sheet__tip {
   margin-top: 10rpx;
   margin-left: 2rpx;
@@ -508,20 +469,6 @@
   font-size: 28rpx;
   line-height: 30rpx;
   font-weight: 500;
-}
-
-.cart-picker-item--disabled {
-  background: rgba(243, 244, 246, 0.78);
-}
-
-.cart-picker-item--disabled .cart-picker-item__money,
-.cart-picker-item--disabled .cart-picker-item__amount-rule,
-.cart-picker-item--disabled .cart-picker-item__title {
-  color: #94a3b8;
-}
-
-.cart-picker-item--disabled .cart-picker-item__divider {
-  opacity: 0.6;
 }
 
 .cart-coupon-sheet__actions {

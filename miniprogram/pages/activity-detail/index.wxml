@@ -37,7 +37,7 @@
         </view>
 
         <view class="activity-image-wrap">
-          <image class="activity-image" src="/assets/test/activity-img.jpg" mode="aspectFill" />
+          <image class="activity-image" src="{{activity.image}}" mode="aspectFill" />
         </view>
 
         <view class="activity-section-title">活动介绍：</view>

@@ -50,9 +50,9 @@
           </view>
         </view>
 
-        <view class="order-actions">
-          <view class="order-btn order-btn--line" data-id="{{order.id}}" bindtap="viewLogistics">查看物流</view>
-          <view class="order-btn order-btn--line" data-id="{{order.id}}" bindtap="viewDetail">订单详情</view>
+        <view class="order-actions" hidden="{{order.statusText !== '待付款'}}">
+          <view class="order-btn order-btn--line" data-id="{{order.id}}" bindtap="viewDetail" hidden="{{true}}">订单详情</view>
+          <view class="order-btn order-btn--line" data-id="{{order.id}}" data-order-id="{{order.orderId}}" bindtap="payOrder">支付</view>
         </view>
       </view>
     </block>

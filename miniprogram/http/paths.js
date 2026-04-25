@@ -29,7 +29,13 @@ const paths = {
     // 可兑换积分商品列表
     pointsGoodsAvailable: '/marketing/app/points-goods/available',
     // 我的优惠券列表
-    myCoupons: '/marketing/app/coupon/my'
+    myCoupons: '/marketing/app/coupon/my',
+    // 订单可用优惠券列表
+    orderAvailableCoupons: '/order/app/marketing/coupon/available',
+    // 活动列表
+    activityList: '/marketing/app/activity/list',
+    // 活动详情
+    activityDetail: (id) => `/marketing/app/activity/${encodeURIComponent(id)}`
   },
   mall: {
     // 商城分类列表
@@ -42,8 +48,26 @@ const paths = {
     cartItemCheck: '/mall/app/cart/item/check',
     // 修改购物车商品数量
     cartItemQty: '/mall/app/cart/item/qty',
+    // 删除购物车商品
+    cartItemDelete: (itemId) => `/mall/app/cart/item/${encodeURIComponent(itemId)}`,
     // 加入购物车
     cartAdd: '/mall/app/cart/add'
+  },
+  address: {
+    // 新增收货地址
+    create: '/uc/app/address',
+    // 收货地址列表
+    list: '/uc/app/address/list',
+    // 设置默认收货地址
+    setDefault: (id) => `/uc/app/address/${encodeURIComponent(id)}/default`
+  },
+  order: {
+    // 创建订单
+    indentCreate: '/order/app/indent/create',
+    // 创建微信支付单
+    indentPayWechatCreate: '/order/app/indent/pay/wechat/create',
+    // 订单列表
+    indentList: '/order/app/indent/list'
   },
   recipe: {
     // 首页聚合数据

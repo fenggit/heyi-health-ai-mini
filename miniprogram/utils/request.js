@@ -107,6 +107,19 @@ function createHttpError(res, url, method) {
   return error
 }
 
+function getResponseMessage(body, fallback = '请求失败') {
+  if (!body || typeof body !== 'object') return fallback
+  return body.msg || body.message || fallback
+}
+
+function getResponseCode(body) {
+  if (!body || typeof body !== 'object' || body.code === undefined || body.code === null) {
+    return null
+  }
+  const code = Number(body.code)
+  return Number.isNaN(code) ? null : code
+}
+
 function request(options = {}) {
   const {
     url = '',
@@ -149,23 +162,33 @@ function request(options = {}) {
       timeout,
       success: (res) => {
         const body = res.data
+        const bizCode = getResponseCode(body)
         console.log(`[request:${requestId}] 响应信息`, JSON.stringify({
           path: url,
           response: body
         }))
 
+        // 全局统一鉴权失效处理：只要响应体 code 为 401，立即清理登录态并跳登录页。
+        if (bizCode === 401) {
+          const msg = getResponseMessage(body, '登录已失效，请重新登录')
+          console.warn(`[request:${requestId}] 鉴权失败 code=401 msg=${msg}`)
+          handleUnauthorized(msg)
+          reject(Object.assign(new Error(msg), {
+            code: 401,
+            statusCode: res.statusCode,
+            data: body
+          }))
+          return
+        }
+
         if (res.statusCode >= 200 && res.statusCode < 300) {
-          if (body && body.code !== undefined && body.code !== 200) {
-            const msg = body.msg || body.message || '请求失败'
-            console.warn(`[request:${requestId}] 业务错误 code=${body.code} msg=${msg}`)
-            if (Number(body.code) === 401) {
-              handleUnauthorized(msg || '登录已失效，请重新登录')
-            } else {
-              setTimeout(() => {
-                wx.showToast({ title: `${msg}(${body.code})`, icon: 'none', duration: 3000 })
-              }, 300)
-            }
-            reject(Object.assign(new Error(msg), { code: body.code, data: body }))
+          if (bizCode !== null && bizCode !== 200) {
+            const msg = getResponseMessage(body)
+            console.warn(`[request:${requestId}] 业务错误 code=${bizCode} msg=${msg}`)
+            setTimeout(() => {
+              wx.showToast({ title: `${msg}(${bizCode})`, icon: 'none', duration: 3000 })
+            }, 300)
+            reject(Object.assign(new Error(msg), { code: bizCode, data: body }))
             return
           }
           resolve(body)
@@ -174,7 +197,8 @@ function request(options = {}) {
 
         console.error(`[request:${requestId}] HTTP错误 statusCode=${res.statusCode}`)
         if (res.statusCode === 401) {
-          handleUnauthorized()
+          const msg = getResponseMessage(body, '登录已失效，请重新登录')
+          handleUnauthorized(msg)
         } else {
           setTimeout(() => {
             wx.showToast({ title: `请求失败(${res.statusCode})`, icon: 'none', duration: 3000 })

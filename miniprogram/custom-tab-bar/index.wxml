@@ -40,8 +40,4 @@
       </block>
     </view>
   </view>
-
-  <view class="tabbar-safe">
-    <view class="tabbar-home-indicator"></view>
-  </view>
 </view>

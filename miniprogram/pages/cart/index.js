@@ -1,32 +1,20 @@
 const { initMiniNav, backWithFallback } = require("../../utils/mini-nav")
-const { get, put } = require("../../utils/request")
+const { get, post, put, del } = require("../../utils/request")
 const paths = require("../../http/paths")
 
 const DEFAULT_DELIVERY_ADDRESS = "请选择收货地址"
+const DEFAULT_DELIVERY_TYPE = "EXPRESS"
 const PERMANENT_VALID_TEXT = "永久有效"
 const DEFAULT_TAG_COLOR = "#008435"
 const DEFAULT_TAG_BG_COLOR = "rgba(0, 201, 80, 0.1)"
-const DEFAULT_ADDRESS_LIST = [
-  {
-    id: "addr-1",
-    name: "李先生",
-    phone: "136 8888 9999",
-    address: "四川省成都市双流区XXX街道XXX小区136号多多驿站",
-    isDefault: false
-  },
-  {
-    id: "addr-2",
-    name: "李先生",
-    phone: "136 8888 9999",
-    address: "四川省成都市高新区XXX街道XXX小区8栋2单元501",
-    isDefault: true
-  }
-]
 
 function formatPrice(value) {
-  const numericValue = Number(value) || 0
-  const fixedValue = numericValue.toFixed(1)
-  return fixedValue.endsWith(".0") ? fixedValue.slice(0, -2) : fixedValue
+  const numericValue = Number(value)
+  if (!Number.isFinite(numericValue)) return "0"
+  const fixedValue = numericValue.toFixed(2)
+  return fixedValue
+    .replace(/\.00$/, "")
+    .replace(/(\.\d)0$/, "$1")
 }
 
 function formatMoney2(value) {
@@ -114,12 +102,12 @@ function mapCouponsForCart(list = []) {
     const amount = Number(raw.amount || 0)
     const hasCanUseFlag = raw.canUse !== undefined && raw.canUse !== null && raw.canUse !== ""
     const canUse = hasCanUseFlag ? toCanUse(raw.canUse) : status === "unused"
+    const couponId = raw.id != null
+      ? raw.id
+      : (raw.userCouponId != null ? raw.userCouponId : raw.couponId)
 
     return {
-      id:
-        raw.id != null
-          ? String(raw.id)
-          : (raw.couponId != null ? `coupon-${String(raw.couponId)}` : `coupon-${index}`),
+      id: couponId != null ? String(couponId) : `coupon-${index}`,
       amount,
       threshold: Number.isFinite(threshold) ? threshold : 0,
       expireDate: toExpireDateText(raw.expireTime),
@@ -127,22 +115,6 @@ function mapCouponsForCart(list = []) {
       status
     }
   })
-}
-
-function splitCouponsByAvailability(list = []) {
-  const availableCoupons = []
-  const unavailableCoupons = []
-
-  list.forEach((coupon) => {
-    const isAvailable = coupon.status === "unused" && coupon.canUse
-    if (isAvailable) {
-      availableCoupons.push(coupon)
-      return
-    }
-    unavailableCoupons.push(coupon)
-  })
-
-  return { availableCoupons, unavailableCoupons }
 }
 
 function unwrapResponseData(res) {
@@ -175,6 +147,85 @@ function normalizeCartItemList(payload) {
   return []
 }
 
+function normalizeAddressList(payload) {
+  if (Array.isArray(payload)) return payload
+  if (!payload || typeof payload !== "object") return []
+
+  const listKeys = ["records", "list", "items", "rows", "result"]
+  for (const key of listKeys) {
+    if (Array.isArray(payload[key])) return payload[key]
+  }
+
+  const resultPayload = payload.result
+  if (resultPayload && typeof resultPayload === "object") {
+    for (const key of listKeys) {
+      if (Array.isArray(resultPayload[key])) return resultPayload[key]
+    }
+  }
+
+  const pagePayload = payload.page
+  if (pagePayload && typeof pagePayload === "object") {
+    for (const key of listKeys) {
+      if (Array.isArray(pagePayload[key])) return pagePayload[key]
+    }
+  }
+
+  return []
+}
+
+function normalizeIsDefault(value) {
+  if (value === true || value === false) return value
+  if (typeof value === "number") return value === 1
+  if (typeof value === "string") {
+    const text = value.trim().toLowerCase()
+    return text === "1" || text === "true" || text === "yes" || text === "y"
+  }
+  return false
+}
+
+function buildAddressText(raw) {
+  const fullAddress = String(raw.fullAddress || raw.address || "").trim()
+  if (fullAddress) return fullAddress
+
+  const detailAddress = String(raw.detailAddress || "").trim()
+  const provinceName = String(raw.provinceName || "").trim()
+  const cityName = String(raw.cityName || "").trim()
+  const districtName = String(raw.districtName || "").trim()
+  return `${provinceName}${cityName}${districtName}${detailAddress}`
+}
+
+function mapAddressItem(item, index) {
+  const raw = item && typeof item === "object" ? item : {}
+  const id = raw.id != null && raw.id !== "" ? String(raw.id) : `addr-${index}`
+  const receiverName = String(raw.receiverName || raw.name || "").trim() || "收货人"
+  const receiverPhonePlain = String(raw.receiverMobile || raw.phone || "").trim()
+  const receiverPhoneMasked = String(raw.receiverMobileMasked || "").trim()
+  const receiverPhone = receiverPhoneMasked || receiverPhonePlain
+  const addressText = buildAddressText(raw)
+
+  return {
+    id,
+    name: receiverName,
+    phone: receiverPhone,
+    phoneRaw: receiverPhonePlain || receiverPhone,
+    address: addressText,
+    isDefault: normalizeIsDefault(raw.isDefault)
+  }
+}
+
+function pickAddress(addressList = [], preferredId = "") {
+  const safeList = Array.isArray(addressList) ? addressList : []
+  if (!safeList.length) return null
+
+  const targetId = preferredId != null && preferredId !== "" ? String(preferredId) : ""
+  if (targetId) {
+    const matched = safeList.find((item) => String(item.id) === targetId)
+    if (matched) return matched
+  }
+
+  return safeList.find((item) => item.isDefault) || safeList[0]
+}
+
 function toBoolYes(value) {
   const text = String(value || "").trim().toUpperCase()
   return text === "Y" || text === "YES" || text === "TRUE" || text === "1"
@@ -186,6 +237,158 @@ function toRequestItemId(value) {
     return numeric
   }
   return String(value)
+}
+
+function toOptionalLong(value) {
+  if (value == null || value === "") return null
+  const text = String(value).trim()
+  if (!text) return null
+  if (!/^\d+$/.test(text)) return null
+  return toRequestItemId(text)
+}
+
+function buildCouponAvailablePayload(items = []) {
+  const safeItems = Array.isArray(items) ? items : []
+  const cartItemIds = []
+  const itemList = []
+
+  safeItems.forEach((item) => {
+    const raw = item && typeof item === "object" ? item : {}
+    const itemId = raw.itemId != null && raw.itemId !== "" ? raw.itemId : raw.id
+    if (itemId != null && itemId !== "") {
+      cartItemIds.push(toRequestItemId(itemId))
+    }
+
+    const skuId = raw.skuId
+    if (skuId == null || skuId === "") return
+
+    const spuId = raw.spuId != null && raw.spuId !== "" ? raw.spuId : skuId
+    const qty = Math.max(1, Number(raw.count || 1))
+    itemList.push({
+      spuId: toRequestItemId(spuId),
+      skuId: toRequestItemId(skuId),
+      buyQty: Number.isFinite(qty) ? qty : 1
+    })
+  })
+
+  return {
+    cartItemIds,
+    itemList
+  }
+}
+
+function buildOrderCreatePayload({ selectedItems = [], selectedAddress = null, selectedCouponId = "" } = {}) {
+  const addressId = toOptionalLong(selectedAddress && selectedAddress.id)
+  if (addressId == null) {
+    return { error: "请选择收货地址" }
+  }
+
+  const cartItemIds = []
+  const itemList = []
+
+  selectedItems.forEach((item) => {
+    const raw = item && typeof item === "object" ? item : {}
+    const cartItemId = toOptionalLong(raw.itemId != null && raw.itemId !== "" ? raw.itemId : raw.id)
+    if (cartItemId != null) cartItemIds.push(cartItemId)
+
+    const skuId = toOptionalLong(raw.skuId)
+    if (skuId == null) return
+    const spuId = toOptionalLong(raw.spuId)
+    const qty = Math.max(1, Number(raw.count || 1))
+    itemList.push({
+      spuId: spuId != null ? spuId : skuId,
+      skuId,
+      buyQty: Number.isFinite(qty) ? qty : 1
+    })
+  })
+
+  if (!itemList.length) {
+    return { error: "商品信息不完整，无法结算" }
+  }
+
+  const receiverName = String((selectedAddress && selectedAddress.name) || "").trim()
+  const receiverMobile = String((selectedAddress && (selectedAddress.phoneRaw || selectedAddress.phone)) || "").trim()
+  const addressText = String((selectedAddress && selectedAddress.address) || "").trim()
+  const addressSnapshot = JSON.stringify({
+    receiverName,
+    receiverMobile,
+    address: addressText
+  })
+
+  const payload = {
+    addressId,
+    receiverName,
+    receiverMobile,
+    addressSnapshot,
+    deliveryType: DEFAULT_DELIVERY_TYPE,
+    remark: "",
+    itemList
+  }
+
+  if (cartItemIds.length) payload.cartItemIds = cartItemIds
+
+  const userCouponId = toOptionalLong(selectedCouponId)
+  if (userCouponId != null) payload.userCouponId = userCouponId
+
+  return { payload }
+}
+
+function pickBizObject(data) {
+  if (!data || typeof data !== "object") return {}
+  if (data.result && typeof data.result === "object") return data.result
+  if (data.data && typeof data.data === "object") return data.data
+  return data
+}
+
+function extractOrderId(data) {
+  const payload = pickBizObject(data)
+  const candidates = [
+    payload.orderId,
+    payload.id,
+    payload.indentId
+  ]
+  for (const candidate of candidates) {
+    if (candidate != null && candidate !== "") return String(candidate)
+  }
+  return ""
+}
+
+function toWechatPayArgs(data) {
+  const payload = pickBizObject(data)
+  const timeStamp = payload.timeStamp != null ? String(payload.timeStamp) : ""
+  const nonceStr = payload.nonceStr != null ? String(payload.nonceStr) : ""
+  const packageValue = payload.packageValue != null
+    ? String(payload.packageValue)
+    : (payload.package != null ? String(payload.package) : "")
+  const signType = payload.signType != null ? String(payload.signType) : "RSA"
+  const paySign = payload.paySign != null ? String(payload.paySign) : ""
+
+  if (!timeStamp || !nonceStr || !packageValue || !paySign) return null
+
+  return {
+    timeStamp,
+    nonceStr,
+    package: packageValue,
+    signType,
+    paySign
+  }
+}
+
+function requestWechatPayment(payArgs) {
+  return new Promise((resolve, reject) => {
+    wx.requestPayment({
+      ...payArgs,
+      success: () => resolve(),
+      fail: (err) => {
+        const error = err || new Error("微信支付失败")
+        const message = String((err && err.errMsg) || "")
+        if (message.toLowerCase().includes("cancel")) {
+          error.__userCanceled = true
+        }
+        reject(error)
+      }
+    })
+  })
 }
 
 function toTagColor(value) {
@@ -308,10 +511,8 @@ Page({
     navTitle: "购物车",
     deliveryAddress: DEFAULT_DELIVERY_ADDRESS,
     availableCoupons: [],
-    unavailableCoupons: [],
     selectedCouponId: "",
     draftCouponId: "",
-    couponTab: "available",
     couponDiscountText: "0",
     couponPickedCount: 0,
     couponPickedAmountFixed: "0.00",
@@ -334,12 +535,14 @@ Page({
     selectedAddressId: "",
     draftAddressId: "",
     editAddressId: "",
+    newAddress: { name: "", phone: "", address: "", gender: "male" },
   },
 
   onLoad() {
     initMiniNav(this)
     this._skipNextOnShowRefresh = true
     this._loadCartData()
+    this._loadAddressList()
     this._pageReady = true
   },
 
@@ -350,6 +553,7 @@ Page({
       return
     }
     this._loadCartData()
+    this._loadAddressList()
   },
 
   _loadCartData() {
@@ -360,18 +564,12 @@ Page({
         const payload = normalizeCartPayload(unwrapResponseData(res))
         const itemList = normalizeCartItemList(payload)
         const mappedItems = mapCartItems(itemList)
-        const defaultAddr = DEFAULT_ADDRESS_LIST.find((a) => a.isDefault) || DEFAULT_ADDRESS_LIST[0]
-        const hasAddress = !!(defaultAddr && defaultAddr.address)
 
         this.setData(
           {
-            deliveryAddress: hasAddress ? `送至：${defaultAddr.address}` : DEFAULT_DELIVERY_ADDRESS,
             items: mappedItems,
             availableCoupons: [],
-            unavailableCoupons: [],
-            selectedCouponId: "",
-            addressList: DEFAULT_ADDRESS_LIST,
-            selectedAddressId: defaultAddr ? defaultAddr.id : ""
+            selectedCouponId: ""
           },
           () => this.syncSummary()
         )
@@ -382,7 +580,6 @@ Page({
           {
             items: [],
             availableCoupons: [],
-            unavailableCoupons: [],
             selectedCouponId: ""
           },
           () => this.syncSummary()
@@ -402,17 +599,18 @@ Page({
       wx.showLoading({ title: "加载中", mask: true })
     }
 
-    this._couponRequestPromise = get(paths.marketing.myCoupons)
+    const couponPayload = buildCouponAvailablePayload(this.data.items)
+
+    this._couponRequestPromise = post(paths.marketing.orderAvailableCoupons, couponPayload)
       .then((res) => {
         const list = normalizeCouponList((res && res.data) || [])
         const mapped = mapCouponsForCart(list)
-        const { availableCoupons, unavailableCoupons } = splitCouponsByAvailability(mapped)
+        const availableCoupons = mapped.filter((coupon) => coupon.status === "unused" && coupon.canUse)
         const selectedCouponExists = availableCoupons.some((coupon) => coupon.id === this.data.selectedCouponId)
 
         this.setData(
           {
             availableCoupons,
-            unavailableCoupons,
             selectedCouponId: selectedCouponExists ? this.data.selectedCouponId : "",
             draftCouponId: selectedCouponExists ? this.data.selectedCouponId : ""
           },
@@ -430,6 +628,44 @@ Page({
     return this._couponRequestPromise
   },
 
+  _loadAddressList({ showLoading = false, preferredId = "" } = {}) {
+    if (this._addressRequestPromise) return this._addressRequestPromise
+
+    if (showLoading) {
+      wx.showLoading({ title: "加载中", mask: true })
+    }
+
+    this._addressRequestPromise = get(paths.address.list)
+      .then((res) => {
+        const payload = unwrapResponseData(res)
+        const sourceList = normalizeAddressList(payload)
+        const addressList = sourceList.map((item, index) => mapAddressItem(item, index))
+        const preferredAddressId = preferredId != null && preferredId !== ""
+          ? String(preferredId)
+          : (this.data.showAddressPicker
+            ? (this.data.draftAddressId || this.data.selectedAddressId)
+            : this.data.selectedAddressId)
+        const selectedAddress = pickAddress(addressList, preferredAddressId)
+        const hasAddress = !!(selectedAddress && selectedAddress.address)
+
+        this.setData({
+          addressList,
+          selectedAddressId: selectedAddress ? selectedAddress.id : "",
+          draftAddressId: this.data.showAddressPicker ? (selectedAddress ? selectedAddress.id : "") : this.data.draftAddressId,
+          deliveryAddress: hasAddress ? `送至：${selectedAddress.address}` : DEFAULT_DELIVERY_ADDRESS
+        })
+      })
+      .catch((err) => {
+        console.warn("[cart] 加载收货地址失败:", err)
+      })
+      .finally(() => {
+        if (showLoading) wx.hideLoading()
+        this._addressRequestPromise = null
+      })
+
+    return this._addressRequestPromise
+  },
+
   handleBack() {
     backWithFallback("/pages/mall/index")
   },
@@ -440,6 +676,8 @@ Page({
       showCouponPicker: false,
       showAmountDetail: false,
       draftAddressId: this.data.selectedAddressId
+    }, () => {
+      this._loadAddressList({ showLoading: true })
     })
   },
 
@@ -450,15 +688,43 @@ Page({
   stopAddressPickerTap() {},
 
   selectAddress(e) {
-    const { id } = e.currentTarget.dataset
-    this.setData({ draftAddressId: id })
+    const { id, setDefault } = e.currentTarget.dataset
+    if (id == null || id === "") return
+    const targetId = String(id)
+    this.setData({ draftAddressId: targetId })
+
+    const shouldSetDefault = String(setDefault || "") === "1"
+    if (!shouldSetDefault) return
+    if (this._settingDefaultAddressId) return
+
+    this._settingDefaultAddressId = targetId
+    wx.showLoading({ title: "设置中", mask: true })
+    put(paths.address.setDefault(targetId))
+      .then(() => {
+        wx.showToast({ title: "已设为默认地址", icon: "success" })
+        return this._loadAddressList({ preferredId: targetId })
+      })
+      .then(() => {
+        this.setData({
+          selectedAddressId: targetId,
+          draftAddressId: targetId
+        })
+      })
+      .catch((err) => {
+        console.warn("[cart] 设置默认收货地址失败:", err)
+      })
+      .finally(() => {
+        wx.hideLoading()
+        this._settingDefaultAddressId = ""
+      })
   },
 
   confirmAddressPicker() {
     const { draftAddressId, addressList } = this.data
-    const addr = addressList.find(a => a.id === draftAddressId)
+    const selectedId = draftAddressId != null && draftAddressId !== "" ? String(draftAddressId) : ""
+    const addr = addressList.find((a) => String(a.id) === selectedId)
     this.setData({
-      selectedAddressId: draftAddressId,
+      selectedAddressId: selectedId,
       deliveryAddress: addr ? `送至：${addr.address}` : this.data.deliveryAddress,
       showAddressPicker: false,
       showAddressForm: false
@@ -471,7 +737,8 @@ Page({
 
   deleteAddress(e) {
     const { id } = e.currentTarget.dataset
-    const nextList = this.data.addressList.filter(a => a.id !== id)
+    const targetId = id != null && id !== "" ? String(id) : ""
+    const nextList = this.data.addressList.filter((a) => String(a.id) !== targetId)
     this.setData({ addressList: nextList })
   },
 
@@ -485,12 +752,13 @@ Page({
 
   openEditAddressForm(e) {
     const { id } = e.currentTarget.dataset
-    const addr = this.data.addressList.find(a => a.id === id)
+    const editId = id != null && id !== "" ? String(id) : ""
+    const addr = this.data.addressList.find((a) => String(a.id) === editId)
     if (!addr) return
     this.setData({
       showAddressPicker: false,
       showAddressForm: true,
-      editAddressId: id,
+      editAddressId: editId,
       newAddress: {
         name: addr.name,
         phone: addr.phone,
@@ -516,34 +784,52 @@ Page({
   },
 
   saveNewAddress() {
-    const { name, phone, address } = this.data.newAddress
+    const name = String((this.data.newAddress && this.data.newAddress.name) || "").trim()
+    const phone = String((this.data.newAddress && this.data.newAddress.phone) || "").trim()
+    const address = String((this.data.newAddress && this.data.newAddress.address) || "").trim()
     if (!name || !phone || !address) {
       wx.showToast({ title: "请填写完整信息", icon: "none" })
       return
     }
+
     const { editAddressId, addressList } = this.data
     if (editAddressId) {
       // 编辑模式：更新已有地址
-      const nextList = addressList.map(a =>
-        a.id === editAddressId
+      const nextList = addressList.map((a) =>
+        String(a.id) === String(editAddressId)
           ? { ...a, name, phone, address, gender: this.data.newAddress.gender }
           : a
       )
       this.setData({ addressList: nextList, showAddressForm: false, editAddressId: "" })
     } else {
-      // 新增模式
-      const newItem = {
-        id: `addr-${Date.now()}`,
-        name,
-        phone,
-        address,
-        gender: this.data.newAddress.gender,
-        isDefault: false
-      }
-      this.setData({
-        addressList: [...addressList, newItem],
-        showAddressForm: false
+      if (this._savingAddress) return
+      this._savingAddress = true
+      wx.showLoading({ title: "保存中", mask: true })
+
+      post(paths.address.create, {
+        receiverName: name,
+        receiverMobile: phone,
+        detailAddress: address,
+        isDefault: "0"
       })
+        .then(() => {
+          return this._loadAddressList()
+        })
+        .then(() => {
+          this.setData({
+            showAddressForm: false,
+            editAddressId: "",
+            newAddress: { name: "", phone: "", address: "", gender: "male" }
+          })
+          wx.showToast({ title: "新增成功", icon: "success" })
+        })
+        .catch((err) => {
+          console.warn("[cart] 新增收货地址失败:", err)
+        })
+        .finally(() => {
+          wx.hideLoading()
+          this._savingAddress = false
+        })
     }
   },
 
@@ -633,7 +919,14 @@ Page({
     if (!id) return
     const current = this.data.items.find((item) => item.id === id)
     if (!current) return
-    const nextQty = Math.max(0, Number(current.count || 1) - 1)
+
+    const currentQty = Math.max(1, Number(current.count || 1))
+    if (currentQty === 1) {
+      this._deleteCartItem(id)
+      return
+    }
+
+    const nextQty = Math.max(1, currentQty - 1)
     this._updateCartItemQty(id, nextQty)
   },
 
@@ -683,13 +976,38 @@ Page({
       })
   },
 
+  _deleteCartItem(id) {
+    const target = this.data.items.find((item) => item.id === id)
+    if (!target) return
+
+    const itemId = target.itemId != null && target.itemId !== "" ? target.itemId : id
+    const lockKey = String(itemId)
+    if (!this._itemQtyLoadingMap) this._itemQtyLoadingMap = {}
+    if (this._itemQtyLoadingMap[lockKey]) return
+    this._itemQtyLoadingMap[lockKey] = true
+
+    del(paths.mall.cartItemDelete(itemId))
+      .then(() => {
+        const nextItems = this.data.items.filter((item) => item.id !== id)
+        this.setData(
+          {
+            items: nextItems
+          },
+          () => this.syncSummary()
+        )
+      })
+      .catch(() => {})
+      .finally(() => {
+        this._itemQtyLoadingMap[lockKey] = false
+      })
+  },
+
   openCouponPicker() {
     this._loadCouponData({ showLoading: true }).finally(() => {
       this.setData(
         {
           showCouponPicker: true,
           showAmountDetail: false,
-          couponTab: "available",
           draftCouponId: this.data.selectedCouponId
         },
         () => this.syncCouponPreview()
@@ -705,14 +1023,6 @@ Page({
   },
 
   stopCouponPickerTap() {},
-
-  switchCouponTab(e) {
-    const { tab } = e.currentTarget.dataset
-    if (tab !== "available" && tab !== "unavailable") return
-    this.setData({
-      couponTab: tab
-    })
-  },
 
   chooseCoupon(e) {
     const { id } = e.currentTarget.dataset
@@ -779,17 +1089,108 @@ Page({
   stopDetailSheetTap() {},
 
   checkout() {
-    if (!this.data.selectedItemCount) {
+    if (this._checkoutLoading) return
+
+    const selectedItems = this.data.items.filter((item) => item.selected)
+    if (!selectedItems.length) {
       wx.showToast({
         title: "请先勾选商品",
         icon: "none"
       })
       return
     }
-    wx.showToast({
-      title: "结算能力待接入",
-      icon: "none"
+
+    const selectedAddress = pickAddress(this.data.addressList, this.data.selectedAddressId)
+    if (!selectedAddress || !selectedAddress.id) {
+      wx.showToast({
+        title: "请选择收货地址",
+        icon: "none"
+      })
+      return
+    }
+
+    const buildResult = buildOrderCreatePayload({
+      selectedItems,
+      selectedAddress,
+      selectedCouponId: this.data.selectedCouponId
     })
+    if (buildResult.error) {
+      wx.showToast({ title: buildResult.error, icon: "none" })
+      return
+    }
+
+    this._checkoutLoading = true
+    wx.showLoading({ title: "提交中", mask: true })
+
+    let createdOrderId = ""
+    post(paths.order.indentCreate, buildResult.payload)
+      .then((res) => {
+        const orderId = extractOrderId(unwrapResponseData(res))
+        if (!orderId) {
+          throw new Error("创建订单成功但未返回订单号")
+        }
+        createdOrderId = orderId
+        const payOrderId = toOptionalLong(orderId)
+        if (payOrderId == null) {
+          throw new Error("订单号格式异常")
+        }
+        return post(paths.order.indentPayWechatCreate, {
+          orderId: payOrderId
+        })
+      })
+      .then((res) => {
+        const payArgs = toWechatPayArgs(unwrapResponseData(res))
+        if (!payArgs) {
+          throw new Error("微信支付参数不完整")
+        }
+        wx.hideLoading()
+        return requestWechatPayment(payArgs)
+      })
+      .then(() => {
+        wx.showToast({
+          title: "支付成功",
+          icon: "success"
+        })
+        this.setData({
+          selectedCouponId: "",
+          draftCouponId: ""
+        })
+        return this._loadCartData()
+          .then(() => this._loadCouponData())
+          .catch(() => {})
+      })
+      .catch((err) => {
+        if (err && err.__userCanceled) {
+          wx.showToast({ title: "已取消支付", icon: "none" })
+          if (!createdOrderId) return
+          return this._loadCartData()
+            .then(() => this._loadCouponData())
+            .catch(() => {})
+        }
+
+        console.warn(
+          "[cart] 结算失败:",
+          err,
+          createdOrderId ? `orderId=${createdOrderId}` : ""
+        )
+
+        const isHttpOrBizError = !!(err && (err.statusCode || err.code != null))
+        if (!isHttpOrBizError) {
+          wx.showToast({
+            title: "结算失败，请稍后重试",
+            icon: "none"
+          })
+        }
+
+        if (!createdOrderId) return
+        return this._loadCartData()
+          .then(() => this._loadCouponData())
+          .catch(() => {})
+      })
+      .finally(() => {
+        wx.hideLoading()
+        this._checkoutLoading = false
+      })
   },
 
   syncSummary() {
