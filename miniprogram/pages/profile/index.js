@@ -97,9 +97,31 @@ function cloneDeep(value) {
   return JSON.parse(JSON.stringify(value))
 }
 
+function toStatNumber(value, fallback = 0) {
+  if (value == null || value === "") return fallback
+  const num = Number(value)
+  return Number.isFinite(num) ? num : fallback
+}
+
+function buildProfileStats(stat) {
+  const safeStat = stat && typeof stat === "object" ? stat : {}
+  return [
+    { label: "收藏配方", value: toStatNumber(safeStat.favoriteRecipeCount, 0) },
+    { label: "历史订单", value: toStatNumber(safeStat.favoriteRecipeCount, toStatNumber(safeStat.orderCount, 0)) },
+    { label: "优惠券", value: toStatNumber(safeStat.couponCount, 0) },
+    { label: "推荐好友", value: toStatNumber(safeStat.referralCount, 0) }
+  ]
+}
+
 function fetchProfileData() {
-  // TODO: 后续替换为个人中心接口
-  return Promise.resolve(cloneDeep(MOCK_PROFILE_DATA))
+  const fallback = cloneDeep(MOCK_PROFILE_DATA)
+  return fetchUserInfo()
+    .then((res) => {
+      const profile = res && res.data && typeof res.data === "object" ? res.data : {}
+      fallback.stats = buildProfileStats(profile.stat)
+      return fallback
+    })
+    .catch(() => fallback)
 }
 
 function sortBySortField(list) {
@@ -287,8 +309,11 @@ Page({
   },
   onShow() {
     this.refreshProfileDataAndUI()
-    if (typeof this.getTabBar === "function" && this.getTabBar()) {
-      this.getTabBar().setData({ selected: 3 })
+    if (typeof this.getTabBar === "function") {
+      const tabBar = this.getTabBar()
+      if (tabBar) {
+        tabBar.setData({ selected: 3 })
+      }
     }
   },
   refreshProfileDataAndUI() {
@@ -303,11 +328,6 @@ Page({
     this._profileRefreshPromise = Promise.all([
       // 基础 UI 数据（统计、菜单等）每次返回“我的”页都重新刷新
       this.loadPageData().catch(() => {}),
-      fetchUserInfo()
-        .then(() => {
-          this.syncUserInfo({ fallbackToStorage: true })
-        })
-        .catch(() => {}),
       this.loadUpgradePageData({ force: true }).catch(() => {})
     ])
       .then(() => {

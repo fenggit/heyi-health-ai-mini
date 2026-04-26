@@ -36,11 +36,11 @@
     </view>
 
     <!-- 描述 -->
-    <text class="dp-desc">{{packInfo.description}}</text>
+    <text class="dp-desc">{{packInfo.sellingPoints}}</text>
 
     <!-- 价格区：未选择（qty===1且未展开）只显示价格+加购；已选择显示减-数字-加 -->
     <view class="dp-price-row">
-      <view wx:if="{{false}}" class="dp-price">
+      <view class="dp-price">
         <text class="dp-price__yen">￥</text>
         <text class="dp-price__num">{{packInfo.price}}</text>
         <text class="dp-price__unit">{{packInfo.priceUnit}}</text>
@@ -54,72 +54,32 @@
 
   <!-- 详情大卡片 -->
   <view class="dp-detail-card">
-
-    <!-- 食材包配比 -->
     <view class="dp-section">
-      <view class="dp-section__head">
-        <title-view text="食材包配比" />
-        <view wx:if="{{packInfo.kcal}}" class="dp-kcal">
-          <text class="dp-kcal__text">{{packInfo.kcal}}Kcal</text>
-        </view>
-      </view>
-      <view class="dp-tip">
-        <text class="dp-tip__text">{{packInfo.tipText}}</text>
-      </view>
-      <view class="dp-ingredients">
-        <block wx:for="{{packInfo.ingredients}}" wx:key="id">
-          <view class="dp-ing-row">
-            <text class="dp-ing-row__name">{{item.name}}</text>
-            <view class="dp-ing-row__line"></view>
-            <text class="dp-ing-row__amount">{{item.amount}}</text>
-          </view>
-        </block>
-      </view>
-    </view>
+      <title-view text="商品详情" />
 
-    <!-- 制作步骤 -->
-    <view class="dp-section">
-      <title-view text="制作步骤" />
-      <view class="dp-steps">
-        <block wx:for="{{packInfo.steps}}" wx:key="index">
-          <view class="dp-step">
-            <view class="dp-step__circle">
-              <text class="dp-step__num">{{index + 1}}</text>
+      <view wx:if="{{packInfo.detailBlocks.length > 0}}" class="dp-detail-blocks">
+        <block wx:for="{{packInfo.detailBlocks}}" wx:key="id" wx:for-item="blockItem">
+          <view class="dp-detail-block">
+            <text wx:if="{{blockItem.type === 'text'}}" class="dp-detail-text">{{blockItem.text}}</text>
+            <view wx:if="{{blockItem.type === 'gallery'}}" class="dp-detail-gallery">
+              <block wx:for="{{blockItem.images}}" wx:key="id" wx:for-item="imgItem">
+                <image class="dp-detail-gallery__img" src="{{imgItem.url}}" mode="widthFix" />
+                <text wx:if="{{imgItem.alt}}" class="dp-detail-gallery__alt">{{imgItem.alt}}</text>
+              </block>
             </view>
-            <text class="dp-step__text">{{item}}</text>
-            <view class="dp-step__vline" wx:if="{{index < packInfo.steps.length - 1}}"></view>
           </view>
         </block>
       </view>
-    </view>
 
-    <!-- 功效说明 -->
-    <view wx:if="{{packInfo.effects.length > 0}}" class="dp-section">
-      <title-view text="功效说明" />
-      <view class="dp-effects">
-        <block wx:for="{{packInfo.effects}}" wx:key="*this">
-          <view class="dp-effect-row">
-            <view class="dp-effect-row__check">
-              <view class="dp-effect-row__tick"></view>
-            </view>
-            <text class="dp-effect-row__text">{{item}}</text>
-          </view>
-        </block>
+      <view wx:else class="dp-detail-empty">
+        暂无详情内容
       </view>
     </view>
 
-    <!-- 视频教程 -->
-    <view class="dp-section dp-section--last" wx:if="{{packInfo.videoUrl}}">
-      <title-view text="视频教程" />
-      <view class="dp-video" bindtap="playVideo">
-        <image class="dp-video__cover" src="{{packInfo.videoCover || packInfo.image}}" mode="aspectFill" />
-        <view class="dp-video__mask"></view>
-        <view class="dp-video__play">
-          <view class="dp-video__play-icon"></view>
-        </view>
-      </view>
+    <view class="dp-section dp-section--last">
+      <title-view text="配送说明" />
+      <text class="dp-delivery-desc">{{packInfo.shippingRemark || '暂无配送说明'}}</text>
     </view>
-
   </view>
 
   <!-- 底部占位：98rpx内容高度 + 系统安全区 -->

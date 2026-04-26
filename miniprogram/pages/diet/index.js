@@ -82,8 +82,11 @@ Page({
     this.loadPageData()
   },
   onShow() {
-    if (typeof this.getTabBar === "function" && this.getTabBar()) {
-      this.getTabBar().setData({ selected: 2 })
+    if (typeof this.getTabBar === "function") {
+      const tabBar = this.getTabBar()
+      if (tabBar) {
+        tabBar.setData({ selected: 2 })
+      }
     }
   },
   syncLayout() {

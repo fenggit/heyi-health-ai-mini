@@ -42,6 +42,8 @@ const paths = {
     categoryList: '/mall/app/category/list',
     // 商城商品分页
     spuPage: '/mall/app/spu/page',
+    // 商城商品详情
+    spuDetail: (spuId) => `/mall/app/spu/${encodeURIComponent(spuId)}`,
     // 购物车信息
     cart: '/mall/app/cart',
     // 勾选/取消勾选购物车商品
@@ -74,6 +76,12 @@ const paths = {
     homeIndex: '/recipe/app/home/index',
     // 配方详情
     formulaDetail: (recipeId) => `/recipe/app/formula/${encodeURIComponent(recipeId)}/detail`
+  },
+  favorite: {
+    // 收藏
+    create: '/uc/app/favorite',
+    // 取消收藏
+    remove: (bizType, bizId) => `/uc/app/favorite?bizType=${encodeURIComponent(bizType)}&bizId=${encodeURIComponent(bizId)}`
   },
   assessment: {
     // 获取问卷详情

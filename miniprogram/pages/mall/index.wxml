@@ -72,7 +72,7 @@
 
     <view class="mall-grid">
       <block wx:for="{{products}}" wx:key="id">
-        <view class="card-panel mall-product" data-id="{{item.id}}">
+        <view class="card-panel mall-product" data-id="{{item.id}}" bindtap="openProduct">
           <view wx:if="{{item.badge}}" class="mall-product__badge mall-product__badge--{{item.badgeType ? item.badgeType : 'new'}}">
             {{item.badge}}
           </view>

@@ -8,35 +8,23 @@ const STATIC_DETAIL_DATA = {
 }
 
 const DEFAULT_PACK_DATA = {
-  id: "yang-wei-qi-xue",
-  recipeId: "",
+  id: "",
+  spuId: "",
   skuId: "",
-  name: "养胃气血汁",
-  description: "富含铁质和维生素C的配方，有助于补血养气，改善春季疲乏。",
-  tags: ["补气血", "养脾胃", "春季养生"],
-  price: "68",
-  priceUnit: "/包",
-  kcal: "0",
-  tipText: "所有食材已按比例配好，一包可制作2人份。",
+  name: "商品详情",
+  sellingPoints: "",
+  description: "",
+  shippingRemark: "",
+  tags: [],
+  price: "0",
+  marketPrice: "",
+  priceUnit: "",
   image: "",
-  videoUrl: "",
-  videoCover: "",
-  ingredients: [
-    { id: "ingredient-1", name: "红枣", amount: "5 颗" },
-    { id: "ingredient-2", name: "枸杞", amount: "10 g" },
-    { id: "ingredient-3", name: "胡萝卜", amount: "1 根" },
-    { id: "ingredient-4", name: "苹果", amount: "1 个" },
-    { id: "ingredient-5", name: "柠檬", amount: "半个" },
-    { id: "ingredient-6", name: "蜂蜜", amount: "适量" }
-  ],
-  steps: [
-    "将红枣去核，枸杞清洗干净备用",
-    "将所有食材放入破壁机中",
-    "加入适量温水，搅打2-3分钟",
-    "过滤后加入柠檬汁和蜂蜜调味",
-    "倒入杯中即可饮用"
-  ],
-  effects: []
+  detailContentData: {
+    version: 1,
+    blocks: []
+  },
+  detailBlocks: []
 }
 
 function cloneDeep(value) {
@@ -76,6 +64,17 @@ function formatNumberText(value, fallback = "0") {
   return trimDecimalZero(num.toFixed(2))
 }
 
+function parseJsonSafely(value) {
+  if (typeof value !== "string") return null
+  const text = value.trim()
+  if (!text) return null
+  try {
+    return JSON.parse(text)
+  } catch (e) {
+    return null
+  }
+}
+
 function normalizeList(data) {
   if (Array.isArray(data)) return data
   if (!data || typeof data !== "object") return []
@@ -85,6 +84,30 @@ function normalizeList(data) {
     if (Array.isArray(data[key])) return data[key]
   }
   return []
+}
+
+function toObject(value) {
+  if (value && typeof value === "object" && !Array.isArray(value)) return value
+  const parsed = parseJsonSafely(value)
+  if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) return parsed
+  return {}
+}
+
+function toArray(value) {
+  if (Array.isArray(value)) return value
+  if (value && typeof value === "object") return normalizeList(value)
+
+  const parsed = parseJsonSafely(value)
+  if (Array.isArray(parsed)) return parsed
+  if (parsed && typeof parsed === "object") return normalizeList(parsed)
+
+  const text = toDisplayText(value, "")
+  if (!text) return []
+  if (!text.includes(",") && !text.includes("，")) return [text]
+  return text
+    .split(/[，,]/)
+    .map((item) => item.trim())
+    .filter(Boolean)
 }
 
 function parseTagList(rawTags) {
@@ -115,110 +138,75 @@ function parseTagList(rawTags) {
     .filter(Boolean)
 }
 
-function sortByNumberField(sourceList = [], fieldName) {
-  const list = sourceList.slice()
-  list.sort((a, b) => {
-    const left = Number(a && a[fieldName])
-    const right = Number(b && b[fieldName])
-    if (Number.isFinite(left) && Number.isFinite(right)) return left - right
-    if (Number.isFinite(left)) return -1
-    if (Number.isFinite(right)) return 1
-    return 0
-  })
+function normalizeGalleryImages(rawImages) {
+  const list = toArray(rawImages)
   return list
-}
-
-function formatAmountText(amount, unit) {
-  const amountText = toDisplayText(formatNumberText(amount, ""), "")
-  const unitText = toDisplayText(unit, "")
-  if (amountText && unitText) return `${amountText} ${unitText}`
-  if (amountText) return amountText
-  if (unitText) return unitText
-  return "--"
-}
-
-function mapIngredients(rawIngredients) {
-  const list = sortByNumberField(normalizeList(rawIngredients), "sortNo")
-  const mapped = list
     .map((item, index) => {
+      if (typeof item === "string") {
+        const url = toDisplayText(item, "")
+        if (!url) return null
+        return {
+          id: `img-${index + 1}`,
+          url,
+          alt: ""
+        }
+      }
+
       const row = item && typeof item === "object" ? item : {}
-      const name = toDisplayText(row.ingredientName || row.name, "")
-      if (!name) return null
+      const url = toDisplayText(row.url || row.imageUrl || row.src || row.coverImage, "")
+      if (!url) return null
+
       return {
-        name,
-        amount: formatAmountText(row.amount, row.unit),
-        id: row.id != null && row.id !== "" ? String(row.id) : `ingredient-${index + 1}`
+        id: row.id != null && row.id !== "" ? String(row.id) : `img-${index + 1}`,
+        url,
+        alt: toDisplayText(row.alt || row.title || row.name || "", "")
       }
     })
     .filter(Boolean)
-  return mapped.length ? mapped : cloneDeep(DEFAULT_PACK_DATA.ingredients)
 }
 
-function mapSteps(rawSteps) {
-  const list = sortByNumberField(normalizeList(rawSteps), "stepNo")
-  const mapped = list
-    .map((item) => {
+function normalizeDetailBlockType(rawType, hasImages) {
+  const type = toDisplayText(rawType, "").toLowerCase()
+  if (type === "gallery") return "gallery"
+  if (type === "text") return "text"
+  return hasImages ? "gallery" : "text"
+}
+
+function normalizeDetailContentData(rawDetailContentData) {
+  const data = toObject(rawDetailContentData)
+  const rawBlocks = toArray(data.blocks || data.blockList || data.contentBlocks)
+
+  const blocks = rawBlocks
+    .map((item, index) => {
       const row = item && typeof item === "object" ? item : {}
-      return toDisplayText(row.stepDesc || row.desc || row.remark, "")
+      const text = toDisplayText(row.text || row.content || row.desc || "", "")
+      const images = normalizeGalleryImages(row.images || row.imageList || row.items || row.Items)
+      const type = normalizeDetailBlockType(row.type, images.length > 0)
+
+      if (type === "gallery") {
+        if (!images.length) return null
+        return {
+          id: row.id != null && row.id !== "" ? String(row.id) : `block-${index + 1}`,
+          type,
+          text: "",
+          images
+        }
+      }
+
+      if (!text) return null
+      return {
+        id: row.id != null && row.id !== "" ? String(row.id) : `block-${index + 1}`,
+        type: "text",
+        text,
+        images: []
+      }
     })
     .filter(Boolean)
 
-  return mapped.length ? mapped : cloneDeep(DEFAULT_PACK_DATA.steps)
-}
-
-function parseEffectItems(rawItems) {
-  if (Array.isArray(rawItems)) {
-    return rawItems
-      .map((item) => {
-        if (typeof item === "string") return item
-        if (!item || typeof item !== "object") return ""
-        return item.effectDesc || item.name || item.label || item.text || ""
-      })
-      .map((item) => String(item || "").trim())
-      .filter(Boolean)
+  return {
+    version: toNumberOr(data.version, 1),
+    blocks
   }
-
-  const text = String(rawItems || "").trim()
-  if (!text) return []
-
-  try {
-    const parsed = JSON.parse(text)
-    if (Array.isArray(parsed)) return parseEffectItems(parsed)
-  } catch (e) {
-    // ignore parse error
-  }
-
-  return []
-}
-
-function buildTipText(detail = {}) {
-  const prepMinutes = Number(detail.prepMinutes)
-  const difficultyLevel = Number(detail.difficultyLevel)
-  const defaultQuantity = Number(detail.defaultQuantity)
-  const unitName = toDisplayText(detail.unitName, "")
-  const tipParts = []
-
-  if (Number.isFinite(prepMinutes) && prepMinutes > 0) {
-    tipParts.push(`制作时长约${prepMinutes}分钟`)
-  }
-  if (Number.isFinite(difficultyLevel) && difficultyLevel > 0) {
-    tipParts.push(`制作难度${difficultyLevel}级`)
-  }
-  if (Number.isFinite(defaultQuantity) && defaultQuantity > 0) {
-    tipParts.push(`默认份量${defaultQuantity}${unitName}`)
-  }
-
-  if (tipParts.length) {
-    return `${tipParts.join("，")}。`
-  }
-  return DEFAULT_PACK_DATA.tipText
-}
-
-function resolveFormulaDetailPath(recipeId) {
-  if (paths && paths.recipe && typeof paths.recipe.formulaDetail === "function") {
-    return paths.recipe.formulaDetail(recipeId)
-  }
-  return `/recipe/app/formula/${encodeURIComponent(recipeId)}/detail`
 }
 
 function resolveCartTotalQty(payload) {
@@ -269,36 +257,82 @@ function toRequestItemId(value) {
   return String(value)
 }
 
-function mapRecipeDetail(detail = {}, recipeId = "") {
-  const source = detail && typeof detail === "object" ? detail : {}
-  const sku = source.sku && typeof source.sku === "object" ? source.sku : {}
-  const recipeIdRaw = source.recipeId != null ? source.recipeId : recipeId
-  const skuIdRaw = sku.skuId != null ? sku.skuId : source.skuId
-  const finalRecipeId = recipeIdRaw != null && recipeIdRaw !== "" ? String(recipeIdRaw) : ""
-  const finalSkuId = skuIdRaw != null && skuIdRaw !== "" ? String(skuIdRaw) : ""
-  const tags = parseTagList(source.customTags || source.tagJson || source.tags || source.tagList)
-  const unitName = toDisplayText(source.unitName, "")
+function resolveSpuDetailPath(spuId) {
+  if (paths && paths.mall && typeof paths.mall.spuDetail === "function") {
+    return paths.mall.spuDetail(spuId)
+  }
+  return `/mall/app/spu/${encodeURIComponent(spuId)}`
+}
+
+function resolveSkuId(source = {}) {
+  const directCandidates = [
+    source.skuId,
+    source.defaultSkuId,
+    source.mainSkuId,
+    source.currentSkuId,
+    source.defaultSku && source.defaultSku.skuId
+  ]
+
+  for (const candidate of directCandidates) {
+    if (candidate !== null && candidate !== undefined && candidate !== "") {
+      return String(candidate)
+    }
+  }
+
+  const skuGroups = [source.skuList, source.skus, source.spuSkuList, source.skuItems]
+  for (const group of skuGroups) {
+    const list = toArray(group)
+    for (const sku of list) {
+      const row = sku && typeof sku === "object" ? sku : {}
+      if (row.skuId !== null && row.skuId !== undefined && row.skuId !== "") {
+        return String(row.skuId)
+      }
+      if (row.id !== null && row.id !== undefined && row.id !== "") {
+        return String(row.id)
+      }
+    }
+  }
+
+  return ""
+}
+
+function resolveCoverImage(source = {}) {
   const coverImage = toDisplayText(source.coverImage, "")
-  const coverUrl = toDisplayText(source.coverUrl, "")
-  const videoCoverUrl = toDisplayText(source.videoCoverUrl, "")
+  if (coverImage) return coverImage
+
+  const albumImages = normalizeGalleryImages(source.albumImages)
+  if (albumImages.length > 0) {
+    return albumImages[0].url
+  }
+
+  return ""
+}
+
+function mapSpuDetail(detail = {}, spuId = "") {
+  const source = detail && typeof detail === "object" ? detail : {}
+  const defaultSku = source.defaultSku && typeof source.defaultSku === "object" ? source.defaultSku : {}
+  const spuIdRaw = source.spuId != null && source.spuId !== "" ? source.spuId : spuId
+  const finalSpuId = toDisplayText(spuIdRaw, "")
+  const unitName = toDisplayText(defaultSku.unitName || source.unitName, "")
+  const salePrice = defaultSku.salePrice != null ? defaultSku.salePrice : source.salePrice
+  const sellingPoints = toDisplayText(source.sellingPoints, toDisplayText(source.description || source.detailContent, ""))
+  const detailContentData = normalizeDetailContentData(source.detailContentData)
 
   return {
-    id: finalRecipeId || DEFAULT_PACK_DATA.id,
-    recipeId: finalRecipeId,
-    skuId: finalSkuId,
-    name: toDisplayText(source.recipeName || source.name, DEFAULT_PACK_DATA.name),
-    description: toDisplayText(source.intro || source.description, DEFAULT_PACK_DATA.description),
-    tags: tags.length ? tags : cloneDeep(DEFAULT_PACK_DATA.tags),
-    price: formatNumberText(source.priceAmount, DEFAULT_PACK_DATA.price),
-    priceUnit: unitName ? `/${unitName}` : DEFAULT_PACK_DATA.priceUnit,
-    kcal: toDisplayText(source.calories, "0"),
-    tipText: buildTipText(source),
-    image: coverImage,
-    videoUrl: toDisplayText(source.videoUrl, ""),
-    videoCover: videoCoverUrl || coverImage || coverUrl,
-    ingredients: mapIngredients(source.ingredients),
-    steps: mapSteps(source.steps),
-    effects: parseEffectItems(source.effectItems)
+    id: finalSpuId,
+    spuId: finalSpuId,
+    skuId: resolveSkuId(source),
+    name: toDisplayText(source.spuName || source.name, DEFAULT_PACK_DATA.name),
+    sellingPoints,
+    description: sellingPoints,
+    shippingRemark: toDisplayText(source.shippingRemark, ""),
+    tags: parseTagList(source.tags || source.tagList || source.customTags || source.tagJson),
+    price: formatNumberText(salePrice, DEFAULT_PACK_DATA.price),
+    marketPrice: formatNumberText(source.marketPrice, ""),
+    priceUnit: unitName ? `/${unitName}` : "",
+    image: resolveCoverImage(source),
+    detailContentData,
+    detailBlocks: detailContentData.blocks
   }
 }
 
@@ -314,10 +348,10 @@ Page({
     menuRight: 12,
     safeAreaBottom: 0,
     // page
-    recipeId: "",
+    spuId: "",
     packInfo: cloneDeep(DEFAULT_PACK_DATA),
     qty: 1,
-    qtySelected: false, // false=未选择(只显示+按钮), true=已选择(显示减数字加)
+    qtySelected: false,
     isFavorited: false,
     cartCount: STATIC_DETAIL_DATA.cartCount
   },
@@ -327,9 +361,10 @@ Page({
     this._detailReqId = 0
     this._cartReqId = 0
     this.syncLayout()
-    const recipeId = toDisplayText(options.recipeId || options.id, "")
-    this.safeSetData({ recipeId })
-    this.loadPackInfo(recipeId)
+
+    const spuId = toDisplayText(options.spuId || options.supId || options.id || options.recipeId, "")
+    this.safeSetData({ spuId })
+    this.loadPackInfo(spuId)
     this.syncCartCount()
   },
 
@@ -346,28 +381,28 @@ Page({
     this.setData(nextData)
   },
 
-  loadPackInfo(recipeId) {
+  loadPackInfo(spuId) {
     const reqId = (this._detailReqId || 0) + 1
     this._detailReqId = reqId
-    if (!recipeId) {
+    if (!spuId) {
       this.safeSetData({ packInfo: cloneDeep(DEFAULT_PACK_DATA) })
       return
     }
 
     wx.showLoading({ title: "加载中", mask: true })
-    get(resolveFormulaDetailPath(recipeId))
+    get(resolveSpuDetailPath(spuId))
       .then((res) => {
         if (!this._isPageAlive || this._detailReqId !== reqId) return
         const payload = unwrapResponseData(res)
-        const packInfo = mapRecipeDetail(payload, recipeId)
+        const packInfo = mapSpuDetail(payload, spuId)
         this.safeSetData({ packInfo })
       })
       .catch((err) => {
         if (!this._isPageAlive || this._detailReqId !== reqId) return
-        console.warn("[food-detail] 拉取配方详情失败，使用默认数据:", err)
+        console.warn("[product-detail] 拉取商品详情失败，使用默认数据:", err)
         const fallback = cloneDeep(DEFAULT_PACK_DATA)
-        fallback.id = String(recipeId)
-        fallback.recipeId = String(recipeId)
+        fallback.id = String(spuId)
+        fallback.spuId = String(spuId)
         this.safeSetData({ packInfo: fallback })
       })
       .finally(() => {
@@ -391,7 +426,7 @@ Page({
         })
       })
       .catch((err) => {
-        console.warn("[food-detail] 获取购物车数量失败:", err)
+        console.warn("[product-detail] 获取购物车数量失败:", err)
       })
       .finally(() => {
         this._cartCountPromise = null
@@ -475,7 +510,6 @@ Page({
     })
   },
 
-  // 第一次点击加购：切换到数量控制模式
   onFirstAdd() {
     this.addCurrentSkuToCart(() => {
       const nextCount = toNumberOr(this.data.cartCount, 0) + 1
@@ -530,16 +564,16 @@ Page({
       })
   },
 
-  getCurrentRecipeId() {
-    const fromPackInfo = this.data.packInfo && (this.data.packInfo.recipeId || this.data.packInfo.id)
-    return toDisplayText(fromPackInfo, toDisplayText(this.data.recipeId, ""))
+  getCurrentSpuId() {
+    const fromPackInfo = this.data.packInfo && (this.data.packInfo.spuId || this.data.packInfo.id)
+    return toDisplayText(fromPackInfo, toDisplayText(this.data.spuId, ""))
   },
 
   onToggleFavorite() {
-    const recipeId = this.getCurrentRecipeId()
-    if (!recipeId) {
+    const spuId = this.getCurrentSpuId()
+    if (!spuId) {
       wx.showToast({
-        title: "配方信息缺失",
+        title: "商品信息缺失",
         icon: "none"
       })
       return
@@ -551,8 +585,8 @@ Page({
     this._isTogglingFavorite = true
 
     requestToggleFavorite({
-      bizType: "RECIPE",
-      bizId: recipeId,
+      bizType: "SPU",
+      bizId: spuId,
       isFavorited
     })
       .then(() => {
@@ -574,30 +608,5 @@ Page({
 
   onShare() {
     wx.showToast({ title: "分享功能开发中", icon: "none" })
-  },
-
-  playVideo() {
-    const videoUrl = toDisplayText(this.data.packInfo && this.data.packInfo.videoUrl, "")
-    if (!videoUrl) {
-      wx.showToast({ title: "暂无视频教程", icon: "none" })
-      return
-    }
-
-    if (typeof wx.previewMedia === "function") {
-      wx.previewMedia({
-        sources: [{ url: videoUrl, type: "video" }],
-        current: 0,
-        fail: () => {
-          wx.navigateTo({
-            url: `/pages/webview-page/index?title=${encodeURIComponent("视频教程")}&url=${encodeURIComponent(videoUrl)}`
-          })
-        }
-      })
-      return
-    }
-
-    wx.navigateTo({
-      url: `/pages/webview-page/index?title=${encodeURIComponent("视频教程")}&url=${encodeURIComponent(videoUrl)}`
-    })
   }
 })

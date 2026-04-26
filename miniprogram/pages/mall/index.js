@@ -3,6 +3,8 @@ const { get, post } = require("../../utils/request")
 const paths = require("../../http/paths")
 
 const DEFAULT_PAGE_SIZE = 10
+const GOODS_TYPE_SINGLE = "SPU" // 商品
+const GOODS_TYPE_RECIPE_PACK = "RECIPE" // 配方
 
 const STATIC_MALL_DATA = {
   mallTitle: "合一商城",
@@ -92,6 +94,13 @@ function buildPriceUnitText(weightValue, weightUnit, unitName) {
 function toBoolYes(value) {
   const text = String(value || "").trim().toUpperCase()
   return text === "Y" || text === "YES" || text === "TRUE" || text === "1"
+}
+
+function normalizeGoodsType(value) {
+  const text = String(value || "").trim().toUpperCase()
+  if (text === GOODS_TYPE_SINGLE) return GOODS_TYPE_SINGLE
+  if (text === GOODS_TYPE_RECIPE_PACK) return GOODS_TYPE_RECIPE_PACK
+  return GOODS_TYPE_RECIPE_PACK
 }
 
 function mergeProductList(prevList = [], nextList = []) {
@@ -189,11 +198,13 @@ function mapMallProduct(item, index) {
       ? ""
       : String(scoreValue)
   const priceUnitText = buildPriceUnitText(weightValue, weightUnit, unitName)
+  const goodsType = normalizeGoodsType(row.goodsType || sku.goodsType)
 
   return {
     id,
     spuId: id,
     skuId,
+    goodsType,
     name: row.spuName || row.spuTitle || row.name || "未命名商品",
     image: row.coverImage || sku.coverImage || "/assets/mall/product-apple.png",
     badge: toBoolYes(row.newFlag) ? "新品" : "",
@@ -312,8 +323,11 @@ Page({
   },
 
   onShow() {
-    if (typeof this.getTabBar === "function" && this.getTabBar()) {
-      this.getTabBar().setData({ selected: 1 })
+    if (typeof this.getTabBar === "function") {
+      const tabBar = this.getTabBar()
+      if (tabBar) {
+        tabBar.setData({ selected: 1 })
+      }
     }
     this.syncCurrentCity({ fromUserAction: false })
     this.syncCartCount()
@@ -735,7 +749,7 @@ Page({
   openProduct(e) {
     const { id } = e.currentTarget.dataset
     wx.navigateTo({
-      url: `/pages/food-detail/index?id=${id || ""}`
+      url: `/pages/product-detail/index?id=${id || ""}`
     })
   },
 

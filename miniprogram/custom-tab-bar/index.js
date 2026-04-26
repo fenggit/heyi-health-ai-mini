@@ -34,11 +34,16 @@ Component({
     switchTab(e) {
       const { path, index } = e.currentTarget.dataset
       const next = Number(index)
+
       this.tryFetchUserInfo(path)
       if (next === this.data.selected || this.switching) return
+
       this.switching = true
       wx.switchTab({
         url: path,
+        fail: (err) => {
+          console.warn("[tabbar] switchTab 失败:", err)
+        },
         complete: () => {
           setTimeout(() => {
             this.switching = false
