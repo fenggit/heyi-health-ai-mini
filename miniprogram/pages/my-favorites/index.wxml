@@ -28,5 +28,8 @@
         </view>
       </view>
     </block>
+
+    <view wx:if="{{list.length === 0 && !loading}}" class="favorite-empty">暂无收藏</view>
+    <view wx:if="{{list.length > 0 || loading}}" class="favorite-load-more">{{loadMoreText}}</view>
   </view>
 </view>

@@ -61,6 +61,11 @@ function toNumberOr(value, fallback = 0) {
   return Number.isFinite(num) ? num : fallback
 }
 
+function parseFavoriteFlag(value) {
+  const text = String(value || "").trim().toUpperCase()
+  return text === "Y" || text === "YES" || text === "TRUE" || text === "1"
+}
+
 function trimDecimalZero(text = "") {
   return String(text).replace(/(\.\d*?[1-9])0+$/, "$1").replace(/\.0+$/, "")
 }
@@ -281,6 +286,7 @@ function mapRecipeDetail(detail = {}, recipeId = "") {
   const coverImage = toDisplayText(source.coverImage, "")
   const coverUrl = toDisplayText(source.coverUrl, "")
   const videoCoverUrl = toDisplayText(source.videoCoverUrl, "")
+  const isFavorited = parseFavoriteFlag(source.favoriteFlag)
 
   return {
     id: finalRecipeId || DEFAULT_PACK_DATA.id,
@@ -298,7 +304,9 @@ function mapRecipeDetail(detail = {}, recipeId = "") {
     videoCover: videoCoverUrl || coverImage || coverUrl,
     ingredients: mapIngredients(source.ingredients),
     steps: mapSteps(source.steps),
-    effects: parseEffectItems(source.effectItems)
+    effects: parseEffectItems(source.effectItems),
+    favoriteFlag: isFavorited ? "Y" : "N",
+    isFavorited
   }
 }
 
@@ -350,7 +358,10 @@ Page({
     const reqId = (this._detailReqId || 0) + 1
     this._detailReqId = reqId
     if (!recipeId) {
-      this.safeSetData({ packInfo: cloneDeep(DEFAULT_PACK_DATA) })
+      this.safeSetData({
+        packInfo: cloneDeep(DEFAULT_PACK_DATA),
+        isFavorited: false
+      })
       return
     }
 
@@ -360,7 +371,10 @@ Page({
         if (!this._isPageAlive || this._detailReqId !== reqId) return
         const payload = unwrapResponseData(res)
         const packInfo = mapRecipeDetail(payload, recipeId)
-        this.safeSetData({ packInfo })
+        this.safeSetData({
+          packInfo,
+          isFavorited: !!packInfo.isFavorited
+        })
       })
       .catch((err) => {
         if (!this._isPageAlive || this._detailReqId !== reqId) return
@@ -368,7 +382,10 @@ Page({
         const fallback = cloneDeep(DEFAULT_PACK_DATA)
         fallback.id = String(recipeId)
         fallback.recipeId = String(recipeId)
-        this.safeSetData({ packInfo: fallback })
+        this.safeSetData({
+          packInfo: fallback,
+          isFavorited: false
+        })
       })
       .finally(() => {
         if (!this._isPageAlive || this._detailReqId !== reqId) return
@@ -556,7 +573,15 @@ Page({
       isFavorited
     })
       .then(() => {
-        this.safeSetData({ isFavorited: nextFavorited })
+        const packInfo = this.data.packInfo || {}
+        this.safeSetData({
+          isFavorited: nextFavorited,
+          packInfo: {
+            ...packInfo,
+            favoriteFlag: nextFavorited ? "Y" : "N",
+            isFavorited: nextFavorited
+          }
+        })
         wx.showToast({
           title: nextFavorited ? "收藏成功" : "已取消收藏",
           icon: "none"

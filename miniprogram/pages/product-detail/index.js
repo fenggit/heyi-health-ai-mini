@@ -49,6 +49,11 @@ function toNumberOr(value, fallback = 0) {
   return Number.isFinite(num) ? num : fallback
 }
 
+function parseFavoriteFlag(value) {
+  const text = String(value || "").trim().toUpperCase()
+  return text === "Y" || text === "YES" || text === "TRUE" || text === "1"
+}
+
 function trimDecimalZero(text = "") {
   return String(text).replace(/(\.\d*?[1-9])0+$/, "$1").replace(/\.0+$/, "")
 }
@@ -317,6 +322,7 @@ function mapSpuDetail(detail = {}, spuId = "") {
   const salePrice = defaultSku.salePrice != null ? defaultSku.salePrice : source.salePrice
   const sellingPoints = toDisplayText(source.sellingPoints, toDisplayText(source.description || source.detailContent, ""))
   const detailContentData = normalizeDetailContentData(source.detailContentData)
+  const isFavorited = parseFavoriteFlag(source.favoriteFlag)
 
   return {
     id: finalSpuId,
@@ -331,6 +337,8 @@ function mapSpuDetail(detail = {}, spuId = "") {
     marketPrice: formatNumberText(source.marketPrice, ""),
     priceUnit: unitName ? `/${unitName}` : "",
     image: resolveCoverImage(source),
+    favoriteFlag: isFavorited ? "Y" : "N",
+    isFavorited,
     detailContentData,
     detailBlocks: detailContentData.blocks
   }
@@ -385,7 +393,10 @@ Page({
     const reqId = (this._detailReqId || 0) + 1
     this._detailReqId = reqId
     if (!spuId) {
-      this.safeSetData({ packInfo: cloneDeep(DEFAULT_PACK_DATA) })
+      this.safeSetData({
+        packInfo: cloneDeep(DEFAULT_PACK_DATA),
+        isFavorited: false
+      })
       return
     }
 
@@ -395,7 +406,10 @@ Page({
         if (!this._isPageAlive || this._detailReqId !== reqId) return
         const payload = unwrapResponseData(res)
         const packInfo = mapSpuDetail(payload, spuId)
-        this.safeSetData({ packInfo })
+        this.safeSetData({
+          packInfo,
+          isFavorited: !!packInfo.isFavorited
+        })
       })
       .catch((err) => {
         if (!this._isPageAlive || this._detailReqId !== reqId) return
@@ -403,7 +417,10 @@ Page({
         const fallback = cloneDeep(DEFAULT_PACK_DATA)
         fallback.id = String(spuId)
         fallback.spuId = String(spuId)
-        this.safeSetData({ packInfo: fallback })
+        this.safeSetData({
+          packInfo: fallback,
+          isFavorited: false
+        })
       })
       .finally(() => {
         if (!this._isPageAlive || this._detailReqId !== reqId) return
@@ -590,7 +607,15 @@ Page({
       isFavorited
     })
       .then(() => {
-        this.safeSetData({ isFavorited: nextFavorited })
+        const packInfo = this.data.packInfo || {}
+        this.safeSetData({
+          isFavorited: nextFavorited,
+          packInfo: {
+            ...packInfo,
+            favoriteFlag: nextFavorited ? "Y" : "N",
+            isFavorited: nextFavorited
+          }
+        })
         wx.showToast({
           title: nextFavorited ? "收藏成功" : "已取消收藏",
           icon: "none"

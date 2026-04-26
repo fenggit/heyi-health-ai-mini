@@ -78,6 +78,8 @@ const paths = {
     formulaDetail: (recipeId) => `/recipe/app/formula/${encodeURIComponent(recipeId)}/detail`
   },
   favorite: {
+    // 收藏分页
+    page: '/uc/app/favorite/page',
     // 收藏
     create: '/uc/app/favorite',
     // 取消收藏
