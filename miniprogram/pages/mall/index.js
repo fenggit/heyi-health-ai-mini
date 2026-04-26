@@ -30,6 +30,12 @@ function unwrapResponseData(res) {
   return res
 }
 
+function toDisplayText(value, fallback = "") {
+  if (value === null || value === undefined) return fallback
+  const text = String(value).trim()
+  return text || fallback
+}
+
 function normalizeArrayLike(data) {
   if (Array.isArray(data)) return data
   if (!data || typeof data !== "object") return []
@@ -46,6 +52,27 @@ function normalizeArrayLike(data) {
   }
 
   return []
+}
+
+function normalizeActivityBannerList(payload) {
+  const list = normalizeArrayLike(payload)
+  return list
+    .map((item, index) => {
+      const row = item && typeof item === "object" ? item : {}
+      const image = toDisplayText(row.bannerImage, "")
+      if (!image) return null
+
+      const rawId =
+        row.id != null && row.id !== ""
+          ? row.id
+          : (row.activityId != null && row.activityId !== "" ? row.activityId : `activity-${index}`)
+
+      return {
+        id: String(rawId),
+        image
+      }
+    })
+    .filter(Boolean)
 }
 
 function toNumberOr(value, fallback = 0) {
@@ -372,6 +399,15 @@ Page({
     })
   },
 
+  fetchActivityBannerList() {
+    return get(paths.marketing.activityList, {
+      activityType: "GOODS"
+    }).then((res) => {
+      const payload = unwrapResponseData(res)
+      return normalizeActivityBannerList(payload)
+    })
+  },
+
   syncCartCount() {
     if (this._cartCountPromise) return this._cartCountPromise
 
@@ -402,20 +438,31 @@ Page({
       wx.showLoading({ title: "加载中", mask: true })
     }
 
-    this._mallDataPromise = this.fetchCategoryList()
-      .then((categories) => {
+    this._mallDataPromise = Promise.all([
+      this.fetchCategoryList(),
+      this.fetchActivityBannerList().catch((err) => {
+        console.warn("[mall] 拉取活动banner失败:", err)
+        return STATIC_MALL_DATA.activityBanners
+      })
+    ])
+      .then(([categories, activityBanners]) => {
         const preferredIndex = previousCategoryId
           ? categories.findIndex((item) => item.id === previousCategoryId)
           : 0
         const activeIndex = preferredIndex >= 0 ? preferredIndex : 0
         const activeCategory = categories[activeIndex] || null
         const cachedCity = formatCityName(this.data.city)
+        const nextBanners =
+          Array.isArray(activityBanners) && activityBanners.length
+            ? activityBanners
+            : STATIC_MALL_DATA.activityBanners
 
         this.setData({
           mallTitle: STATIC_MALL_DATA.mallTitle,
           city: cachedCity || STATIC_MALL_DATA.city,
           searchPlaceholder: STATIC_MALL_DATA.searchPlaceholder,
-          activityBanners: STATIC_MALL_DATA.activityBanners,
+          activityBanners: nextBanners,
+          bannerCurrent: 0,
           categories,
           activeCategory: activeCategory ? activeIndex : 0,
           activeCategoryKey: activeCategory ? activeCategory.key : "",
@@ -434,6 +481,8 @@ Page({
       .catch((err) => {
         console.warn("[mall] 拉取分类失败:", err)
         this.setData({
+          activityBanners: STATIC_MALL_DATA.activityBanners,
+          bannerCurrent: 0,
           categories: [],
           activeCategory: 0,
           activeCategoryKey: "",
