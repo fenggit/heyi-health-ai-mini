@@ -57,12 +57,22 @@
   width: 80rpx;
   height: 80rpx;
   border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: linear-gradient(140deg, #4effe2 0%, #cef94c 100%);
   color: #1e293b;
   font-size: 32rpx;
   line-height: 80rpx;
   text-align: center;
   font-weight: 700;
+}
+
+.setting-avatar-image {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .setting-profile-text {

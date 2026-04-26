@@ -8,7 +8,10 @@
   <view class="profile-content">
     <view class="profile-header">
       <view class="profile-user">
-        <view class="profile-avatar">合</view>
+        <view class="profile-avatar">
+          <image wx:if="{{user.avatarUrl}}" class="profile-avatar__image" src="{{user.avatarUrl}}" mode="aspectFill" />
+          <text wx:else>合</text>
+        </view>
         <view class="profile-user__meta">
           <view class="profile-name">{{user.nickname}}</view>
           <view class="profile-id">ID：{{user.userId}}</view>

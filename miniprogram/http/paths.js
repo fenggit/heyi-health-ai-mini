@@ -8,6 +8,10 @@ const paths = {
     miniPhoneLogin: '/auth/mini/phone/login',
     // 当前登录用户信息
     currentUserProfile: '/auth/user/profile/current',
+    // 修改昵称
+    updateNickname: '/uc/app/profile/nickname',
+    // 修改头像
+    updateAvatar: '/uc/app/profile/avatar',
     // 游客 session
     guestSession: '/auth/mini/guest/session'
   },

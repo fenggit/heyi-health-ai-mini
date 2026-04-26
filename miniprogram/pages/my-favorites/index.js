@@ -1,9 +1,10 @@
 const { initMiniNav, backWithFallback } = require('../../utils/mini-nav')
 const { get } = require('../../utils/request')
 const paths = require('../../http/paths')
+const { removeFavorite: requestRemoveFavorite } = require('../../utils/favorite')
 
-const INITIAL_PAGE_SIZE = 0
-const REQUEST_PAGE_NUM = 10
+const DEFAULT_PAGE_SIZE = 10
+const INITIAL_PAGE_NUM = 1
 
 function unwrapResponseData(res) {
   if (res && Object.prototype.hasOwnProperty.call(res, 'data') && res.data !== undefined && res.data !== null) {
@@ -74,14 +75,16 @@ function mapFavoriteItem(item, index) {
     raw.id != null && raw.id !== ''
       ? raw.id
       : (raw.favoriteId != null && raw.favoriteId !== '' ? raw.favoriteId : (raw.bizId != null ? raw.bizId : index))
-  const name = normalizeText(raw.name || raw.title || raw.spuName || raw.bizName, '收藏内容')
-  const tags = normalizeTags(raw.tags || raw.tagList || raw.labels)
-  const desc = normalizeText(raw.desc || raw.description || raw.summary || raw.subTitle || raw.spuDesc)
-  const image = normalizeText(raw.image || raw.coverImage || raw.spuImage || raw.thumbnail || raw.picUrl, '/assets/mall/product-carrot.png')
-  const time = formatDateTime(raw.createTime || raw.favoriteTime || raw.gmtCreate || raw.updateTime)
+  const name = normalizeText(raw.bizTitle || raw.name || raw.title || raw.spuName || raw.bizName, '收藏内容')
+  const tags = ['test']
+  const desc = normalizeText(raw.bizSummary || raw.desc || raw.description || raw.summary || raw.subTitle || raw.spuDesc)
+  const image = normalizeText(raw.bizCoverImage || raw.image || raw.coverImage || raw.spuImage || raw.thumbnail || raw.picUrl, '/assets/mall/product-carrot.png')
+  const time = formatDateTime(raw.favoriteTime || raw.createTime || raw.gmtCreate || raw.updateTime)
 
   return {
     id: String(rawId),
+    bizType: normalizeText(raw.bizType || raw.favoriteBizType || raw.biz_type),
+    bizId: normalizeText(raw.bizId || raw.targetBizId || raw.targetId || raw.biz_id),
     name,
     tags,
     desc,
@@ -112,7 +115,7 @@ function resolvePagePayload(payload) {
   const pages = toNumberOr(pageData && (pageData.pages || pageData.totalPage || pageData.pageCount), NaN)
   const total = toNumberOr(pageData && (pageData.total || pageData.totalCount || pageData.count), NaN)
   const current = toNumberOr(
-    pageData && (pageData.current || pageData.pageNo || pageData.pageIndex || pageData.pageSize || pageData.pageNum),
+    pageData && (pageData.current || pageData.pageNo || pageData.pageIndex || pageData.pageNum),
     NaN
   )
 
@@ -124,7 +127,7 @@ function resolvePagePayload(payload) {
   }
 }
 
-function computeHasMore({ pages, total, current, loadedCount, fetchedCount, requestSize }) {
+function computeHasMore({ pages, total, current, loadedCount, fetchedCount, requestPageSize }) {
   if (Number.isFinite(total) && total >= 0) {
     return loadedCount < total
   }
@@ -134,8 +137,8 @@ function computeHasMore({ pages, total, current, loadedCount, fetchedCount, requ
     return zeroBasedCurrent + 1 < pages
   }
 
-  if (requestSize > 0) {
-    return fetchedCount >= requestSize
+  if (requestPageSize > 0) {
+    return fetchedCount >= requestPageSize
   }
 
   return fetchedCount > 0
@@ -161,8 +164,8 @@ Page({
 
     navTitle: '我的收藏',
     list: [],
-    pageSize: INITIAL_PAGE_SIZE,
-    pageNum: REQUEST_PAGE_NUM,
+    pageSize: DEFAULT_PAGE_SIZE,
+    pageNum: 0,
     hasMore: true,
     loading: false,
     loadMoreText: '加载中...'
@@ -191,17 +194,17 @@ Page({
     if (this._favoritePagePromise) return this._favoritePagePromise
     if (!reset && !this.data.hasMore) return Promise.resolve()
 
-    const nextPageSize = reset ? INITIAL_PAGE_SIZE : this.data.pageSize + 1
-    const requestPageNum = this.data.pageNum || REQUEST_PAGE_NUM
-    const requestKey = `favorite-${nextPageSize}-${Date.now()}`
+    const requestPageSize = this.data.pageSize || DEFAULT_PAGE_SIZE
+    const nextPageNum = reset ? INITIAL_PAGE_NUM : this.data.pageNum + 1
+    const requestKey = `favorite-${nextPageNum}-${Date.now()}`
     this._latestFavoriteRequestKey = requestKey
 
     this.setData({ loading: true })
     this.refreshLoadMoreText()
 
     this._favoritePagePromise = get(paths.favorite.page, {
-      pageSize: nextPageSize,
-      pageNum: requestPageNum
+      pageSize: requestPageSize,
+      pageNum: nextPageNum
     })
       .then((res) => {
         if (this._latestFavoriteRequestKey !== requestKey) return
@@ -216,12 +219,12 @@ Page({
           current: pagePayload.current,
           fetchedCount: mappedList.length,
           loadedCount: mergedList.length,
-          requestSize: requestPageNum
+          requestPageSize
         })
 
         this.setData({
           list: mergedList,
-          pageSize: nextPageSize,
+          pageNum: nextPageNum,
           hasMore
         })
       })
@@ -231,7 +234,7 @@ Page({
         if (reset) {
           this.setData({
             list: [],
-            pageSize: INITIAL_PAGE_SIZE,
+            pageNum: 0,
             hasMore: false
           })
         }
@@ -257,9 +260,39 @@ Page({
   },
 
   cancelFavorite(e) {
-    const { id } = e.currentTarget.dataset
-    const nextList = this.data.list.filter((item) => item.id !== id)
-    this.setData({ list: nextList })
-    wx.showToast({ title: '已取消收藏', icon: 'none' })
+    const { id, bizType, bizId } = e.currentTarget.dataset
+    const finalBizType = normalizeText(bizType)
+    const finalBizId = normalizeText(bizId)
+    if (!finalBizType || !finalBizId) {
+      wx.showToast({ title: '收藏参数缺失', icon: 'none' })
+      return
+    }
+
+    const cancelKey = `${finalBizType}_${finalBizId}`
+    this._cancelingFavoriteMap = this._cancelingFavoriteMap || {}
+    if (this._cancelingFavoriteMap[cancelKey]) return
+    this._cancelingFavoriteMap[cancelKey] = true
+
+    requestRemoveFavorite({
+      bizType: finalBizType,
+      bizId: finalBizId
+    })
+      .then(() => {
+        const nextList = this.data.list.filter((item) => item.id !== id)
+        this.setData({ list: nextList }, () => {
+          this.refreshLoadMoreText()
+        })
+        wx.showToast({ title: '已取消收藏', icon: 'none' })
+      })
+      .catch((err) => {
+        console.warn('[my-favorites] 取消收藏失败:', err)
+        const isHttpOrBizError = !!(err && (err.statusCode || err.code != null))
+        if (!isHttpOrBizError) {
+          wx.showToast({ title: '取消失败，请稍后重试', icon: 'none' })
+        }
+      })
+      .finally(() => {
+        delete this._cancelingFavoriteMap[cancelKey]
+      })
   }
 })

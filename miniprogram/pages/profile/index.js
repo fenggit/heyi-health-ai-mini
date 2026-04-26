@@ -38,6 +38,7 @@ const MOCK_PROFILE_DATA = {
   pageTitle: "个人中心",
   user: {
     nickname: "西兰花护体专员",
+    avatarUrl: "",
     userId: "20260327",
     memberLevel: "普通会员",
     points: 1280
@@ -348,6 +349,9 @@ Page({
     return get(paths.member.pointsCenter).then((res) => {
       const d = (res && res.data) || {}
       const patch = {}
+      if (Object.prototype.hasOwnProperty.call(d, "avatarUrl")) {
+        patch["user.avatarUrl"] = d.avatarUrl || ""
+      }
       if (d.nickName) {
         patch["user.nickname"] = d.nickName
       }
@@ -391,6 +395,7 @@ Page({
 
     const memberInfo = userInfo.memberInfo || {}
     const patch = {
+      "user.avatarUrl": userInfo.avatarUrl || userInfo.avatar || userInfo.headImgUrl || userInfo.headImg || "",
       "user.userId": userInfo.userId || "",
       "user.memberLevel": memberInfo.currentLevelName || "普通会员",
       "user.points": memberInfo.totalPoints != null ? memberInfo.totalPoints : 0

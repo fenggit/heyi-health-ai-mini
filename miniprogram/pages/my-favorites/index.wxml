@@ -24,7 +24,13 @@
             <text class="favorite-time__label">收藏时间：</text>
             <text class="favorite-time__value">{{favorite.time}}</text>
           </view>
-          <view class="favorite-cancel" data-id="{{favorite.id}}" bindtap="cancelFavorite">取消收藏</view>
+          <view
+            class="favorite-cancel"
+            data-id="{{favorite.id}}"
+            data-biz-type="{{favorite.bizType}}"
+            data-biz-id="{{favorite.bizId}}"
+            bindtap="cancelFavorite"
+          >取消收藏</view>
         </view>
       </view>
     </block>
