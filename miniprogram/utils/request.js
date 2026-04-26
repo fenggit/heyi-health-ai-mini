@@ -120,6 +120,10 @@ function getResponseCode(body) {
   return Number.isNaN(code) ? null : code
 }
 
+function shouldForceSilentCouponAvailableToast(path = '') {
+  return String(path || '').includes('/order/app/marketing/coupon/available')
+}
+
 function request(options = {}) {
   const {
     url = '',
@@ -128,7 +132,10 @@ function request(options = {}) {
     header = {},
     timeout = DEFAULT_TIMEOUT,
     baseUrl = HOST,
-    withAuth = true
+    withAuth = true,
+    silentBizErrorToast = false,
+    silentHttpErrorToast = false,
+    silentNetworkErrorToast = false
   } = options
 
   const finalUrl = normalizeUrl(url, baseUrl)
@@ -139,6 +146,10 @@ function request(options = {}) {
   const upperMethod = String(method).toUpperCase()
   const finalHeader = buildHeaders(header, withAuth)
   const requestId = `${Date.now()}_${Math.random().toString(16).slice(2, 8)}`
+  const forceSilentToast = shouldForceSilentCouponAvailableToast(url)
+  const finalSilentBizErrorToast = silentBizErrorToast || forceSilentToast
+  const finalSilentHttpErrorToast = silentHttpErrorToast || forceSilentToast
+  const finalSilentNetworkErrorToast = silentNetworkErrorToast || forceSilentToast
 
   // 只打印非空 header 字段
   const printHeader = Object.keys(finalHeader).reduce((acc, k) => {
@@ -185,9 +196,11 @@ function request(options = {}) {
           if (bizCode !== null && bizCode !== 200) {
             const msg = getResponseMessage(body)
             console.warn(`[request:${requestId}] 业务错误 code=${bizCode} msg=${msg}`)
-            setTimeout(() => {
-              wx.showToast({ title: `${msg}(${bizCode})`, icon: 'none', duration: 3000 })
-            }, 300)
+            if (!finalSilentBizErrorToast) {
+              setTimeout(() => {
+                wx.showToast({ title: `${msg}(${bizCode})`, icon: 'none', duration: 3000 })
+              }, 300)
+            }
             reject(Object.assign(new Error(msg), { code: bizCode, data: body }))
             return
           }
@@ -200,17 +213,21 @@ function request(options = {}) {
           const msg = getResponseMessage(body, '登录已失效，请重新登录')
           handleUnauthorized(msg)
         } else {
-          setTimeout(() => {
-            wx.showToast({ title: `请求失败(${res.statusCode})`, icon: 'none', duration: 3000 })
-          }, 300)
+          if (!finalSilentHttpErrorToast) {
+            setTimeout(() => {
+              wx.showToast({ title: `请求失败(${res.statusCode})`, icon: 'none', duration: 3000 })
+            }, 300)
+          }
         }
         reject(createHttpError(res, finalUrl, upperMethod))
       },
       fail: (error) => {
         console.error(`[request:${requestId}] 网络错误`, JSON.stringify(error))
-        setTimeout(() => {
-          wx.showToast({ title: '网络异常，请稍后重试', icon: 'none', duration: 3000 })
-        }, 300)
+        if (!finalSilentNetworkErrorToast) {
+          setTimeout(() => {
+            wx.showToast({ title: '网络异常，请稍后重试', icon: 'none', duration: 3000 })
+          }, 300)
+        }
         reject(error)
       }
     })

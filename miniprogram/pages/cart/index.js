@@ -3,7 +3,7 @@ const { get, post, put, del } = require("../../utils/request")
 const paths = require("../../http/paths")
 
 const DEFAULT_DELIVERY_ADDRESS = "请选择收货地址"
-const DEFAULT_DELIVERY_TYPE = "EXPRESS"
+const DEFAULT_DELIVERY_TYPE = "HOME_DELIVERY"
 const PERMANENT_VALID_TEXT = "永久有效"
 const DEFAULT_TAG_COLOR = "#008435"
 const DEFAULT_TAG_BG_COLOR = "rgba(0, 201, 80, 0.1)"
@@ -601,7 +601,11 @@ Page({
 
     const couponPayload = buildCouponAvailablePayload(this.data.items)
 
-    this._couponRequestPromise = post(paths.marketing.orderAvailableCoupons, couponPayload)
+    this._couponRequestPromise = post(paths.marketing.orderAvailableCoupons, couponPayload, {
+      silentBizErrorToast: true,
+      silentHttpErrorToast: true,
+      silentNetworkErrorToast: true
+    })
       .then((res) => {
         const list = normalizeCouponList((res && res.data) || [])
         const mapped = mapCouponsForCart(list)
@@ -1123,6 +1127,15 @@ Page({
     wx.showLoading({ title: "提交中", mask: true })
 
     let createdOrderId = ""
+    const orderedItemKeySet = new Set(
+      selectedItems
+        .map((item) => {
+          const key = item && (item.id != null ? item.id : item.itemId)
+          if (key == null || key === "") return ""
+          return String(key)
+        })
+        .filter(Boolean)
+    )
     post(paths.order.indentCreate, buildResult.payload)
       .then((res) => {
         const orderId = extractOrderId(unwrapResponseData(res))
@@ -1130,6 +1143,27 @@ Page({
           throw new Error("创建订单成功但未返回订单号")
         }
         createdOrderId = orderId
+
+        if (orderedItemKeySet.size > 0) {
+          const nextItems = this.data.items.filter((item) => {
+            const key = item && (item.id != null ? item.id : item.itemId)
+            if (key == null || key === "") return true
+            return !orderedItemKeySet.has(String(key))
+          })
+          this.setData(
+            {
+              items: nextItems,
+              selectedCouponId: "",
+              draftCouponId: ""
+            },
+            () => this.syncSummary()
+          )
+        }
+
+        this._loadCartData()
+          .then(() => this._loadCouponData())
+          .catch(() => {})
+
         const payOrderId = toOptionalLong(orderId)
         if (payOrderId == null) {
           throw new Error("订单号格式异常")
