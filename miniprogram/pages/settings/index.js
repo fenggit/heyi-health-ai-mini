@@ -40,7 +40,14 @@ function clearAvatarOverride() {
 
 function pickNickname(userInfo, fallbackNickname) {
   const safeUserInfo = userInfo && typeof userInfo === 'object' ? userInfo : {}
-  const rawNickname = safeUserInfo.nickName || safeUserInfo.nickname || fallbackNickname || ''
+  const profile = safeUserInfo.profile && typeof safeUserInfo.profile === 'object' ? safeUserInfo.profile : {}
+  const rawNickname =
+    profile.nickName ||
+    profile.nickname ||
+    safeUserInfo.nickName ||
+    safeUserInfo.nickname ||
+    fallbackNickname ||
+    ''
   const currentUserId = safeUserInfo.userId ? String(safeUserInfo.userId) : ''
   const override = loadNicknameOverride()
   if (override && override.nickName) {
@@ -54,7 +61,10 @@ function pickNickname(userInfo, fallbackNickname) {
 
 function getAvatarUrlFromUserInfo(userInfo) {
   const safeUserInfo = userInfo && typeof userInfo === 'object' ? userInfo : {}
+  const profile = safeUserInfo.profile && typeof safeUserInfo.profile === 'object' ? safeUserInfo.profile : {}
   return (
+    profile.avatarUrl ||
+    profile.avatar ||
     safeUserInfo.avatarUrl ||
     safeUserInfo.avatar ||
     safeUserInfo.headImgUrl ||
@@ -228,10 +238,15 @@ Page({
     const app = getApp()
     const currentUser = (app && app.globalData && app.globalData.userInfo) || {}
     const userId = currentUser.userId != null ? String(currentUser.userId) : ''
+    const currentProfile = currentUser.profile && typeof currentUser.profile === 'object' ? currentUser.profile : {}
     const nextUser = Object.assign({}, currentUser, {
       avatarUrl,
       avatar: avatarUrl,
-      headImgUrl: avatarUrl
+      headImgUrl: avatarUrl,
+      profile: Object.assign({}, currentProfile, {
+        avatarUrl,
+        avatar: avatarUrl
+      })
     })
 
     setCachedUserInfo(nextUser)
@@ -263,7 +278,15 @@ Page({
         const app = getApp()
         const currentUser = (app && app.globalData && app.globalData.userInfo) || {}
         const userId = currentUser.userId != null ? String(currentUser.userId) : ''
-        const nextUser = Object.assign({}, currentUser, { nickName, nickname: nickName })
+        const currentProfile = currentUser.profile && typeof currentUser.profile === 'object' ? currentUser.profile : {}
+        const nextUser = Object.assign({}, currentUser, {
+          nickName,
+          nickname: nickName,
+          profile: Object.assign({}, currentProfile, {
+            nickName,
+            nickname: nickName
+          })
+        })
         setCachedUserInfo(nextUser)
         saveNicknameOverride(userId, nickName)
         this.setData({

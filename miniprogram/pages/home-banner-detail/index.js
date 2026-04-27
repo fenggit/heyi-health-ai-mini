@@ -19,6 +19,7 @@ const STATUS_MAP = {
 }
 
 const SIGNUP_STATUS = {
+  NOTSIGNED: "NOTSIGNED",
   UNPAID: "UNPAID",
   PAID: "PAID",
   CANCELLED: "CANCELLED",
@@ -49,8 +50,9 @@ function extractOrderId(data) {
   const payload = pickBizObject(data)
   const candidates = [
     payload.orderId,
-    payload.id,
-    payload.indentId
+    payload.indentId,
+    payload.order && payload.order.orderId,
+    payload.order && payload.order.id
   ]
   for (const candidate of candidates) {
     if (candidate != null && candidate !== "") return String(candidate)
@@ -115,6 +117,7 @@ function requestWechatPayment(payArgs) {
 function normalizeSignupStatus(value) {
   const status = toDisplayText(value, "").toUpperCase()
   if (
+    status === SIGNUP_STATUS.NOTSIGNED ||
     status === SIGNUP_STATUS.UNPAID ||
     status === SIGNUP_STATUS.PAID ||
     status === SIGNUP_STATUS.CANCELLED
@@ -232,7 +235,7 @@ function signupActivity(id) {
     })
 }
 
-function createWechatPayArgs(orderId) {
+function createWechatPayPayload(orderId) {
   const payOrderId = toOptionalLong(orderId)
   if (payOrderId == null) {
     throw new Error("订单号异常，无法支付")
@@ -241,11 +244,15 @@ function createWechatPayArgs(orderId) {
     orderId: payOrderId
   })
     .then((res) => {
-      const payArgs = toWechatPayArgs(unwrapResponseData(res))
-      if (!payArgs) {
-        throw new Error("微信支付参数不完整")
+      const payload = unwrapResponseData(res)
+      const result = pickBizObject(payload)
+      const signupStatus = normalizeSignupStatus(result.signupStatus)
+      const payArgs = toWechatPayArgs(result)
+
+      return {
+        signupStatus,
+        payArgs
       }
-      return payArgs
     })
 }
 
@@ -411,10 +418,6 @@ Page({
 
     const currentSignupStatus = normalizeSignupStatus(target.signupStatus)
     if (currentSignupStatus === SIGNUP_STATUS.PAID) {
-      wx.showToast({
-        title: "已报名",
-        icon: "none"
-      })
       return
     }
 
@@ -436,7 +439,7 @@ Page({
         switchLoading("报名中")
         const signupResult = await signupActivity(target.id)
         nextSignupStatus = signupResult.signupStatus
-        nextOrderId = signupResult.orderId || nextOrderId
+        nextOrderId = toDisplayText(signupResult.orderId, "")
         this.patchActivitySignupState(target.id, {
           signupStatus: nextSignupStatus,
           orderId: nextOrderId
@@ -445,10 +448,10 @@ Page({
       }
 
       if (nextSignupStatus === SIGNUP_STATUS.PAID) {
-        wx.showToast({
-          title: "已报名",
-          icon: "none"
-        })
+        return
+      }
+
+      if (nextSignupStatus !== SIGNUP_STATUS.UNPAID) {
         return
       }
 
@@ -457,12 +460,35 @@ Page({
       }
 
       switchLoading("拉起支付中")
-      const payArgs = await createWechatPayArgs(nextOrderId)
+      const payResult = await createWechatPayPayload(nextOrderId)
+      const statusFromPay = normalizeSignupStatus(payResult.signupStatus)
+
+      if (statusFromPay) {
+        nextSignupStatus = statusFromPay
+        this.patchActivitySignupState(target.id, {
+          signupStatus: nextSignupStatus,
+          orderId: nextOrderId
+        })
+        shouldReload = true
+      }
+
+      if (nextSignupStatus === SIGNUP_STATUS.PAID) {
+        return
+      }
+
+      if (nextSignupStatus !== SIGNUP_STATUS.UNPAID) {
+        return
+      }
+
+      if (!payResult.payArgs) {
+        throw new Error("微信支付参数不完整")
+      }
+
       if (loadingShown) {
         wx.hideLoading()
         loadingShown = false
       }
-      await requestWechatPayment(payArgs)
+      await requestWechatPayment(payResult.payArgs)
 
       this.patchActivitySignupState(target.id, {
         signupStatus: SIGNUP_STATUS.PAID,

@@ -108,7 +108,7 @@ function buildProfileStats(stat) {
   const safeStat = stat && typeof stat === "object" ? stat : {}
   return [
     { label: "收藏配方", value: toStatNumber(safeStat.favoriteRecipeCount, 0) },
-    { label: "历史订单", value: toStatNumber(safeStat.favoriteRecipeCount, toStatNumber(safeStat.orderCount, 0)) },
+    { label: "历史订单", value: toStatNumber(safeStat.historyOrderCount, 0) },
     { label: "优惠券", value: toStatNumber(safeStat.couponCount, 0) },
     { label: "推荐好友", value: toStatNumber(safeStat.referralCount, 0) }
   ]
@@ -348,12 +348,15 @@ Page({
   loadPointsCenterData() {
     return get(paths.member.pointsCenter).then((res) => {
       const d = (res && res.data) || {}
+      const profile = d.profile && typeof d.profile === "object" ? d.profile : {}
       const patch = {}
-      if (Object.prototype.hasOwnProperty.call(d, "avatarUrl")) {
-        patch["user.avatarUrl"] = d.avatarUrl || ""
+      const avatarUrl = d.avatarUrl || profile.avatarUrl || ""
+      if (avatarUrl) {
+        patch["user.avatarUrl"] = avatarUrl
       }
-      if (d.nickName) {
-        patch["user.nickname"] = d.nickName
+      const nickName = d.nickName || d.nickname || profile.nickName || profile.nickname || ""
+      if (nickName) {
+        patch["user.nickname"] = nickName
       }
       if (d.currentLevelName) {
         patch["user.memberLevel"] = d.currentLevelName
@@ -393,15 +396,23 @@ Page({
     }
     this._userInfo = userInfo
 
+    const profile = userInfo.profile && typeof userInfo.profile === "object" ? userInfo.profile : {}
     const memberInfo = userInfo.memberInfo || {}
     const patch = {
-      "user.avatarUrl": userInfo.avatarUrl || userInfo.avatar || userInfo.headImgUrl || userInfo.headImg || "",
+      "user.avatarUrl":
+        profile.avatarUrl ||
+        profile.avatar ||
+        userInfo.avatarUrl ||
+        userInfo.avatar ||
+        userInfo.headImgUrl ||
+        userInfo.headImg ||
+        "",
       "user.userId": userInfo.userId || "",
       "user.memberLevel": memberInfo.currentLevelName || "普通会员",
       "user.points": memberInfo.totalPoints != null ? memberInfo.totalPoints : 0
     }
 
-    const nickName = userInfo.nickName || userInfo.nickname || ""
+    const nickName = profile.nickName || profile.nickname || userInfo.nickName || userInfo.nickname || ""
     if (nickName) {
       patch["user.nickname"] = nickName
     }

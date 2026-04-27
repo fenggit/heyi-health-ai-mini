@@ -213,13 +213,67 @@ function clearUserInfoCache() {
   return setCachedUserInfo(null)
 }
 
+function normalizeCurrentUserProfile(rawUserInfo) {
+  const userInfo = rawUserInfo && typeof rawUserInfo === 'object' ? rawUserInfo : {}
+  const profile = userInfo.profile && typeof userInfo.profile === 'object' ? userInfo.profile : {}
+
+  const nickName =
+    profile.nickName ||
+    profile.nickname ||
+    userInfo.nickName ||
+    userInfo.nickname ||
+    ''
+
+  const avatarUrl =
+    profile.avatarUrl ||
+    profile.avatar ||
+    userInfo.avatarUrl ||
+    userInfo.avatar ||
+    userInfo.headImgUrl ||
+    userInfo.headimgurl ||
+    ''
+
+  const nextUserInfo = Object.assign({}, userInfo)
+
+  if (nickName) {
+    nextUserInfo.nickName = nickName
+    nextUserInfo.nickname = nickName
+  }
+
+  if (avatarUrl) {
+    nextUserInfo.avatarUrl = avatarUrl
+    if (!nextUserInfo.avatar) nextUserInfo.avatar = avatarUrl
+    if (!nextUserInfo.headImgUrl) nextUserInfo.headImgUrl = avatarUrl
+    if (!nextUserInfo.headimgurl) nextUserInfo.headimgurl = avatarUrl
+  }
+
+  if (Object.keys(profile).length || nickName || avatarUrl) {
+    nextUserInfo.profile = Object.assign({}, profile)
+    if (nickName && !nextUserInfo.profile.nickName) {
+      nextUserInfo.profile.nickName = nickName
+    }
+    if (nickName && !nextUserInfo.profile.nickname) {
+      nextUserInfo.profile.nickname = nickName
+    }
+    if (avatarUrl && !nextUserInfo.profile.avatarUrl) {
+      nextUserInfo.profile.avatarUrl = avatarUrl
+    }
+  }
+
+  return nextUserInfo
+}
+
 /**
  * 获取当前登录用户信息，并写入全局 userInfo
  * @returns {Promise<LoginUserInfoVo>}
  */
 function fetchUserInfo() {
   return request.get(paths.auth.currentUserProfile).then((res) => {
-    setCachedUserInfo((res && res.data) || null)
+    const normalizedUserInfo = normalizeCurrentUserProfile((res && res.data) || null)
+    setCachedUserInfo(normalizedUserInfo)
+    if (res && typeof res === 'object') {
+      res.data = normalizedUserInfo
+    }
     return res
   })
 }
