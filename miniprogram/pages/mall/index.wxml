@@ -42,7 +42,12 @@
       >
         <block wx:for="{{activityBanners}}" wx:key="id">
           <swiper-item>
-            <view class="mall-banner-slide">
+            <view
+              class="mall-banner-slide"
+              bindtap="onTapBanner"
+              data-id="{{item.id}}"
+              data-cover-image="{{item.coverImage || item.image}}"
+            >
               <image class="mall-banner-image" src="{{item.image}}" mode="aspectFill" />
             </view>
           </swiper-item>

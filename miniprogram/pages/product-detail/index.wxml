@@ -107,9 +107,9 @@
     </view>
 
     <!-- 分享 -->
-    <view class="dp-bar__item" bindtap="onShare">
+    <button class="dp-bar__item dp-bar__share-btn" open-type="share">
       <view class="dp-bar__share-icon"></view>
       <text class="dp-bar__label">分享</text>
-    </view>
+    </button>
   </view>
 </view>

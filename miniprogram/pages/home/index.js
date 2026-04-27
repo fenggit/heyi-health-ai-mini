@@ -401,7 +401,7 @@ Page({
     const { id } = e.currentTarget.dataset
     if (id === undefined || id === null || id === "") return
     wx.navigateTo({
-      url: `/pages/activity-detail/index?id=${encodeURIComponent(String(id))}`
+      url: `/pages/home-banner-detail/index?id=${encodeURIComponent(String(id))}`
     })
   },
   openShortcut(e) {

@@ -369,6 +369,11 @@ Page({
     this._detailReqId = 0
     this._cartReqId = 0
     this.syncLayout()
+    if (wx.showShareMenu) {
+      wx.showShareMenu({
+        menus: ["shareAppMessage", "shareTimeline"]
+      })
+    }
 
     const spuId = toDisplayText(options.spuId || options.supId || options.id || options.recipeId, "")
     this.safeSetData({ spuId })
@@ -631,7 +636,38 @@ Page({
     wx.navigateTo({ url: "/pages/cart/index" })
   },
 
-  onShare() {
-    wx.showToast({ title: "分享功能开发中", icon: "none" })
+  buildSharePayload() {
+    const spuId = this.getCurrentSpuId()
+    const encodedSpuId = spuId ? encodeURIComponent(String(spuId)) : ""
+    const path = encodedSpuId
+      ? `/pages/product-detail/index?spuId=${encodedSpuId}`
+      : "/pages/product-detail/index"
+    const name = toDisplayText(this.data.packInfo && this.data.packInfo.name, "商品详情")
+    const imageUrl = toDisplayText(this.data.packInfo && this.data.packInfo.image, "")
+
+    return {
+      title: `${name}｜合一商城`,
+      path,
+      imageUrl,
+      query: encodedSpuId ? `spuId=${encodedSpuId}` : ""
+    }
+  },
+
+  onShareAppMessage() {
+    const payload = this.buildSharePayload()
+    return {
+      title: payload.title,
+      path: payload.path,
+      imageUrl: payload.imageUrl
+    }
+  },
+
+  onShareTimeline() {
+    const payload = this.buildSharePayload()
+    return {
+      title: payload.title,
+      query: payload.query,
+      imageUrl: payload.imageUrl
+    }
   }
 })

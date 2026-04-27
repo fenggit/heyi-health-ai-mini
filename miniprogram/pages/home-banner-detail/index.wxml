@@ -77,7 +77,6 @@
           <view
             class="activity-btn activity-btn--{{activity.btnType}}"
             data-id="{{activity.id}}"
-            data-open="{{activity.open}}"
             bindtap="onActionTap"
           >
             <image class="activity-btn__bg" src="{{activity.btnBg}}" mode="scaleToFill" />

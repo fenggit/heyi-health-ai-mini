@@ -12,10 +12,10 @@ Component({
         text: "商城",
         path: "/pages/mall/index"
       },
-      {
-        text: "食养",
-        path: "/pages/diet/index"
-      },
+      // {
+      //   text: "食养",
+      //   path: "/pages/diet/index"
+      // },
       {
         text: "我的",
         path: "/pages/profile/index"

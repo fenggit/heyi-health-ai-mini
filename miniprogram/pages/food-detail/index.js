@@ -335,6 +335,11 @@ Page({
     this._detailReqId = 0
     this._cartReqId = 0
     this.syncLayout()
+    if (wx.showShareMenu) {
+      wx.showShareMenu({
+        menus: ["shareAppMessage", "shareTimeline"]
+      })
+    }
     const recipeId = toDisplayText(options.recipeId || options.id, "")
     this.safeSetData({ recipeId })
     this.loadPackInfo(recipeId)
@@ -597,8 +602,39 @@ Page({
     wx.navigateTo({ url: "/pages/cart/index" })
   },
 
-  onShare() {
-    wx.showToast({ title: "分享功能开发中", icon: "none" })
+  buildSharePayload() {
+    const recipeId = this.getCurrentRecipeId()
+    const encodedRecipeId = recipeId ? encodeURIComponent(String(recipeId)) : ""
+    const path = encodedRecipeId
+      ? `/pages/food-detail/index?recipeId=${encodedRecipeId}`
+      : "/pages/food-detail/index"
+    const name = toDisplayText(this.data.packInfo && this.data.packInfo.name, "食养详情")
+    const imageUrl = toDisplayText(this.data.packInfo && this.data.packInfo.image, "")
+
+    return {
+      title: `${name}｜合一食养`,
+      path,
+      imageUrl,
+      query: encodedRecipeId ? `recipeId=${encodedRecipeId}` : ""
+    }
+  },
+
+  onShareAppMessage() {
+    const payload = this.buildSharePayload()
+    return {
+      title: payload.title,
+      path: payload.path,
+      imageUrl: payload.imageUrl
+    }
+  },
+
+  onShareTimeline() {
+    const payload = this.buildSharePayload()
+    return {
+      title: payload.title,
+      query: payload.query,
+      imageUrl: payload.imageUrl
+    }
   },
 
   playVideo() {

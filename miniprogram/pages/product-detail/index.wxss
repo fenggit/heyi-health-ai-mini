@@ -481,6 +481,19 @@
   gap: 8rpx;
 }
 
+.dp-bar__share-btn {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  line-height: 1;
+}
+
+.dp-bar__share-btn::after {
+  border: none;
+}
+
 /* 购物车：使用项目已有图标 */
 .dp-bar__cart-wrap {
   position: relative;

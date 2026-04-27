@@ -5,6 +5,25 @@ const HOST = 'https://api.tyhctech.com'
 
 let authToken = ''
 let unauthorizedRedirecting = false
+let requestLoadingCount = 0
+
+function showRequestLoading(title = '加载中', mask = true) {
+  if (requestLoadingCount === 0) {
+    wx.showLoading({
+      title: String(title || '加载中'),
+      mask: !!mask
+    })
+  }
+  requestLoadingCount += 1
+}
+
+function hideRequestLoading() {
+  if (requestLoadingCount <= 0) return
+  requestLoadingCount -= 1
+  if (requestLoadingCount === 0) {
+    wx.hideLoading()
+  }
+}
 
 function initAuthToken() {
   const token = wx.getStorageSync(STORAGE_TOKEN_KEY) || ''
@@ -133,6 +152,9 @@ function request(options = {}) {
     timeout = DEFAULT_TIMEOUT,
     baseUrl = HOST,
     withAuth = true,
+    showLoading = false,
+    loadingTitle = '加载中',
+    loadingMask = true,
     silentBizErrorToast = false,
     silentHttpErrorToast = false,
     silentNetworkErrorToast = false
@@ -150,6 +172,11 @@ function request(options = {}) {
   const finalSilentBizErrorToast = silentBizErrorToast || forceSilentToast
   const finalSilentHttpErrorToast = silentHttpErrorToast || forceSilentToast
   const finalSilentNetworkErrorToast = silentNetworkErrorToast || forceSilentToast
+  const finalShowLoading = !!showLoading
+
+  if (finalShowLoading) {
+    showRequestLoading(loadingTitle, loadingMask)
+  }
 
   // 只打印非空 header 字段
   const printHeader = Object.keys(finalHeader).reduce((acc, k) => {
@@ -229,6 +256,11 @@ function request(options = {}) {
           }, 300)
         }
         reject(error)
+      },
+      complete: () => {
+        if (finalShowLoading) {
+          hideRequestLoading()
+        }
       }
     })
   })

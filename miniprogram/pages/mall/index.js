@@ -13,11 +13,13 @@ const STATIC_MALL_DATA = {
   activityBanners: [
     {
       id: "tea-experience",
-      image: "/assets/test/home-banner1.png"
+      image: "/assets/test/home-banner1.png",
+      coverImage: "/assets/test/home-banner1.png"
     },
     {
       id: "food-market",
-      image: "/assets/test/home-banner2.png"
+      image: "/assets/test/home-banner2.png",
+      coverImage: "/assets/test/home-banner2.png"
     }
   ],
   cartCount: 0
@@ -59,8 +61,8 @@ function normalizeActivityBannerList(payload) {
   return list
     .map((item, index) => {
       const row = item && typeof item === "object" ? item : {}
-      const image = toDisplayText(row.bannerImage, "")
-      if (!image) return null
+      const coverImage = toDisplayText(row.coverImage || row.bannerImage || row.imageUrl || row.image, "")
+      if (!coverImage) return null
 
       const rawId =
         row.id != null && row.id !== ""
@@ -69,7 +71,8 @@ function normalizeActivityBannerList(payload) {
 
       return {
         id: String(rawId),
-        image
+        image: coverImage,
+        coverImage
       }
     })
     .filter(Boolean)
@@ -697,6 +700,22 @@ Page({
   onBannerChange(e) {
     this.setData({
       bannerCurrent: e.detail.current
+    })
+  },
+
+  onTapBanner(e) {
+    const { coverImage, image } = e.currentTarget.dataset || {}
+    const finalCoverImage = toDisplayText(coverImage || image, "")
+    if (!finalCoverImage) {
+      wx.showToast({
+        title: "活动图加载中",
+        icon: "none"
+      })
+      return
+    }
+
+    wx.navigateTo({
+      url: `/pages/mall-banner-detail/index?coverImage=${encodeURIComponent(finalCoverImage)}`
     })
   },
 

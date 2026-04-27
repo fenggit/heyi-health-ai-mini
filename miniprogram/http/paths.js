@@ -39,7 +39,9 @@ const paths = {
     // 活动列表
     activityList: '/marketing/app/activity/list',
     // 活动详情
-    activityDetail: (id) => `/marketing/app/activity/${encodeURIComponent(id)}`
+    activityDetail: (id) => `/marketing/app/activity/${encodeURIComponent(id)}`,
+    // 活动报名
+    activitySignup: (id) => `/marketing/app/activity/${encodeURIComponent(id)}/signup`
   },
   mall: {
     // 商城分类列表

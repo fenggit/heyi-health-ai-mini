@@ -2,8 +2,9 @@
   "pages": [  
     "pages/login/index",
     "pages/home/index",
-    "pages/activity-detail/index",
+    "pages/home-banner-detail/index",
     "pages/mall/index",
+    "pages/mall-banner-detail/index",
     "pages/cart/index",
     "pages/diet/index",
     "pages/diet-plan/index",

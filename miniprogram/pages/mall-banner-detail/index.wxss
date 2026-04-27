@@ -1,0 +1,57 @@
+.mall-activity-page {
+  min-height: 100vh;
+  background: transparent;
+}
+
+.mall-activity-page-bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 750rpx;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.mall-activity-nav__title {
+  color: #1e293b;
+  font-size: 30rpx;
+  font-weight: 700;
+  line-height: 1;
+  margin-left: 20rpx;
+}
+
+.mall-activity-page .mini-nav__back {
+  width: auto;
+  display: flex;
+  align-items: center;
+}
+
+.mall-activity-content {
+  position: relative;
+  z-index: 1;
+  padding: 24rpx;
+}
+
+.mall-activity-card {
+  border-radius: 24rpx;
+  overflow: hidden;
+  padding: 20rpx;
+  min-height: 320rpx;
+}
+
+.mall-activity-cover {
+  width: 100%;
+  border-radius: 16rpx;
+  display: block;
+}
+
+.mall-activity-empty {
+  min-height: 280rpx;
+  border-radius: 16rpx;
+  background: rgba(148, 163, 184, 0.12);
+  color: #64748b;
+  font-size: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

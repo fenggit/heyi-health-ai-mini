@@ -1,5 +1,7 @@
 {
   "navigationStyle": "custom",
+  "enableShareAppMessage": true,
+  "enableShareTimeline": true,
   "usingComponents": {
     "title-view": "/components/title-view/index"
   }
