@@ -6,10 +6,6 @@
   <view class="page-top-gap" style="height: {{topInset}}px;"></view>
 
   <view class="page-wrap page-wrap--no-title">
-    <view class="glass-card help-search">
-      <text class="help-search__text">{{keywordPlaceholder}}</text>
-    </view>
-
     <view class="help-group-list">
       <block wx:for="{{groups}}" wx:key="key">
         <view

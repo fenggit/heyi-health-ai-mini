@@ -53,7 +53,6 @@ Page({
     menuRight: 12,
 
     navTitle: '帮助中心',
-    keywordPlaceholder: '关键词搜索',
     groups: FAQ_GROUPS,
     activeGroup: 'all',
     questions: FAQ_LIST,

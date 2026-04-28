@@ -266,18 +266,20 @@ Page({
       const profileSessionId = this.getProfileSessionIdForMessages()
       if (profileSessionId) {
         const sessionId = this.persistSessionId(profileSessionId)
-        await this.loadHistoryMessages(sessionId)
+        await this.loadHistoryMessages(sessionId, { closePageLoading: true })
         return
       }
 
       const sessionId = await this.ensureSessionId()
-      await this.loadHistoryMessages(sessionId)
+      await this.loadHistoryMessages(sessionId, { closePageLoading: true })
     } catch (error) {
       console.warn("[ai-chat] 初始化会话失败:", error)
     } finally {
-      this.setData({
-        pageLoading: false
-      })
+      if (this.data.pageLoading) {
+        this.setData({
+          pageLoading: false
+        })
+      }
     }
   },
   getProfileSessionIdForMessages() {
@@ -341,14 +343,20 @@ Page({
 
     return sessionId
   },
-  async loadHistoryMessages(sessionId) {
+  async loadHistoryMessages(sessionId, options = {}) {
+    const { closePageLoading = false } = options
     const finalSessionId =
       normalizeSessionId(sessionId) ||
       normalizeSessionId(this.data.sessionId) ||
       normalizeSessionId(this.getProfileSessionIdForMessages()) ||
       readCachedSessionId()
 
-    if (!finalSessionId) return
+    if (!finalSessionId) {
+      if (closePageLoading && this.data.pageLoading) {
+        this.setData({ pageLoading: false })
+      }
+      return
+    }
 
     try {
       const res = await getAssistantMessages(finalSessionId)
@@ -369,6 +377,10 @@ Page({
       )
     } catch (error) {
       console.warn("[ai-chat] 获取历史消息失败:", error)
+    } finally {
+      if (closePageLoading && this.data.pageLoading) {
+        this.setData({ pageLoading: false })
+      }
     }
   },
   scrollToLatest() {

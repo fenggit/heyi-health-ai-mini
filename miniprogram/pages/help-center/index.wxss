@@ -1,20 +1,7 @@
 @import "../profile-sub/common.wxss";
 
-.help-search {
-  margin-top: 4rpx;
-  height: 86rpx;
-  padding: 0 24rpx;
-  display: flex;
-  align-items: center;
-}
-
-.help-search__text {
-  color: #9aa8b8;
-  font-size: 24rpx;
-}
-
 .help-group-list {
-  margin-top: 14rpx;
+  margin-top: 4rpx;
   display: flex;
   flex-wrap: wrap;
   gap: 12rpx;
