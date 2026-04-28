@@ -69,6 +69,10 @@ const paths = {
     // 设置默认收货地址
     setDefault: (id) => `/uc/app/address/${encodeURIComponent(id)}/default`
   },
+  location: {
+    // 根据经纬度解析城市
+    city: '/uc/app/location/city'
+  },
   order: {
     // 创建订单
     indentCreate: '/order/app/indent/create',

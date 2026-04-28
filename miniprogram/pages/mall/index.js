@@ -276,28 +276,6 @@ function formatCityName(rawCity = "") {
   return `${city}市`
 }
 
-function pickCityByAddressText(text = "") {
-  const input = String(text || "")
-  if (!input) return ""
-  const matched = input.match(/([^省\s]+?(?:市|自治州|地区|盟))/)
-  return matched ? matched[1] : ""
-}
-
-function extractCityFromLocationResult(result = {}) {
-  const directCity =
-    result.city ||
-    result.locality ||
-    result.cityName ||
-    (result.addressComponent && result.addressComponent.city) ||
-    (result.ad_info && result.ad_info.city)
-
-  const normalizedDirectCity = formatCityName(directCity)
-  if (normalizedDirectCity) return normalizedDirectCity
-
-  const addressCity = pickCityByAddressText(result.address || result.formatted_address || "")
-  return formatCityName(addressCity)
-}
-
 function isLocationPermissionError(err) {
   const message = String((err && err.errMsg) || "").toLowerCase()
   if (!message) return false
@@ -643,7 +621,7 @@ Page({
         wx.openSetting({
           success: (settingRes) => {
             const authSetting = (settingRes && settingRes.authSetting) || {}
-            const hasLocationAuth = !!authSetting["scope.userLocation"]
+            const hasLocationAuth = !!authSetting["scope.userFuzzyLocation"] || !!authSetting["scope.userLocation"]
             console.log("[mall] openSetting 返回", {
               authSetting,
               hasLocationAuth
@@ -734,6 +712,31 @@ Page({
     })
   },
 
+  resolveCoordinatePayload(result = {}) {
+    const latitude = Number(result.latitude)
+    const longitude = Number(result.longitude)
+
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+      return null
+    }
+
+    return {
+      latitude,
+      longitude
+    }
+  },
+
+  fetchCityByCoordinate({ latitude, longitude }) {
+    return get(paths.location.city, {
+      latitude,
+      longitude
+    }).then((res) => {
+      const payload = unwrapResponseData(res)
+      const cityName = payload && payload.cityName ? payload.cityName : ""
+      return formatCityName(cityName)
+    })
+  },
+
   syncCurrentCity({ fromUserAction = false } = {}) {
     if (this.isLocatingCity) return
     this.isLocatingCity = true
@@ -770,41 +773,47 @@ Page({
       }
     }
 
-    if (typeof wx.getLocation !== "function") {
-      console.warn("[mall] 当前基础库不支持 wx.getLocation")
+    if (typeof wx.getFuzzyLocation !== "function") {
+      console.warn("[mall] 当前基础库不支持 wx.getFuzzyLocation")
       setFallbackIfNeeded()
       finalize()
       return
     }
 
-    console.log("[mall] 调用 wx.getLocation")
-    wx.getLocation({
-      type: "gcj02",
-      isHighAccuracy: true,
-      highAccuracyExpireTime: 3000,
+    console.log("[mall] 调用 wx.getFuzzyLocation")
+    wx.getFuzzyLocation({
       success: (res) => {
-        console.log("[mall] wx.getLocation 成功", res)
-        const city = extractCityFromLocationResult(res)
-        if (!city) {
-          console.log("[mall] wx.getLocation 仅返回经纬度，未直接返回城市信息", {
-            latitude: res.latitude,
-            longitude: res.longitude,
-            accuracy: res.accuracy,
-            note: "如需展示城市，需要再做逆地理解析"
-          })
-        }
-        if (!applyCity(city)) {
+        console.log("[mall] wx.getFuzzyLocation 成功", res)
+        const coordinate = this.resolveCoordinatePayload(res)
+        if (!coordinate) {
+          console.warn("[mall] 模糊定位结果缺少经纬度", res)
           setFallbackIfNeeded()
+          return
         }
+
+        this.fetchCityByCoordinate(coordinate)
+          .then((city) => {
+            if (!applyCity(city)) {
+              setFallbackIfNeeded()
+            }
+          })
+          .catch((err) => {
+            console.warn("[mall] 城市解析接口失败:", err)
+            setFallbackIfNeeded()
+          })
+          .finally(() => {
+            finalize()
+          })
       },
       fail: (err) => {
-        console.warn("[mall] 获取当前城市失败:", err)
+        console.warn("[mall] 获取模糊定位失败:", err)
         if (isLocationPermissionError(err)) {
           this.promptLocationPermission({ fromUserAction })
         }
         setFallbackIfNeeded()
+        finalize()
       },
-      complete: finalize
+      complete: () => {}
     })
   },
 
