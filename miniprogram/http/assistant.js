@@ -34,17 +34,23 @@ function extractSessionId(payload) {
 }
 
 function createAssistantSession() {
-  return request.post(paths.recipe.assistantSession, {})
+  return request.post(paths.recipe.assistantSession, {}, {
+    showLoading: false
+  })
 }
 
 function getAssistantMessages(sessionId) {
-  return request.get(paths.recipe.assistantSessionMessages(sessionId))
+  return request.get(paths.recipe.assistantSessionMessages(sessionId), null, {
+    showLoading: false
+  })
 }
 
 function chatWithAssistant({ sessionId, questionText } = {}) {
   return request.post(paths.recipe.assistantChat, {
     sessionId,
     questionText
+  }, {
+    showLoading: false
   })
 }
 

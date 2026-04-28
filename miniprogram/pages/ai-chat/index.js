@@ -198,6 +198,8 @@ Page({
     quickActions: [],
     messages: [],
     sessionId: "",
+    pageLoading: true,
+    sendLoading: false,
     inputMode: "text",
     inputFocus: false,
     draftText: "",
@@ -254,7 +256,11 @@ Page({
     })
   },
   async loadPageData() {
-    this.setData(STATIC_PAGE_DATA)
+    this.setData(
+      Object.assign({}, STATIC_PAGE_DATA, {
+        pageLoading: true
+      })
+    )
 
     try {
       const profileSessionId = this.getProfileSessionIdForMessages()
@@ -268,6 +274,10 @@ Page({
       await this.loadHistoryMessages(sessionId)
     } catch (error) {
       console.warn("[ai-chat] 初始化会话失败:", error)
+    } finally {
+      this.setData({
+        pageLoading: false
+      })
     }
   },
   getProfileSessionIdForMessages() {
@@ -417,8 +427,19 @@ Page({
     if (!value) return
     if (this._sendingQuestion) return
 
+    // 兜底关闭系统 loading，发送阶段只保留聊天区小 loading。
+    wx.hideLoading()
+
     this.appendMessage(createMessage("user", value, userExtras), { clearDraft })
     this._sendingQuestion = true
+    this.setData(
+      {
+        sendLoading: true
+      },
+      () => {
+        this.scrollToLatest()
+      }
+    )
 
     try {
       let sessionId = this.data.sessionId
@@ -437,6 +458,12 @@ Page({
       this.appendMessage(createMessage("assistant", "抱歉，暂时无法回复，请稍后重试。"))
     } finally {
       this._sendingQuestion = false
+      if (this.data.sendLoading) {
+        this.setData({
+          sendLoading: false
+        })
+      }
+      wx.hideLoading()
     }
   },
   async sendText() {

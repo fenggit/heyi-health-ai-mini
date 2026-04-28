@@ -206,11 +206,12 @@
 
 .analysis-chat-row {
   margin-top: 14rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .analysis-chat-row--user {
-  display: flex;
-  flex-direction: column;
   align-items: flex-end;
 }
 
@@ -219,7 +220,7 @@
   border-radius: 24rpx;
   padding: 14rpx 18rpx;
   box-sizing: border-box;
-  display: flex;
+  display: inline-flex;
   align-items: flex-start;
 }
 
@@ -406,6 +407,36 @@
   border-radius: 4rpx;
   background: rgba(255, 255, 255, 0.95);
   animation: voiceWave 0.9s ease-in-out infinite;
+}
+
+.analysis-page-loading-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(243, 244, 248, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.analysis-page-loading-card {
+  min-width: 260rpx;
+  height: 132rpx;
+  border-radius: 24rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.94);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.analysis-page-loading-text {
+  margin-top: 14rpx;
+  color: #334155;
+  font-size: 24rpx;
+  line-height: 1;
 }
 
 @keyframes voiceWave {

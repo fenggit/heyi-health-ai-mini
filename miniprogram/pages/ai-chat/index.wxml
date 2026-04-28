@@ -73,6 +73,12 @@
               <text class="analysis-chat-time">{{item.time}}</text>
             </view>
           </block>
+
+          <view wx:if="{{sendLoading}}" class="analysis-chat-row">
+            <view class="analysis-chat-bubble analysis-chat-bubble--assistant">
+              <text class="analysis-chat-bubble__text">小亿正在思考...</text>
+            </view>
+          </view>
         </view>
       </scroll-view>
     </view>
@@ -130,6 +136,13 @@
           </block>
         </view>
       </view>
+    </view>
+  </view>
+
+  <view wx:if="{{pageLoading}}" class="analysis-page-loading-mask">
+    <view class="analysis-page-loading-card">
+      <loading size="24" color="#06c851" />
+      <text class="analysis-page-loading-text">正在加载会话...</text>
     </view>
   </view>
 </view>
