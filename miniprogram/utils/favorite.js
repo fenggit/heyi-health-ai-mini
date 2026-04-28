@@ -5,11 +5,6 @@ function normalizeBizId(value) {
   if (value === null || value === undefined || value === "") return ""
   const text = String(value).trim()
   if (!text) return ""
-
-  const numeric = Number(text)
-  if (Number.isSafeInteger(numeric) && String(numeric) === text) {
-    return numeric
-  }
   return text
 }
 

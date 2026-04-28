@@ -85,7 +85,14 @@ const paths = {
     // 首页聚合数据
     homeIndex: '/recipe/app/home/index',
     // 配方详情
-    formulaDetail: (recipeId) => `/recipe/app/formula/${encodeURIComponent(recipeId)}/detail`
+    formulaDetail: (recipeId) => `/recipe/app/formula/${encodeURIComponent(recipeId)}/detail`,
+    // AI 助手：创建会话
+    assistantSession: '/recipe/app/assistant/session',
+    // AI 助手：会话历史消息
+    assistantSessionMessages: (sessionId) =>
+      `/recipe/app/assistant/session/${encodeURIComponent(sessionId)}/messages`,
+    // AI 助手：发送问题
+    assistantChat: '/recipe/app/assistant/chat'
   },
   favorite: {
     // 收藏分页

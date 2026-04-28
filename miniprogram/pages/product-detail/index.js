@@ -255,11 +255,8 @@ function normalizeCartItemList(payload) {
 }
 
 function toRequestItemId(value) {
-  const numeric = Number(value)
-  if (Number.isSafeInteger(numeric) && String(numeric) === String(value)) {
-    return numeric
-  }
-  return String(value)
+  if (value == null || value === "") return ""
+  return String(value).trim()
 }
 
 function resolveSpuDetailPath(spuId) {

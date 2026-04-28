@@ -1,8 +1,17 @@
 const { getLayoutMetrics } = require("../../utils/layout")
+const { getCachedUserInfo, setCachedUserInfo } = require("../../http/auth")
+const {
+  createAssistantSession,
+  getAssistantMessages,
+  chatWithAssistant,
+  extractSessionId,
+  normalizeSessionId
+} = require("../../http/assistant")
 
+const STORAGE_ASSISTANT_SESSION_KEY = "assistantSessionId"
 const DEFAULT_REPLY = "你可以用语音或文字告诉我你的需求，我会尽力帮你！"
 
-const MOCK_PAGE_DATA = {
+const STATIC_PAGE_DATA = {
   title: "哈喽，我是小亿！",
   subTitle: "你的AI食养助手",
   capabilities: ["进行趣味性生活状态分析", "提供个性化饮食建议", "解答饮食健康问题", "快速访问各项功能"],
@@ -32,33 +41,7 @@ const MOCK_PAGE_DATA = {
       path: "/pages/profile/index",
       routeType: "tab"
     }
-  ],
-  messages: [
-    {
-      id: "m1",
-      role: "user",
-      text: "你好",
-      time: "12:22"
-    },
-    {
-      id: "m2",
-      role: "user",
-      text: "帮我分析下体质",
-      time: "12:23",
-      leftIcon: "/assets/analysis/chat/voice_icon.png"
-    },
-    {
-      id: "m3",
-      role: "assistant",
-      text: DEFAULT_REPLY,
-      time: "12:22"
-    }
   ]
-}
-
-function fetchPageData() {
-  // TODO: 后续替换为真实会话数据接口
-  return Promise.resolve(JSON.parse(JSON.stringify(MOCK_PAGE_DATA)))
 }
 
 function padClock(value) {
@@ -69,6 +52,45 @@ function formatClock(date = new Date()) {
   return `${padClock(date.getHours())}:${padClock(date.getMinutes())}`
 }
 
+function parseDateValue(rawValue) {
+  if (rawValue === undefined || rawValue === null || rawValue === "") return null
+
+  if (typeof rawValue === "number" && Number.isFinite(rawValue)) {
+    const timestamp = rawValue < 1e12 ? rawValue * 1000 : rawValue
+    const dateFromNumber = new Date(timestamp)
+    return Number.isNaN(dateFromNumber.getTime()) ? null : dateFromNumber
+  }
+
+  const text = String(rawValue).trim()
+  if (!text) return null
+
+  if (/^\d+$/.test(text)) {
+    const numeric = Number(text)
+    if (Number.isFinite(numeric)) {
+      const timestamp = numeric < 1e12 ? numeric * 1000 : numeric
+      const dateFromTextNumber = new Date(timestamp)
+      if (!Number.isNaN(dateFromTextNumber.getTime())) return dateFromTextNumber
+    }
+  }
+
+  const dateFromString = new Date(text.replace(/-/g, "/"))
+  if (!Number.isNaN(dateFromString.getTime())) return dateFromString
+
+  return null
+}
+
+function formatServerClock(rawValue) {
+  const parsedDate = parseDateValue(rawValue)
+  if (parsedDate) return formatClock(parsedDate)
+
+  if (typeof rawValue === "string") {
+    const match = rawValue.match(/(\d{2}:\d{2})/)
+    if (match && match[1]) return match[1]
+  }
+
+  return formatClock()
+}
+
 function createMessage(role, text, extras = {}) {
   return {
     id: `m${Date.now()}-${Math.floor(Math.random() * 1000)}`,
@@ -77,6 +99,81 @@ function createMessage(role, text, extras = {}) {
     time: formatClock(),
     ...extras
   }
+}
+
+function extractProfileSessionId(userInfo) {
+  const safeUserInfo = userInfo && typeof userInfo === "object" ? userInfo : {}
+  const profile = safeUserInfo.profile && typeof safeUserInfo.profile === "object" ? safeUserInfo.profile : {}
+
+  const candidates = [
+    profile.sessionId,
+    profile.sessionID,
+    profile.SessionId,
+    safeUserInfo.sessionId,
+    safeUserInfo.sessionID,
+    safeUserInfo.SessionId
+  ]
+
+  for (let i = 0; i < candidates.length; i += 1) {
+    const normalized = normalizeSessionId(candidates[i])
+    if (normalized !== "") return normalized
+  }
+
+  return ""
+}
+
+function readCachedSessionId() {
+  return normalizeSessionId(wx.getStorageSync(STORAGE_ASSISTANT_SESSION_KEY))
+}
+
+function syncSessionIdToUserInfo(sessionId) {
+  const normalizedSessionId = normalizeSessionId(sessionId)
+  if (normalizedSessionId === "") return
+
+  const app = getApp()
+  const globalUserInfo = app && app.globalData ? app.globalData.userInfo : null
+  const cachedUserInfo = getCachedUserInfo()
+  const baseUserInfo =
+    (globalUserInfo && typeof globalUserInfo === "object" && globalUserInfo) ||
+    (cachedUserInfo && typeof cachedUserInfo === "object" && cachedUserInfo) ||
+    {}
+
+  const nextUserInfo = Object.assign({}, baseUserInfo)
+  const nextProfile = Object.assign({}, nextUserInfo.profile && typeof nextUserInfo.profile === "object" ? nextUserInfo.profile : {})
+  nextProfile.sessionId = normalizedSessionId
+  nextUserInfo.profile = nextProfile
+
+  setCachedUserInfo(nextUserInfo)
+}
+
+function mapHistoryMessage(item, index, fallbackTime) {
+  const safeItem = item && typeof item === "object" ? item : null
+  if (!safeItem) return null
+
+  const text = String(safeItem.messageText || "").trim()
+  if (!text) return null
+
+  const roleType = String(safeItem.roleType || "").toUpperCase()
+  const role = roleType === "USER" ? "user" : "assistant"
+  const createTime = safeItem.createTime || safeItem.replyTime || fallbackTime
+
+  return {
+    id: `history-${safeItem.id || Date.now()}-${index}`,
+    role,
+    text,
+    time: formatServerClock(createTime)
+  }
+}
+
+function buildAssistantMessage(response) {
+  const body = response && typeof response === "object" ? response : {}
+  const data = body.data && typeof body.data === "object" ? body.data : {}
+  const answer = String(data.answer || body.answer || "").trim() || DEFAULT_REPLY
+  const replyTime = data.replyTime || body.replyTime || data.createTime || body.createTime
+
+  return createMessage("assistant", answer, {
+    time: formatServerClock(replyTime)
+  })
 }
 
 const WAVE_BARS = [10, 18, 12, 22, 14, 26, 16, 20, 12, 24, 15, 28, 13, 21, 11, 24, 14, 26, 12, 20, 10, 22, 13, 18]
@@ -100,6 +197,7 @@ Page({
     noticeText: "",
     quickActions: [],
     messages: [],
+    sessionId: "",
     inputMode: "text",
     inputFocus: false,
     draftText: "",
@@ -156,8 +254,112 @@ Page({
     })
   },
   async loadPageData() {
-    const payload = await fetchPageData()
-    this.setData(payload)
+    this.setData(STATIC_PAGE_DATA)
+
+    try {
+      const profileSessionId = this.getProfileSessionIdForMessages()
+      if (profileSessionId) {
+        const sessionId = this.persistSessionId(profileSessionId)
+        await this.loadHistoryMessages(sessionId)
+        return
+      }
+
+      const sessionId = await this.ensureSessionId()
+      await this.loadHistoryMessages(sessionId)
+    } catch (error) {
+      console.warn("[ai-chat] 初始化会话失败:", error)
+    }
+  },
+  getProfileSessionIdForMessages() {
+    const app = getApp()
+    const globalUserInfo = app && app.globalData ? app.globalData.userInfo : null
+    let sessionId = extractProfileSessionId(globalUserInfo)
+
+    if (!sessionId) {
+      sessionId = extractProfileSessionId(getCachedUserInfo())
+    }
+
+    return sessionId
+  },
+  async ensureSessionId() {
+    if (this._sessionPromise) return this._sessionPromise
+
+    this._sessionPromise = this._ensureSessionIdCore()
+      .finally(() => {
+        this._sessionPromise = null
+      })
+
+    return this._sessionPromise
+  },
+  async _ensureSessionIdCore() {
+    let sessionId = ""
+
+    if (!sessionId) {
+      const app = getApp()
+      sessionId = extractProfileSessionId(app && app.globalData ? app.globalData.userInfo : null)
+    }
+
+    if (!sessionId) {
+      sessionId = extractProfileSessionId(getCachedUserInfo())
+    }
+
+    if (!sessionId) {
+      sessionId = readCachedSessionId()
+    }
+
+    if (!sessionId) {
+      const sessionRes = await createAssistantSession()
+      sessionId = extractSessionId(sessionRes)
+    }
+
+    if (!sessionId) {
+      throw new Error("未获取到有效 sessionId")
+    }
+
+    return this.persistSessionId(sessionId)
+  },
+  persistSessionId(rawSessionId) {
+    const sessionId = normalizeSessionId(rawSessionId)
+    if (sessionId === "") return ""
+
+    wx.setStorageSync(STORAGE_ASSISTANT_SESSION_KEY, sessionId)
+    syncSessionIdToUserInfo(sessionId)
+
+    if (this.data.sessionId !== sessionId) {
+      this.setData({ sessionId })
+    }
+
+    return sessionId
+  },
+  async loadHistoryMessages(sessionId) {
+    const finalSessionId =
+      normalizeSessionId(sessionId) ||
+      normalizeSessionId(this.data.sessionId) ||
+      normalizeSessionId(this.getProfileSessionIdForMessages()) ||
+      readCachedSessionId()
+
+    if (!finalSessionId) return
+
+    try {
+      const res = await getAssistantMessages(finalSessionId)
+      const data = res && res.data && typeof res.data === "object" ? res.data : {}
+      const items = Array.isArray(data.items) ? data.items : []
+      const fallbackTime = data.createTime
+      const messages = items
+        .map((item, index) => mapHistoryMessage(item, index, fallbackTime))
+        .filter((item) => !!item)
+
+      this.setData(
+        {
+          messages
+        },
+        () => {
+          this.scrollToLatest()
+        }
+      )
+    } catch (error) {
+      console.warn("[ai-chat] 获取历史消息失败:", error)
+    }
   },
   scrollToLatest() {
     const { messages } = this.data
@@ -179,14 +381,14 @@ Page({
       })
     })
   },
-  appendConversation(userText, userExtras = {}) {
-    const latest = [createMessage("user", userText, userExtras), createMessage("assistant", DEFAULT_REPLY)]
-    const messages = this.data.messages.concat(latest)
+  appendMessage(message, options = {}) {
+    const { clearDraft = false } = options
+    const messages = this.data.messages.concat(message)
+    const payload = { messages }
+    if (clearDraft) payload.draftText = ""
+
     this.setData(
-      {
-        messages,
-        draftText: ""
-      },
+      payload,
       () => {
         this.scrollToLatest()
       }
@@ -209,7 +411,35 @@ Page({
       inputFocus: false
     })
   },
-  sendText() {
+  async sendQuestionText(questionText, options = {}) {
+    const { clearDraft = false, userExtras = {} } = options
+    const value = String(questionText || "").trim()
+    if (!value) return
+    if (this._sendingQuestion) return
+
+    this.appendMessage(createMessage("user", value, userExtras), { clearDraft })
+    this._sendingQuestion = true
+
+    try {
+      let sessionId = this.data.sessionId
+      if (!sessionId) {
+        sessionId = await this.ensureSessionId()
+      }
+
+      const response = await chatWithAssistant({
+        sessionId,
+        questionText: value
+      })
+
+      this.appendMessage(buildAssistantMessage(response))
+    } catch (error) {
+      console.warn("[ai-chat] 发送消息失败:", error)
+      this.appendMessage(createMessage("assistant", "抱歉，暂时无法回复，请稍后重试。"))
+    } finally {
+      this._sendingQuestion = false
+    }
+  },
+  async sendText() {
     const value = (this.data.draftText || "").trim()
     if (!value) {
       wx.showToast({
@@ -218,7 +448,10 @@ Page({
       })
       return
     }
-    this.appendConversation(value)
+
+    await this.sendQuestionText(value, {
+      clearDraft: true
+    })
   },
   switchToVoice() {
     this.setData(
@@ -276,7 +509,9 @@ Page({
       return
     }
 
-    this.appendConversation("帮我分析下体质", { leftIcon: "/assets/analysis/chat/voice_icon.png" })
+    this.sendQuestionText("帮我分析下体质", {
+      userExtras: { leftIcon: "/assets/analysis/chat/voice_icon.png" }
+    })
   },
   onVoiceHoldCancel() {
     this.setData({

@@ -4,6 +4,7 @@
 const request = require('../utils/request')
 const paths = require('./paths')
 const STORAGE_USER_INFO_KEY = 'userInfo'
+const STORAGE_ASSISTANT_SESSION_KEY = 'assistantSessionId'
 
 /**
  * 登录响应数据结构 (RLoginVo)
@@ -263,6 +264,29 @@ function normalizeCurrentUserProfile(rawUserInfo) {
   return nextUserInfo
 }
 
+function pickProfileSessionId(userInfo) {
+  const safeUserInfo = userInfo && typeof userInfo === 'object' ? userInfo : {}
+  const profile = safeUserInfo.profile && typeof safeUserInfo.profile === 'object' ? safeUserInfo.profile : {}
+  const candidates = [
+    profile.sessionId,
+    profile.sessionID,
+    profile.SessionId,
+    safeUserInfo.sessionId,
+    safeUserInfo.sessionID,
+    safeUserInfo.SessionId
+  ]
+
+  for (let i = 0; i < candidates.length; i += 1) {
+    const value = candidates[i]
+    if (value === undefined || value === null) continue
+    const text = String(value).trim()
+    if (!text) continue
+    return text
+  }
+
+  return ''
+}
+
 /**
  * 获取当前登录用户信息，并写入全局 userInfo
  * @returns {Promise<LoginUserInfoVo>}
@@ -271,6 +295,10 @@ function fetchUserInfo() {
   return request.get(paths.auth.currentUserProfile).then((res) => {
     const normalizedUserInfo = normalizeCurrentUserProfile((res && res.data) || null)
     setCachedUserInfo(normalizedUserInfo)
+    const profileSessionId = pickProfileSessionId(normalizedUserInfo)
+    if (profileSessionId !== '') {
+      wx.setStorageSync(STORAGE_ASSISTANT_SESSION_KEY, profileSessionId)
+    }
     if (res && typeof res === 'object') {
       res.data = normalizedUserInfo
     }
