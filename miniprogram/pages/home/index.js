@@ -354,7 +354,6 @@ Page({
     this._isPageAlive = true
     this._loadReqId = 0
     this.syncLayout()
-    this.loadPageData()
   },
   onShow() {
     if (typeof this.getTabBar === "function") {
@@ -363,13 +362,28 @@ Page({
         tabBar.setData({ selected: 0 })
       }
     }
+    this.loadPageData({ showLoading: true })
   },
   onUnload() {
     this._isPageAlive = false
+    this.hidePageLoading()
   },
   safeSetData(nextData) {
     if (!this._isPageAlive) return
     this.setData(nextData)
+  },
+  showPageLoading(title = "加载中...") {
+    if (this._pageLoadingVisible) return
+    this._pageLoadingVisible = true
+    wx.showLoading({
+      title,
+      mask: true
+    })
+  },
+  hidePageLoading() {
+    if (!this._pageLoadingVisible) return
+    this._pageLoadingVisible = false
+    wx.hideLoading()
   },
   syncLayout() {
     const { statusBarHeight } = getLayoutMetrics()
@@ -377,9 +391,13 @@ Page({
       topInset: Math.max(statusBarHeight + 12, 32)
     })
   },
-  async loadPageData() {
+  async loadPageData(options = {}) {
+    const { showLoading = false } = options
     const reqId = (this._loadReqId || 0) + 1
     this._loadReqId = reqId
+    if (showLoading) {
+      this.showPageLoading()
+    }
     try {
       const payload = await fetchHomeData()
       if (!this._isPageAlive || this._loadReqId !== reqId) return
@@ -390,6 +408,10 @@ Page({
       this.safeSetData(Object.assign({
         bannerCurrent: 0
       }, createEmptyHomeData()))
+    } finally {
+      if (showLoading && this._loadReqId === reqId) {
+        this.hidePageLoading()
+      }
     }
   },
   onBannerChange(e) {

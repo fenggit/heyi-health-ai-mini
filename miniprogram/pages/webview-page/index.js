@@ -1,5 +1,6 @@
 const { getLayoutMetrics } = require("../../utils/layout")
-const { HOST } = require("../../utils/request")
+const request = require("../../utils/request")
+const { HOST } = request
 
 function normalizeWebviewUrl(rawUrl) {
   if (!rawUrl) return ''
@@ -57,14 +58,14 @@ Page({
 
   _downloadFile(fileUrl, fileName) {
     wx.showLoading({ title: '下载中...', mask: true })
-    wx.downloadFile({
+    request.downloadFile({
       url: fileUrl,
-      success: (res) => {
+      withAuth: false,
+      silentHttpErrorToast: true,
+      silentNetworkErrorToast: true
+    })
+      .then((res) => {
         wx.hideLoading()
-        if (res.statusCode !== 200) {
-          wx.showToast({ title: '下载失败', icon: 'none' })
-          return
-        }
         const tempPath = res.tempFilePath
         const ext = (fileName.split('.').pop() || tempPath.split('.').pop() || '').toLowerCase()
         const imageExts = ['png', 'jpg', 'jpeg', 'gif', 'webp']
@@ -95,11 +96,13 @@ Page({
             fail: () => wx.showToast({ title: '无法打开文件', icon: 'none' })
           })
         }
-      },
-      fail: () => {
+      })
+      .catch((err) => {
         wx.hideLoading()
+        if (err && (Number(err.code) === 401 || Number(err.statusCode) === 401)) {
+          return
+        }
         wx.showToast({ title: '下载失败', icon: 'none' })
-      }
-    })
+      })
   }
 })

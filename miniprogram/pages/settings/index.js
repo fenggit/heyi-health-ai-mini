@@ -179,31 +179,21 @@ Page({
     })
   },
   uploadAvatar(filePath) {
-    const uploadUrl = getUploadUrl(paths.auth.updateAvatar)
-    const token = request.getAuthToken()
-    const header = {
-      'X-App-Source': 'miniapp'
-    }
-    if (token) {
-      header.Authorization = `Bearer ${token}`
-    }
-
     wx.showLoading({ title: '上传中', mask: true })
-    wx.uploadFile({
-      url: uploadUrl,
+    request.uploadFile({
+      url: getUploadUrl(paths.auth.updateAvatar),
       filePath,
-      name: 'avatarfile',
-      header,
-      success: (res) => {
-        this.handleAvatarUploadSuccess(res, filePath)
-      },
-      fail: () => {
-        wx.showToast({ title: '上传失败，请重试', icon: 'none' })
-      },
-      complete: () => {
-        wx.hideLoading()
-      }
+      name: 'avatarfile'
     })
+      .then((res) => {
+        this.handleAvatarUploadSuccess(res, filePath)
+      })
+      .catch((err) => {
+        console.warn('[settings] 头像上传失败:', err)
+      })
+      .finally(() => {
+        wx.hideLoading()
+      })
   },
   handleAvatarUploadSuccess(res, fallbackAvatarUrl) {
     const statusCode = Number(res && res.statusCode)

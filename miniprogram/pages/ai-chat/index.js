@@ -150,7 +150,25 @@ function mapHistoryMessage(item, index, fallbackTime) {
   const safeItem = item && typeof item === "object" ? item : null
   if (!safeItem) return null
 
-  const text = String(safeItem.messageText || "").trim()
+  let parsedMessageJson = null
+  if (safeItem.messageJson && typeof safeItem.messageJson === "string") {
+    try {
+      parsedMessageJson = JSON.parse(safeItem.messageJson)
+    } catch (e) {
+      parsedMessageJson = null
+    }
+  } else if (safeItem.messageJson && typeof safeItem.messageJson === "object") {
+    parsedMessageJson = safeItem.messageJson
+  }
+
+  const text = String(
+    safeItem.messageText ||
+    safeItem.text ||
+    safeItem.content ||
+    safeItem.questionText ||
+    (parsedMessageJson && (parsedMessageJson.answer || parsedMessageJson.content || parsedMessageJson.text)) ||
+    ""
+  ).trim()
   if (!text) return null
 
   const roleType = String(safeItem.roleType || "").toUpperCase()
@@ -165,6 +183,36 @@ function mapHistoryMessage(item, index, fallbackTime) {
   }
 }
 
+function extractHistoryItems(response) {
+  const body = response && typeof response === "object" ? response : {}
+  const data = body.data
+
+  if (Array.isArray(data)) return data
+  if (!data || typeof data !== "object") return []
+
+  const candidates = [
+    data.items,
+    data.list,
+    data.records,
+    data.rows,
+    data.messages
+  ]
+
+  for (let i = 0; i < candidates.length; i += 1) {
+    if (Array.isArray(candidates[i])) return candidates[i]
+  }
+
+  return []
+}
+
+function extractHistoryFallbackTime(response) {
+  const body = response && typeof response === "object" ? response : {}
+  const data = body.data
+  if (!data || typeof data !== "object" || Array.isArray(data)) return body.createTime || body.replyTime
+
+  return data.createTime || data.replyTime || body.createTime || body.replyTime
+}
+
 function buildAssistantMessage(response) {
   const body = response && typeof response === "object" ? response : {}
   const data = body.data && typeof body.data === "object" ? body.data : {}
@@ -174,6 +222,40 @@ function buildAssistantMessage(response) {
   return createMessage("assistant", answer, {
     time: formatServerClock(replyTime)
   })
+}
+
+function buildMessageMergeKey(message) {
+  const safeMessage = message && typeof message === "object" ? message : {}
+  return [
+    safeMessage.role || "",
+    safeMessage.text || "",
+    safeMessage.time || "",
+    safeMessage.leftIcon || ""
+  ].join("::")
+}
+
+function mergeMessages(historyMessages, liveMessages) {
+  const merged = []
+  const seen = {}
+  const source = []
+
+  if (Array.isArray(historyMessages)) {
+    source.push(...historyMessages)
+  }
+  if (Array.isArray(liveMessages)) {
+    source.push(...liveMessages)
+  }
+
+  for (let i = 0; i < source.length; i += 1) {
+    const item = source[i]
+    if (!item || typeof item !== "object") continue
+    const key = buildMessageMergeKey(item)
+    if (seen[key]) continue
+    seen[key] = true
+    merged.push(item)
+  }
+
+  return merged
 }
 
 const WAVE_BARS = [10, 18, 12, 22, 14, 26, 16, 20, 12, 24, 15, 28, 13, 21, 11, 24, 14, 26, 12, 20, 10, 22, 13, 18]
@@ -256,8 +338,10 @@ Page({
     })
   },
   async loadPageData() {
+    this._historyInitialized = false
     this.setData(
       Object.assign({}, STATIC_PAGE_DATA, {
+        messages: [],
         pageLoading: true
       })
     )
@@ -360,12 +444,16 @@ Page({
 
     try {
       const res = await getAssistantMessages(finalSessionId)
-      const data = res && res.data && typeof res.data === "object" ? res.data : {}
-      const items = Array.isArray(data.items) ? data.items : []
-      const fallbackTime = data.createTime
-      const messages = items
+      const items = extractHistoryItems(res)
+      const fallbackTime = extractHistoryFallbackTime(res)
+      const historyMessages = items
         .map((item, index) => mapHistoryMessage(item, index, fallbackTime))
         .filter((item) => !!item)
+      const messages = this._historyInitialized
+        ? this.data.messages
+        : mergeMessages(historyMessages, this.data.messages)
+
+      this._historyInitialized = true
 
       this.setData(
         {

@@ -306,10 +306,9 @@ Page({
   },
   onLoad() {
     this.syncLayout()
-    this.loadPageData()
   },
   onShow() {
-    this.refreshProfileDataAndUI()
+    this.refreshProfileDataAndUI({ showLoading: true })
     if (typeof this.getTabBar === "function") {
       const tabBar = this.getTabBar()
       if (tabBar) {
@@ -317,10 +316,35 @@ Page({
       }
     }
   },
-  refreshProfileDataAndUI() {
+  onUnload() {
+    this.hidePageLoading()
+  },
+  showPageLoading(title = "加载中...") {
+    if (this._pageLoadingVisible) return
+    this._pageLoadingVisible = true
+    wx.showLoading({
+      title,
+      mask: true
+    })
+  },
+  hidePageLoading() {
+    if (!this._pageLoadingVisible) return
+    this._pageLoadingVisible = false
+    wx.hideLoading()
+  },
+  refreshProfileDataAndUI(options = {}) {
+    const { showLoading = false } = options
+    if (showLoading) {
+      this.showPageLoading()
+    }
+
     if (this._profileRefreshPromise) {
       this._profileRefreshPending = true
-      return this._profileRefreshPromise
+      return this._profileRefreshPromise.finally(() => {
+        if (showLoading) {
+          this.hidePageLoading()
+        }
+      })
     }
 
     this.syncLayout()
@@ -340,6 +364,9 @@ Page({
         if (this._profileRefreshPending) {
           this._profileRefreshPending = false
           this.refreshProfileDataAndUI()
+        }
+        if (showLoading) {
+          this.hidePageLoading()
         }
       })
 

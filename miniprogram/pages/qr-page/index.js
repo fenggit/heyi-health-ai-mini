@@ -1,4 +1,5 @@
 const { getMiniNavData, backWithFallback } = require("../../utils/mini-nav")
+const request = require("../../utils/request")
 
 const PAGE_DATA = {
   navTitle: "体质测评",
@@ -93,9 +94,12 @@ Page({
     }).catch((err) => {
       console.error("[qr-page] 二维码加载失败:", err)
       this.setData({ qrLoading: false })
+      if (err && (Number(err.code) === 401 || Number(err.statusCode) === 401)) {
+        return
+      }
       if (!silent) {
         wx.showToast({
-          title: "二维码加载失败",
+          title: "暂无二维码",
           icon: "none"
         })
       }
@@ -138,18 +142,16 @@ Page({
   },
 
   _downloadToTemp(url) {
-    return new Promise((resolve, reject) => {
-      wx.downloadFile({
-        url,
-        success: (res) => {
-          if (res.statusCode !== 200 || !res.tempFilePath) {
-            reject(new Error(`下载二维码失败: ${res.statusCode}`))
-            return
-          }
-          resolve(res.tempFilePath)
-        },
-        fail: reject
-      })
+    return request.downloadFile({
+      url,
+      withAuth: false,
+      silentHttpErrorToast: true,
+      silentNetworkErrorToast: true
+    }).then((res) => {
+      if (!res.tempFilePath) {
+        throw new Error(`下载二维码失败: ${res.statusCode}`)
+      }
+      return res.tempFilePath
     })
   },
 
