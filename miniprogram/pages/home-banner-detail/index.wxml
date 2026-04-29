@@ -47,9 +47,17 @@
           <view class="activity-meta-text">{{activity.dateTime}}</view>
         </view>
 
-        <view class="activity-meta-row">
+        <view
+          class="activity-meta-row activity-meta-row--location"
+          bindtap="openActivityLocation"
+          data-name="{{activity.locationName}}"
+          data-address="{{activity.locationAddress || activity.location}}"
+          data-location="{{activity.location}}"
+          data-latitude="{{activity.latitude}}"
+          data-longitude="{{activity.longitude}}"
+        >
           <image class="activity-meta-icon" src="/assets/activity/icon_location.png" mode="aspectFit" />
-          <view class="activity-meta-text activity-meta-text--inline">{{activity.location}}</view>
+          <view class="activity-meta-text activity-meta-text--location">{{activity.location}}</view>
           <image class="activity-meta-icon activity-meta-icon--right" src="/assets/activity/icon_seat.png" mode="aspectFit" />
         </view>
 

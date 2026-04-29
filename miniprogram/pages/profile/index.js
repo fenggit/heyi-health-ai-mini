@@ -272,14 +272,27 @@ function pickSelectedPlanId(plans, payload, fallbackSelectedPlanId) {
   return plans[0].id
 }
 
+function getInitialProfileViewData() {
+  const profile = cloneDeep(MOCK_PROFILE_DATA)
+  return {
+    pageTitle: profile.pageTitle,
+    user: profile.user,
+    quickEntry: profile.quickEntry,
+    stats: profile.stats,
+    featureMenus: profile.featureMenus
+  }
+}
+
+const INITIAL_PROFILE_VIEW_DATA = getInitialProfileViewData()
+
 Page({
   data: {
     topInset: 32,
-    pageTitle: "",
-    user: {},
-    quickEntry: {},
-    stats: [],
-    featureMenus: [],
+    pageTitle: INITIAL_PROFILE_VIEW_DATA.pageTitle,
+    user: INITIAL_PROFILE_VIEW_DATA.user,
+    quickEntry: INITIAL_PROFILE_VIEW_DATA.quickEntry,
+    stats: INITIAL_PROFILE_VIEW_DATA.stats,
+    featureMenus: INITIAL_PROFILE_VIEW_DATA.featureMenus,
     showMemberSheet: false,
     selectedMemberPlanId: "normal",
     memberPlans: cloneDeep(DEFAULT_MEMBER_PLANS),
@@ -305,10 +318,12 @@ Page({
     ]
   },
   onLoad() {
+    this._hasLoadedProfileDataSuccessfully = false
     this.syncLayout()
+    this.syncUserInfo({ fallbackToStorage: true })
   },
   onShow() {
-    this.refreshProfileDataAndUI({ showLoading: true })
+    this.refreshProfileDataAndUI({ showLoading: !this._hasLoadedProfileDataSuccessfully })
     if (typeof this.getTabBar === "function") {
       const tabBar = this.getTabBar()
       if (tabBar) {
@@ -406,6 +421,7 @@ Page({
   },
   async loadPageData() {
     const payload = await fetchProfileData()
+    this._hasLoadedProfileDataSuccessfully = true
     this.setData(payload)
     this.syncUserInfo()
     if (this._upgradePagePayload) {

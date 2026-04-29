@@ -174,6 +174,40 @@ function mapActivityTag(activityType) {
   return "活动"
 }
 
+function toCoordinateNumber(value) {
+  const number = Number(value)
+  return Number.isFinite(number) ? number : null
+}
+
+function pickCoordinateValue(sources, keys) {
+  for (let i = 0; i < sources.length; i += 1) {
+    const source = sources[i]
+    if (!source || typeof source !== "object") continue
+
+    for (let j = 0; j < keys.length; j += 1) {
+      const coordinate = toCoordinateNumber(source[keys[j]])
+      if (coordinate != null) return coordinate
+    }
+  }
+
+  return null
+}
+
+function resolveActivityCoordinate(row) {
+  const locationObject = row && row.location && typeof row.location === "object" ? row.location : null
+  const addressObject = row && row.address && typeof row.address === "object" ? row.address : null
+  const sources = [row, locationObject, addressObject]
+  const latitude = pickCoordinateValue(sources, ["latitude", "lat", "locationLatitude", "locationLat", "addressLatitude"])
+  const longitude = pickCoordinateValue(sources, ["longitude", "lng", "lon", "locationLongitude", "locationLng", "addressLongitude"])
+
+  if (latitude == null || longitude == null) return null
+
+  return {
+    latitude,
+    longitude
+  }
+}
+
 function mapActivityDetail(rawDetail, fallbackId = "") {
   const row = rawDetail && typeof rawDetail === "object" ? rawDetail : {}
   const idRaw = row.id != null && row.id !== "" ? row.id : fallbackId
@@ -187,6 +221,7 @@ function mapActivityDetail(rawDetail, fallbackId = "") {
   const locationName = toDisplayText(row.locationName, "")
   const locationAddress = toDisplayText(row.locationAddress, "")
   const location = [locationName, locationAddress].filter(Boolean).join(" ")
+  const coordinate = resolveActivityCoordinate(row)
 
   return {
     id,
@@ -196,6 +231,10 @@ function mapActivityDetail(rawDetail, fallbackId = "") {
     name: toDisplayText(row.title, "活动"),
     dateTime: toDisplayText(row.activityTimeText, toDisplayText(row.startTime, "")),
     location: location || "线下地址待更新",
+    locationName,
+    locationAddress,
+    latitude: coordinate ? coordinate.latitude : "",
+    longitude: coordinate ? coordinate.longitude : "",
     seatText: seat.seatText,
     seatType: seat.seatType,
     highlights: parseHighlights(row),
@@ -394,6 +433,49 @@ Page({
       return
     }
     wx.switchTab({ url: "/pages/home/index" })
+  },
+  openActivityLocation(e) {
+    const dataset = e && e.currentTarget ? e.currentTarget.dataset || {} : {}
+    const locationDisplay = toDisplayText(dataset.location, "")
+    const locationName = toDisplayText(dataset.name, locationDisplay || "活动地点")
+    const locationAddress = locationDisplay || toDisplayText(dataset.address, "")
+    const latitude = toCoordinateNumber(dataset.latitude)
+    const longitude = toCoordinateNumber(dataset.longitude)
+
+    if (latitude == null || longitude == null) {
+      if (!locationAddress) {
+        wx.showToast({
+          title: "地址暂未配置",
+          icon: "none"
+        })
+        return
+      }
+
+      wx.setClipboardData({
+        data: locationAddress,
+        success: () => {
+          wx.showToast({
+            title: "地址已复制",
+            icon: "none"
+          })
+        }
+      })
+      return
+    }
+
+    wx.openLocation({
+      latitude,
+      longitude,
+      name: locationName,
+      address: locationAddress,
+      scale: 18,
+      fail: () => {
+        wx.showToast({
+          title: "无法打开导航",
+          icon: "none"
+        })
+      }
+    })
   },
   showGuideTips() {
     const content = BOOKING_NOTES.map((item, index) => `${index + 1}. ${item}`).join("\n")

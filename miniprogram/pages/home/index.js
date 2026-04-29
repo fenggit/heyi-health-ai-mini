@@ -353,6 +353,7 @@ Page({
   onLoad() {
     this._isPageAlive = true
     this._loadReqId = 0
+    this._hasLoadedHomeDataSuccessfully = false
     this.syncLayout()
   },
   onShow() {
@@ -362,7 +363,7 @@ Page({
         tabBar.setData({ selected: 0 })
       }
     }
-    this.loadPageData({ showLoading: true })
+    this.loadPageData({ showLoading: !this._hasLoadedHomeDataSuccessfully })
   },
   onUnload() {
     this._isPageAlive = false
@@ -401,6 +402,7 @@ Page({
     try {
       const payload = await fetchHomeData()
       if (!this._isPageAlive || this._loadReqId !== reqId) return
+      this._hasLoadedHomeDataSuccessfully = true
       this.safeSetData(payload)
     } catch (err) {
       console.warn("[home] 拉取首页接口失败，清空首页数据:", err)

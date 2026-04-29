@@ -61,6 +61,8 @@
             <view id="msg-{{item.id}}" class="analysis-chat-row {{item.role === 'user' ? 'analysis-chat-row--user' : ''}}">
               <view
                 class="analysis-chat-bubble {{item.role === 'user' ? 'analysis-chat-bubble--user' : 'analysis-chat-bubble--assistant'}} {{item.leftIcon ? 'analysis-chat-bubble--with-icon' : ''}}"
+                bindlongpress="copyMessage"
+                data-text="{{item.text}}"
               >
                 <image
                   wx:if="{{item.leftIcon}}"
@@ -76,7 +78,7 @@
 
           <view wx:if="{{sendLoading}}" class="analysis-chat-row">
             <view class="analysis-chat-bubble analysis-chat-bubble--assistant">
-              <text class="analysis-chat-bubble__text">小亿正在思考...</text>
+              <text class="analysis-chat-bubble__text">天天正在思考...</text>
             </view>
           </view>
         </view>

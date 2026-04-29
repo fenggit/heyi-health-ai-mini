@@ -39,7 +39,7 @@
     <text class="dp-desc">{{packInfo.description}}</text>
 
     <!-- 价格区：未选择（qty===1且未展开）只显示价格+加购；已选择显示减-数字-加 -->
-    <view class="dp-price-row">
+    <view wx:if="{{false}}" class="dp-price-row">
       <view wx:if="{{false}}" class="dp-price">
         <text class="dp-price__yen">￥</text>
         <text class="dp-price__num">{{packInfo.price}}</text>

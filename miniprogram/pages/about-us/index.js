@@ -1,4 +1,5 @@
 const { initMiniNav, backWithFallback } = require('../../utils/mini-nav')
+const { AGREEMENT_CONTENT, PRIVACY_CONTENT } = require('../../utils/agreement')
 
 const CORE_VALUES = [
   '专业：融合传统中医智慧与现代科技',
@@ -39,6 +40,9 @@ Page({
     appName: '合一食养',
     version: '当前版本：V1.0.0',
     copyright: '© 2026 合一食养团队',
+    popupShow: false,
+    popupTitle: '',
+    popupContent: '',
     mission:
       '基于中医体质理论和现代营养学，运用AI技术为每一位用户提供个性化的食养方案，帮助大家通过科学饮食改善体质，实现健康生活。',
     values: CORE_VALUES,
@@ -56,10 +60,24 @@ Page({
   },
 
   openAgreement() {
-    wx.showToast({ title: '用户协议待接入', icon: 'none' })
+    this.setData({
+      popupShow: true,
+      popupTitle: '用户协议',
+      popupContent: AGREEMENT_CONTENT
+    })
   },
 
   openPrivacy() {
-    wx.showToast({ title: '隐私政策待接入', icon: 'none' })
+    this.setData({
+      popupShow: true,
+      popupTitle: '隐私政策',
+      popupContent: PRIVACY_CONTENT
+    })
+  },
+
+  onPopupConfirm() {
+    this.setData({
+      popupShow: false
+    })
   }
 })

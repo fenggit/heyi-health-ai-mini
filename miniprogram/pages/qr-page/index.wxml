@@ -42,7 +42,7 @@
           <view class="constitution-qr-frame">
             <image wx:if="{{qrImage}}" class="constitution-qr" src="{{qrImage}}" mode="aspectFit" show-menu-by-longpress="true" />
             <view wx:elif="{{qrLoading}}" class="constitution-qr-placeholder">二维码生成中...</view>
-            <view wx:else class="constitution-qr-placeholder">二维码生成失败</view>
+            <view wx:else class="constitution-qr-placeholder">暂无二维码</view>
           </view>
 
           <view class="constitution-scan-hint">{{scanHint}}</view>

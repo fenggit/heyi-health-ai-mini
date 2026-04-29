@@ -157,6 +157,10 @@
   align-items: center;
 }
 
+.activity-meta-row--location {
+  gap: 10rpx;
+}
+
 .activity-meta-icon {
   width: 32rpx;
   height: 32rpx;
@@ -166,7 +170,7 @@
 
 .activity-meta-icon--right {
   margin-right: 0;
-  margin-left: 10rpx;
+  margin-left: auto;
 }
 
 .activity-meta-text {
@@ -177,9 +181,9 @@
   line-height: 1.5;
 }
 
-.activity-meta-text--inline {
-  flex: none;
-  min-width: auto;
+.activity-meta-text--location {
+  flex: 1;
+  min-width: 0;
 }
 
 .activity-seat {

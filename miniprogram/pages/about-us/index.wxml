@@ -56,4 +56,11 @@
       <view class="about-tip">提示：合一食养不能替代医疗诊断和治疗如有健康问题请及时就医。</view>
     </view>
   </view>
+
+  <agreement-popup
+    show="{{popupShow}}"
+    title="{{popupTitle}}"
+    content="{{popupContent}}"
+    bind:confirm="onPopupConfirm"
+  />
 </view>

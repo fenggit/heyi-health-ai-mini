@@ -23,8 +23,8 @@ const VOICE_MESSAGE_ICON = "/assets/analysis/chat/voice_icon.png"
 const VOICE_UNAVAILABLE_MESSAGE = "当前小程序未配置语音识别服务"
 
 const STATIC_PAGE_DATA = {
-  title: "哈喽，我是小亿！",
-  subTitle: "你的AI食养助手",
+  title: "哈喽，我是天天！",
+  subTitle: "你的AI食养顾问",
   capabilities: ["进行趣味性生活状态分析", "提供个性化饮食建议", "解答饮食健康问题", "快速访问各项功能"],
   noticeText: "提示: 本服务仅供娱乐与生活参考，不能替代医疗建议~",
   quickActions: [
@@ -367,8 +367,10 @@ Page({
   },
   onLoad() {
     this._pageUnloaded = false
+    this._initialPageLoadingVisible = false
     this.initVoiceRecognition()
     this.syncLayout()
+    this.showInitialPageLoading()
     this.loadPageData()
   },
   onReady() {
@@ -383,6 +385,20 @@ Page({
     this._voiceStopAfterStart = true
     this.resetVoiceState()
     this.stopVoiceRecognition({ silent: true })
+    this.hideInitialPageLoading()
+  },
+  showInitialPageLoading(title = "加载中...") {
+    if (this._initialPageLoadingVisible) return
+    this._initialPageLoadingVisible = true
+    wx.showLoading({
+      title,
+      mask: true
+    })
+  },
+  hideInitialPageLoading() {
+    if (!this._initialPageLoadingVisible) return
+    this._initialPageLoadingVisible = false
+    wx.hideLoading()
   },
   initVoiceRecognition() {
     this._recordRecognitionManager = recordRecognitionManager
@@ -680,6 +696,7 @@ Page({
     } catch (error) {
       console.warn("[ai-chat] 初始化会话失败:", error)
     } finally {
+      this.hideInitialPageLoading()
       if (this.data.pageLoading) {
         this.setData({
           pageLoading: false
@@ -830,6 +847,20 @@ Page({
         this.scrollToLatest()
       }
     )
+  },
+  copyMessage(e) {
+    const text = String(e && e.currentTarget && e.currentTarget.dataset ? e.currentTarget.dataset.text || "" : "").trim()
+    if (!text) return
+
+    wx.setClipboardData({
+      data: text,
+      success: () => {
+        wx.showToast({
+          title: "已复制",
+          icon: "none"
+        })
+      }
+    })
   },
   onInputChange(e) {
     this.setData({
