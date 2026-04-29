@@ -8,8 +8,19 @@ const {
   normalizeSessionId
 } = require("../../http/assistant")
 
+let recordRecognitionManager = null
+
+try {
+  const wechatSI = requirePlugin("WechatSI")
+  recordRecognitionManager = wechatSI.getRecordRecognitionManager()
+} catch (error) {
+  console.warn("[ai-chat] WechatSI 插件未就绪:", error)
+}
+
 const STORAGE_ASSISTANT_SESSION_KEY = "assistantSessionId"
 const DEFAULT_REPLY = "你可以用语音或文字告诉我你的需求，我会尽力帮你！"
+const VOICE_MESSAGE_ICON = "/assets/analysis/chat/voice_icon.png"
+const VOICE_UNAVAILABLE_MESSAGE = "当前小程序未配置语音识别服务"
 
 const STATIC_PAGE_DATA = {
   title: "哈喽，我是小亿！",
@@ -258,6 +269,69 @@ function mergeMessages(historyMessages, liveMessages) {
   return merged
 }
 
+function getVoiceErrorMessage(error) {
+  const retcode = error && error.retcode
+
+  if (retcode === -30011) return "语音识别仍在进行中，请稍后重试"
+  if (retcode === -30006) return "语音识别超时，请重试"
+  if (retcode === -40001) return "语音识别请求过于频繁，请稍后再试"
+  if (retcode === -30001 || retcode === -30003 || retcode === -30008 || retcode === -30010) {
+    return "录音或网络异常，请稍后重试"
+  }
+
+  const message = String((error && error.msg) || "").trim()
+  return message || "语音识别失败，请稍后重试"
+}
+
+function bindRecordRecognitionEvent(manager, eventName, handler) {
+  if (!manager || typeof handler !== "function") return false
+
+  manager[eventName] = handler
+  console.log(`[ai-chat] bind ${eventName}`, {
+    assigned: typeof manager[eventName] === "function",
+    managerKeys: Object.keys(manager || {})
+  })
+  return true
+}
+
+function logAiChat(eventName, payload) {
+  if (payload === undefined) {
+    console.log(`[ai-chat] ${eventName}`)
+    return
+  }
+
+  console.log(`[ai-chat] ${eventName}`, payload)
+}
+
+function safeSerialize(value) {
+  if (value === undefined) return "undefined"
+  try {
+    return JSON.stringify(value)
+  } catch (error) {
+    return String(value)
+  }
+}
+
+function extractRecognitionText(payload) {
+  const safePayload = payload && typeof payload === "object" ? payload : {}
+  const candidates = [
+    safePayload.result,
+    safePayload.resultText,
+    safePayload.resultString,
+    safePayload.text,
+    safePayload.content,
+    safePayload.message,
+    safePayload.msg
+  ]
+
+  for (let i = 0; i < candidates.length; i += 1) {
+    const value = String(candidates[i] || "").trim()
+    if (value) return value
+  }
+
+  return ""
+}
+
 const WAVE_BARS = [10, 18, 12, 22, 14, 26, 16, 20, 12, 24, 15, 28, 13, 21, 11, 24, 14, 26, 12, 20, 10, 22, 13, 18]
 
 Page({
@@ -285,12 +359,15 @@ Page({
     inputMode: "text",
     inputFocus: false,
     draftText: "",
+    voiceEntryEnabled: false,
     voiceHintVisible: false,
     voiceHintCancel: false,
     voiceHolding: false,
     waveBars: WAVE_BARS
   },
   onLoad() {
+    this._pageUnloaded = false
+    this.initVoiceRecognition()
     this.syncLayout()
     this.loadPageData()
   },
@@ -299,6 +376,250 @@ Page({
   },
   onShow() {
     this.measureInputDock()
+  },
+  onUnload() {
+    this._pageUnloaded = true
+    this._voiceCancelOnStop = true
+    this._voiceStopAfterStart = true
+    this.resetVoiceState()
+    this.stopVoiceRecognition({ silent: true })
+  },
+  initVoiceRecognition() {
+    this._recordRecognitionManager = recordRecognitionManager
+    this.setData({
+      voiceEntryEnabled: !!this._recordRecognitionManager
+    })
+    logAiChat("initVoiceRecognition", {
+      voiceEntryEnabled: !!this._recordRecognitionManager,
+      managerType: this._recordRecognitionManager ? typeof this._recordRecognitionManager : "null"
+    })
+    if (!this._recordRecognitionManager) return
+
+    bindRecordRecognitionEvent(this._recordRecognitionManager, "onStart", (res) => {
+      console.log("[ai-chat] recordRecoManager.onStart", res)
+      logAiChat("voice.onStart", {
+        rawResult: res,
+        serializedResult: safeSerialize(res)
+      })
+      this._voiceStarting = false
+      this._voiceRecordingActive = true
+
+      if (this._voiceStopAfterStart) {
+        this._voiceStopAfterStart = false
+        this.stopVoiceRecognition({ silent: true })
+      }
+    })
+
+    bindRecordRecognitionEvent(this._recordRecognitionManager, "onRecognize", (res) => {
+      const recognizedText = String((res && res.result) || "").trim() || extractRecognitionText(res)
+      this._voiceStarting = false
+      this._voiceRecordingActive = true
+      logAiChat("voice.onRecognize", {
+        result: res && res.result,
+        recognizedText,
+        resultLength: recognizedText.length,
+        rawResult: res,
+        serializedResult: safeSerialize(res)
+      })
+
+      if (this._voiceStopAfterStart) {
+        logAiChat("voice.onRecognize.stopAfterStart")
+        this._voiceStopAfterStart = false
+        this.stopVoiceRecognition({ silent: true })
+      }
+    })
+
+    bindRecordRecognitionEvent(this._recordRecognitionManager, "onStop", (res) => {
+      const shouldCancel = !!this._voiceCancelOnStop
+      const result = String((res && res.result) || "").trim()
+      const recognizedText = result || extractRecognitionText(res)
+      console.log("[ai-chat] recordRecoManager.onStop", res)
+      console.log("[ai-chat] record file path", res && res.tempFilePath)
+      console.log("[ai-chat] result", result)
+      logAiChat("voice.onStop", {
+        shouldCancel,
+        result,
+        recognizedText,
+        resultLength: recognizedText.length,
+        rawResult: res,
+        serializedResult: safeSerialize(res)
+      })
+
+      console.log("[ai-chat] recordRecoManager.onStop result", result)
+      console.log("[ai-chat] recognizedText(final)", recognizedText)
+
+      this._voiceStarting = false
+      this._voiceRecordingActive = false
+      this._voiceCancelOnStop = false
+      this._voiceStopAfterStart = false
+
+      if (this._pageUnloaded) return
+
+      this.resetVoiceState()
+
+      if (shouldCancel) {
+        return
+      }
+
+      if (!recognizedText) {
+        this.setData({
+          draftText: safeSerialize(res)
+        })
+        wx.showToast({
+          title: "未识别到语音内容",
+          icon: "none"
+        })
+        return
+      }
+
+      this.setData({
+        draftText: recognizedText
+      })
+
+      this.sendQuestionText(recognizedText, {
+        userExtras: { leftIcon: VOICE_MESSAGE_ICON }
+      })
+    })
+
+    bindRecordRecognitionEvent(this._recordRecognitionManager, "onError", (error) => {
+      console.error("[ai-chat] recordRecoManager.onError", error)
+      console.error("[ai-chat] error msg", error && error.msg)
+      logAiChat("voice.onError", error)
+      const shouldCancel = !!this._voiceCancelOnStop
+
+      this._voiceStarting = false
+      this._voiceRecordingActive = false
+      this._voiceCancelOnStop = false
+      this._voiceStopAfterStart = false
+
+      if (this._pageUnloaded) return
+
+      this.resetVoiceState()
+
+      if (shouldCancel && error && error.retcode === -30012) return
+
+      wx.showToast({
+        title: getVoiceErrorMessage(error),
+        icon: "none"
+      })
+    })
+  },
+  resetVoiceState() {
+    if (this._pageUnloaded) return
+    if (!this.data.voiceHintVisible && !this.data.voiceHintCancel && !this.data.voiceHolding) return
+    this.setData({
+      voiceHintVisible: false,
+      voiceHintCancel: false,
+      voiceHolding: false
+    })
+  },
+  ensureRecordPermission() {
+    return new Promise((resolve) => {
+      wx.getSetting({
+        success: (settingRes) => {
+          if (settingRes && settingRes.authSetting && settingRes.authSetting["scope.record"]) {
+            resolve(true)
+            return
+          }
+
+          wx.authorize({
+            scope: "scope.record",
+            success: () => {
+              resolve(true)
+            },
+            fail: () => {
+              wx.showToast({
+                title: "请允许录音后再试",
+                icon: "none"
+              })
+              resolve(false)
+            }
+          })
+        },
+        fail: () => {
+          wx.showToast({
+            title: "无法获取录音权限",
+            icon: "none"
+          })
+          resolve(false)
+        }
+      })
+    })
+  },
+  async startVoiceRecognition() {
+    logAiChat("voice.start.request", {
+      hasManager: !!this._recordRecognitionManager,
+      voiceStarting: !!this._voiceStarting,
+      voiceRecordingActive: !!this._voiceRecordingActive
+    })
+    if (!this._recordRecognitionManager) {
+      wx.showToast({
+        title: "当前环境不支持语音识别",
+        icon: "none"
+      })
+      this.resetVoiceState()
+      return
+    }
+
+    if (this._voiceStarting || this._voiceRecordingActive) return
+
+    this._voiceCancelOnStop = false
+  this._voiceStopAfterStart = false
+    this._voiceStarting = true
+
+    const permissionGranted = await this.ensureRecordPermission()
+    logAiChat("voice.start.permission", { permissionGranted })
+    if (!permissionGranted) {
+      this._voiceStarting = false
+      this.resetVoiceState()
+      return
+    }
+
+    try {
+      logAiChat("voice.start.invoke", {
+        duration: 60000,
+        lang: "zh_CN"
+      })
+      this._recordRecognitionManager.start({
+        duration: 60000,
+        lang: "zh_CN"
+      })
+    } catch (error) {
+      logAiChat("voice.start.catch", error)
+      this._voiceStarting = false
+      this.resetVoiceState()
+      wx.showToast({
+        title: getVoiceErrorMessage(error),
+        icon: "none"
+      })
+    }
+  },
+  stopVoiceRecognition(options = {}) {
+    const { silent = false } = options
+    logAiChat("voice.stop.request", {
+      silent,
+      voiceStarting: !!this._voiceStarting,
+      voiceRecordingActive: !!this._voiceRecordingActive
+    })
+
+    if (!this._recordRecognitionManager) return
+    if (!this._voiceStarting && !this._voiceRecordingActive) return
+
+    try {
+      logAiChat("voice.stop.invoke")
+      this._recordRecognitionManager.stop()
+    } catch (error) {
+      logAiChat("voice.stop.catch", error)
+      this._voiceStarting = false
+      this._voiceRecordingActive = false
+      this._voiceCancelOnStop = false
+      if (!silent) {
+        wx.showToast({
+          title: getVoiceErrorMessage(error),
+          icon: "none"
+        })
+      }
+    }
   },
   syncLayout() {
     const { statusBarHeight, navBarHeight, headerHeight } = getLayoutMetrics()
@@ -496,6 +817,12 @@ Page({
     const messages = this.data.messages.concat(message)
     const payload = { messages }
     if (clearDraft) payload.draftText = ""
+    logAiChat("appendMessage", {
+      role: message && message.role,
+      text: message && message.text,
+      nextMessageCount: messages.length,
+      clearDraft
+    })
 
     this.setData(
       payload,
@@ -524,8 +851,21 @@ Page({
   async sendQuestionText(questionText, options = {}) {
     const { clearDraft = false, userExtras = {} } = options
     const value = String(questionText || "").trim()
-    if (!value) return
-    if (this._sendingQuestion) return
+    logAiChat("sendQuestionText.enter", {
+      rawQuestionText: questionText,
+      normalizedValue: value,
+      clearDraft,
+      userExtras,
+      sendingQuestion: !!this._sendingQuestion
+    })
+    if (!value) {
+      logAiChat("sendQuestionText.skip.empty")
+      return
+    }
+    if (this._sendingQuestion) {
+      logAiChat("sendQuestionText.skip.busy")
+      return
+    }
 
     // 兜底关闭系统 loading，发送阶段只保留聊天区小 loading。
     wx.hideLoading()
@@ -546,11 +886,16 @@ Page({
       if (!sessionId) {
         sessionId = await this.ensureSessionId()
       }
+      logAiChat("sendQuestionText.request", {
+        sessionId,
+        questionText: value
+      })
 
       const response = await chatWithAssistant({
         sessionId,
         questionText: value
       })
+      logAiChat("sendQuestionText.response", response)
 
       this.appendMessage(buildAssistantMessage(response))
     } catch (error) {
@@ -581,6 +926,14 @@ Page({
     })
   },
   switchToVoice() {
+    if (!this.data.voiceEntryEnabled) {
+      wx.showToast({
+        title: VOICE_UNAVAILABLE_MESSAGE,
+        icon: "none"
+      })
+      return
+    }
+
     this.setData(
       {
         inputMode: "voice",
@@ -605,47 +958,60 @@ Page({
   onVoiceHoldStart(e) {
     const touch = (e.touches && e.touches[0]) || null
     this.voiceStartY = touch ? touch.clientY : 0
+    logAiChat("voice.holdStart", {
+      startY: this.voiceStartY
+    })
     this.setData({
       voiceHintVisible: true,
       voiceHintCancel: false,
       voiceHolding: true
     })
+
+    this.startVoiceRecognition()
   },
   onVoiceHoldMove(e) {
     if (!this.data.voiceHintVisible) return
     const touch = (e.touches && e.touches[0]) || null
     if (!touch) return
     const moveDistance = this.voiceStartY - touch.clientY
+    logAiChat("voice.holdMove", {
+      moveDistance,
+      willCancel: moveDistance > 90
+    })
     this.setData({
       voiceHintCancel: moveDistance > 90
     })
   },
   onVoiceHoldEnd() {
     const isCancel = this.data.voiceHintCancel
-    this.setData({
-      voiceHintVisible: false,
-      voiceHintCancel: false,
-      voiceHolding: false
+    logAiChat("voice.holdEnd", {
+      isCancel,
+      voiceStarting: !!this._voiceStarting,
+      voiceRecordingActive: !!this._voiceRecordingActive
     })
+    this.resetVoiceState()
 
-    if (isCancel) {
-      wx.showToast({
-        title: "已取消发送",
-        icon: "none"
-      })
+    this._voiceCancelOnStop = isCancel
+    if (this._voiceStarting && !this._voiceRecordingActive) {
+      this._voiceStopAfterStart = true
       return
     }
 
-    this.sendQuestionText("帮我分析下体质", {
-      userExtras: { leftIcon: "/assets/analysis/chat/voice_icon.png" }
-    })
+    this.stopVoiceRecognition()
   },
   onVoiceHoldCancel() {
-    this.setData({
-      voiceHintVisible: false,
-      voiceHintCancel: false,
-      voiceHolding: false
+    logAiChat("voice.holdCancel", {
+      voiceStarting: !!this._voiceStarting,
+      voiceRecordingActive: !!this._voiceRecordingActive
     })
+    this._voiceCancelOnStop = true
+    this.resetVoiceState()
+    if (this._voiceStarting && !this._voiceRecordingActive) {
+      this._voiceStopAfterStart = true
+      return
+    }
+
+    this.stopVoiceRecognition({ silent: true })
   },
   tapQuickAction(e) {
     const { path, routeType } = e.currentTarget.dataset

@@ -62,6 +62,12 @@
   "usingComponents": {
     "title-view": "/components/title-view/index"
   },
+  "plugins": {
+    "WechatSI": {
+      "version": "0.0.7",
+      "provider": "wx069ba97219f66d99"
+    }
+  },
   "requiredPrivateInfos": [
     "getFuzzyLocation"
   ],

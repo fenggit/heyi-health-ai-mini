@@ -87,14 +87,17 @@
   <view class="analysis-input-dock" style="padding-bottom: calc(16rpx + {{safeBottom}}px);">
     <view class="analysis-input-shell">
       <view wx:if="{{inputMode === 'text'}}" class="analysis-input-row" bindtap="focusInput">
-        <view class="analysis-input-icon-wrap analysis-input-icon-wrap--left-box" catchtap="switchToVoice">
+        <view
+          class="analysis-input-icon-wrap analysis-input-icon-wrap--left-box {{voiceEntryEnabled ? '' : 'analysis-input-icon-wrap--disabled'}}"
+          catchtap="switchToVoice"
+        >
           <image class="analysis-input-icon analysis-input-icon--large" src="/assets/analysis/chat/mic_icon.png" mode="aspectFit" />
         </view>
         <input
           class="analysis-text-input"
           value="{{draftText}}"
           focus="{{inputFocus}}"
-          placeholder="输入消息或者使用语音..."
+          placeholder="{{voiceEntryEnabled ? '输入消息或者使用语音...' : '输入消息...'}}"
           placeholder-class="analysis-text-input__placeholder"
           bindinput="onInputChange"
           bindconfirm="sendText"
@@ -119,7 +122,13 @@
       </view>
     </view>
 
-    <view wx:if="{{voiceHintVisible}}" class="analysis-record-overlay">
+    <view
+      class="analysis-record-overlay-mask {{voiceHintVisible ? 'analysis-record-overlay-mask--active' : ''}}"
+      bindtouchmove="onVoiceHoldMove"
+      bindtouchend="onVoiceHoldEnd"
+      bindtouchcancel="onVoiceHoldCancel"
+    >
+      <view class="analysis-record-overlay {{voiceHintVisible ? 'analysis-record-overlay--active' : ''}}">
       <image
         class="analysis-record-overlay__bg"
         src="{{voiceHintCancel ? '/assets/analysis/chat/voice_cancel.png' : '/assets/analysis/chat/voice_confirm.png'}}"
@@ -136,6 +145,7 @@
           </block>
         </view>
       </view>
+    </view>
     </view>
   </view>
 
