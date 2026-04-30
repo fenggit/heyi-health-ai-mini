@@ -42,7 +42,7 @@
       </view>
     </view>
 
-    <view class="glass-card setting-main-card">
+    <view wx:if="{{false}}" class="glass-card setting-main-card">
       <view class="setting-section-head">
         <title-view text="偏好设置" />
       </view>

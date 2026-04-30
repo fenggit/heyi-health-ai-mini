@@ -41,12 +41,6 @@ const STATIC_PAGE_DATA = {
       routeType: "tab"
     },
     {
-      id: "diet",
-      label: "查看我的计划",
-      path: "/pages/my-week-plan/index",
-      routeType: "navigate"
-    },
-    {
       id: "profile",
       label: "个人中心",
       path: "/pages/profile/index",
