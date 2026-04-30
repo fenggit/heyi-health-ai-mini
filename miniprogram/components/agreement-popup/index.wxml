@@ -9,7 +9,15 @@
 
     <!-- 可滚动内容 -->
     <scroll-view class="popup-scroll" scroll-y>
-      <text class="popup-content">{{content}}</text>
+      <view wx:if="{{summary}}" class="popup-section">
+        <text class="popup-section-title">摘要</text>
+        <text class="popup-summary">{{summary}}</text>
+      </view>
+
+      <view class="popup-section {{summary ? 'popup-section--content' : ''}}">
+        <text class="popup-section-title">内容</text>
+        <text class="popup-content">{{content}}</text>
+      </view>
     </scroll-view>
 
     <!-- 确认按钮 -->

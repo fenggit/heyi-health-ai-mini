@@ -72,6 +72,7 @@
   <agreement-popup
     show="{{popupShow}}"
     title="{{popupTitle}}"
+    summary="{{popupSummary}}"
     content="{{popupContent}}"
     bind:confirm="onPopupConfirm"
   />

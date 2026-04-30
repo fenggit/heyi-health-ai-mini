@@ -28,7 +28,7 @@
 
     <view class="card-panel analysis-intro-card">
       <view class="analysis-intro-card__head">
-        <title-view text="我可以帮你：" />
+        <title-view text="我可以帮您：" />
       </view>
       <block wx:for="{{capabilities}}" wx:key="*this">
         <view class="analysis-intro-card__item">· {{item}}</view>

@@ -3,7 +3,7 @@ const request = require("../../utils/request")
 
 const PAGE_DATA = {
   navTitle: "体质测评",
-  welcomeTitle: "欢迎来到合一食养",
+  welcomeTitle: "欢迎来到天元食养",
   welcomeSubtitle: "AI智能体质测评·个性化食养方案",
   tag: "体质测评",
   metrics: [

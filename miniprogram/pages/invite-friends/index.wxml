@@ -53,7 +53,13 @@
 
       <view class="invite-share-list">
         <block wx:for="{{channels}}" wx:key="id">
-          <view class="invite-share-item" data-name="{{item.name}}" bindtap="shareByChannel">
+          <button wx:if="{{item.id !== 'poster'}}" class="invite-share-item invite-share-item--button" data-channel-id="{{item.id}}" open-type="share" bindtap="prepareShare">
+            <view class="invite-share-item__tile" style="background: {{item.tileBg}};">
+              <image class="invite-share-item__icon" src="{{item.icon}}" mode="aspectFit" />
+              <view class="invite-share-item__name">{{item.name}}</view>
+            </view>
+          </button>
+          <view wx:else class="invite-share-item" data-name="{{item.name}}" bindtap="shareByChannel">
             <view class="invite-share-item__tile" style="background: {{item.tileBg}};">
               <image class="invite-share-item__icon" src="{{item.icon}}" mode="aspectFit" />
               <view class="invite-share-item__name">{{item.name}}</view>
@@ -86,22 +92,21 @@
           <view class="poster-hero__glow poster-hero__glow--left"></view>
           <view class="poster-hero__glow poster-hero__glow--right"></view>
           <view class="poster-brand">{{posterBrand}}</view>
-          <view class="poster-subtitle">
-            <view class="poster-subtitle__line"></view>
-            <view>{{posterSubTitle}}</view>
-            <view class="poster-subtitle__line"></view>
-          </view>
         </view>
 
         <view class="poster-card__body">
+          <view class="poster-subtitle">
+            <view>{{posterSubTitle}}</view>
+          </view>
+
           <view wx:if="{{posterQrImage}}" class="poster-qrcode">
             <image class="poster-qrcode__image" src="{{posterQrImage}}" mode="aspectFill" />
           </view>
           <view wx:else class="poster-qrcode poster-qrcode--placeholder">
-            <view class="poster-qrcode__placeholder-text">二维码图片待接入</view>
+            <view class="poster-qrcode__placeholder-text">邀请二维码暂未生成</view>
           </view>
 
-          <view class="poster-user-id">ID：{{posterUserId}}</view>
+          <view class="poster-user-id">邀请码：{{inviteCode}}</view>
         </view>
 
         <view class="poster-save-btn" bindtap="savePoster">保存到手机</view>

@@ -2,6 +2,7 @@ Component({
   properties: {
     show: { type: Boolean, value: false },
     title: { type: String, value: '' },
+    summary: { type: String, value: '' },
     content: { type: String, value: '' }
   },
   methods: {

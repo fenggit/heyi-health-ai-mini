@@ -53,13 +53,14 @@
       <view class="about-link" bindtap="openAgreement">用户协议</view>
       <view class="about-link" bindtap="openPrivacy">隐私政策</view>
 
-      <view class="about-tip">提示：合一食养不能替代医疗诊断和治疗如有健康问题请及时就医。</view>
+      <view class="about-tip">提示：天元食养不能替代医疗诊断和治疗如有健康问题请及时就医。</view>
     </view>
   </view>
 
   <agreement-popup
     show="{{popupShow}}"
     title="{{popupTitle}}"
+    summary="{{popupSummary}}"
     content="{{popupContent}}"
     bind:confirm="onPopupConfirm"
   />

@@ -1,5 +1,5 @@
 {
-  "description": "合一食养小程序本地配置",
+  "description": "天元食养小程序本地配置",
   "setting": {
     "compileHotReLoad": true,
     "useApiHook": true,

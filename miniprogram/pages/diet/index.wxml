@@ -4,7 +4,7 @@
 
   <!-- 标题行：左侧标题，右侧为微信胶囊留白 -->
   <view class="diet-title-row">
-    <text class="diet-title">合一食养</text>
+    <text class="diet-title">天元食养</text>
   </view>
 
   <view class="diet-wrap">

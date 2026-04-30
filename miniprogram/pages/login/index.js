@@ -1,12 +1,17 @@
 const { login } = require('../../http/auth')
 const { getAuthToken } = require('../../utils/request')
-const { AGREEMENT_CONTENT, PRIVACY_CONTENT } = require('../../utils/agreement')
+const {
+  USER_AGREEMENT_KIND,
+  PRIVACY_POLICY_KIND,
+  getAgreementPopupData
+} = require('../../utils/agreement')
 
 Page({
   data: {
     agreed: false,
     popupShow: false,
     popupTitle: '',
+    popupSummary: '',
     popupContent: ''
   },
 
@@ -72,12 +77,32 @@ Page({
     }
   },
 
+  openAgreementByKind(kind) {
+    wx.showLoading({ title: '加载中', mask: true })
+    getAgreementPopupData(kind)
+      .then((agreement) => {
+        this.setData({
+          popupShow: true,
+          popupTitle: agreement.title,
+          popupSummary: agreement.summary,
+          popupContent: agreement.content
+        })
+      })
+      .catch((error) => {
+        console.warn('[login] 获取协议内容失败:', error)
+        wx.showToast({ title: '协议内容加载失败', icon: 'none' })
+      })
+      .finally(() => {
+        wx.hideLoading()
+      })
+  },
+
   openUserAgreement() {
-    this.setData({ popupShow: true, popupTitle: '用户协议', popupContent: AGREEMENT_CONTENT })
+    this.openAgreementByKind(USER_AGREEMENT_KIND)
   },
 
   openPrivacyPolicy() {
-    this.setData({ popupShow: true, popupTitle: '隐私政策', popupContent: PRIVACY_CONTENT })
+    this.openAgreementByKind(PRIVACY_POLICY_KIND)
   },
 
   onPopupConfirm() {

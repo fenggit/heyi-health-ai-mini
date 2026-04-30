@@ -54,8 +54,33 @@
   overflow: hidden;
 }
 
+.popup-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.popup-section--content {
+  margin-top: 28rpx;
+}
+
+.popup-section-title {
+  color: #475569;
+  font-size: 24rpx;
+  line-height: 36rpx;
+  font-weight: 600;
+}
+
+.popup-summary {
+  display: block;
+  margin-top: 12rpx;
+  color: #334155;
+  font-size: 26rpx;
+  line-height: 40rpx;
+}
+
 .popup-content {
   display: block;
+  margin-top: 12rpx;
   color: #1e293b;
   font-size: 28rpx;
   line-height: 42rpx;

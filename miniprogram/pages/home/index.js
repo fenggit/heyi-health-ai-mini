@@ -11,7 +11,7 @@ function createProgressSegments(filled, total) {
 }
 
 const DEFAULT_HOME_DATA = {
-  greetingTitle: "合一食养",
+  greetingTitle: "天元食养",
   greetingText: "早上好，开启健康新一天~",
   activityBanners: [
     {

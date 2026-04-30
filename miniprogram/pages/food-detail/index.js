@@ -609,7 +609,7 @@ Page({
     const imageUrl = toDisplayText(this.data.packInfo && this.data.packInfo.image, "")
 
     return {
-      title: `${name}｜合一食养`,
+      title: `${name}｜天元食养`,
       path,
       imageUrl,
       query: encodedRecipeId ? `recipeId=${encodedRecipeId}` : ""

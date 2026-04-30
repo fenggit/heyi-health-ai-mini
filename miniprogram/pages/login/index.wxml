@@ -8,7 +8,7 @@
       <view class="login-logo">
         <text class="login-logo-text">合</text>
       </view>
-      <text class="login-app-name">合一食养</text>
+      <text class="login-app-name">天元食养</text>
     </view>
   </view>
 
@@ -34,6 +34,7 @@
 <agreement-popup
   show="{{popupShow}}"
   title="{{popupTitle}}"
+  summary="{{popupSummary}}"
   content="{{popupContent}}"
   bind:confirm="onPopupConfirm"
 />

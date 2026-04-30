@@ -1,8 +1,9 @@
 const { getLayoutMetrics } = require("../../utils/layout")
-
-const AGREEMENT_CONTENT = '基于中医体质理论和现代营养学，运用AI技术为每一位用户提供个性化的食养方案，帮助大家通过科学饮食改善体质，实现健康生活。\n\n基于中医体质理论和现代营养学，运用AI技术为每一位用户提供个性化的食养方案，帮助大家通过科学饮食改善体质，实现健康生活。'
-
-const PRIVACY_CONTENT = '基于中医体质理论和现代营养学，运用AI技术为每一位用户提供个性化的食养方案，帮助大家通过科学饮食改善体质，实现健康生活。\n\n基于中医体质理论和现代营养学，运用AI技术为每一位用户提供个性化的食养方案，帮助大家通过科学饮食改善体质，实现健康生活。'
+const {
+  USER_AGREEMENT_KIND,
+  PRIVACY_POLICY_KIND,
+  getAgreementPopupData
+} = require('../../utils/agreement')
 
 const MOCK_REPORT_DATA = {
   navTitle: "趣味分析",
@@ -146,6 +147,7 @@ Page({
     agreed: false,
     popupShow: false,
     popupTitle: "",
+    popupSummary: "",
     popupContent: ""
   },
   onLoad(options) {
@@ -211,11 +213,30 @@ Page({
   toggleAgreed() {
     this.setData({ agreed: !this.data.agreed })
   },
+  openAgreementByKind(kind) {
+    wx.showLoading({ title: '加载中', mask: true })
+    getAgreementPopupData(kind)
+      .then((agreement) => {
+        this.setData({
+          popupShow: true,
+          popupTitle: agreement.title,
+          popupSummary: agreement.summary,
+          popupContent: agreement.content
+        })
+      })
+      .catch((error) => {
+        console.warn('[analysis-report] 获取协议内容失败:', error)
+        wx.showToast({ title: '协议内容加载失败', icon: 'none' })
+      })
+      .finally(() => {
+        wx.hideLoading()
+      })
+  },
   openUserAgreement() {
-    this.setData({ popupShow: true, popupTitle: "用户协议", popupContent: AGREEMENT_CONTENT })
+    this.openAgreementByKind(USER_AGREEMENT_KIND)
   },
   openPrivacyPolicy() {
-    this.setData({ popupShow: true, popupTitle: "隐私政策", popupContent: PRIVACY_CONTENT })
+    this.openAgreementByKind(PRIVACY_POLICY_KIND)
   },
   onPopupConfirm() {
     this.setData({ popupShow: false })

@@ -2,9 +2,11 @@ const { getLayoutMetrics } = require("../../utils/layout")
 const { get } = require("../../utils/request")
 const paths = require("../../http/paths")
 const { login } = require("../../http/auth")
-
-const AGREEMENT_CONTENT = "基于中医体质理论和现代营养学，运用AI技术为每一位用户提供个性化的食养方案，帮助大家通过科学饮食改善体质，实现健康生活。"
-const PRIVACY_CONTENT = "我们重视并保护您的个人隐私信息，授权信息仅用于生成个性化健康分析与服务体验。"
+const {
+  USER_AGREEMENT_KIND,
+  PRIVACY_POLICY_KIND,
+  getAgreementPopupData
+} = require('../../utils/agreement')
 
 const STATIC_DATA = {
   navTitle: "趣味分析",
@@ -46,6 +48,7 @@ Page({
     agreed: false,
     popupShow: false,
     popupTitle: "",
+    popupSummary: "",
     popupContent: "",
     mainType: "",
     mainTypeHint: "",
@@ -144,11 +147,30 @@ Page({
       })
     }
   },
+  openAgreementByKind(kind) {
+    wx.showLoading({ title: '加载中', mask: true })
+    getAgreementPopupData(kind)
+      .then((agreement) => {
+        this.setData({
+          popupShow: true,
+          popupTitle: agreement.title,
+          popupSummary: agreement.summary,
+          popupContent: agreement.content
+        })
+      })
+      .catch((error) => {
+        console.warn('[analysis-auth] 获取协议内容失败:', error)
+        wx.showToast({ title: '协议内容加载失败', icon: 'none' })
+      })
+      .finally(() => {
+        wx.hideLoading()
+      })
+  },
   openUserAgreement() {
-    this.setData({ popupShow: true, popupTitle: "用户协议", popupContent: AGREEMENT_CONTENT })
+    this.openAgreementByKind(USER_AGREEMENT_KIND)
   },
   openPrivacyPolicy() {
-    this.setData({ popupShow: true, popupTitle: "隐私政策", popupContent: PRIVACY_CONTENT })
+    this.openAgreementByKind(PRIVACY_POLICY_KIND)
   },
   onPopupConfirm() {
     this.setData({ popupShow: false })
