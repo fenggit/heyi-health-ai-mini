@@ -1,6 +1,6 @@
 const { getLayoutMetrics } = require("../../utils/layout")
 const { navigateToReport } = require("../../utils/navigateReport")
-const { get } = require("../../utils/request")
+const { get, post } = require("../../utils/request")
 const { fetchUserInfo, loadUserInfoFromStorage } = require("../../http/auth")
 const paths = require("../../http/paths")
 
@@ -10,6 +10,7 @@ const RECOMMEND_PLAN_CHIP_BG = "/assets/profile-pages/vip/recommend_img@2x.png"
 const DEFAULT_MEMBER_PLANS = [
   {
     id: "normal",
+    planId: "",
     title: "当前：普通会员",
     price: 0,
     unit: "",
@@ -18,6 +19,7 @@ const DEFAULT_MEMBER_PLANS = [
   },
   {
     id: "gold",
+    planId: "gold",
     title: "推荐：黄金会员",
     price: 99,
     unit: "/月",
@@ -26,6 +28,7 @@ const DEFAULT_MEMBER_PLANS = [
   },
   {
     id: "diamond",
+    planId: "diamond",
     title: "钻石会员",
     price: 999,
     unit: "/年",
@@ -96,6 +99,58 @@ const PROFILE_REPORT_MENU_MAP = {
 
 function cloneDeep(value) {
   return JSON.parse(JSON.stringify(value))
+}
+
+function unwrapResponseData(res) {
+  if (res && Object.prototype.hasOwnProperty.call(res, "data") && res.data !== undefined && res.data !== null) {
+    return res.data
+  }
+  return res
+}
+
+function pickBizObject(data) {
+  if (!data || typeof data !== "object") return {}
+  if (data.result && typeof data.result === "object") return data.result
+  if (data.data && typeof data.data === "object") return data.data
+  return data
+}
+
+function toWechatPayArgs(data) {
+  const payload = pickBizObject(data)
+  const timeStamp = payload.timeStamp != null ? String(payload.timeStamp) : ""
+  const nonceStr = payload.nonceStr != null ? String(payload.nonceStr) : ""
+  const packageValue = payload.packageValue != null
+    ? String(payload.packageValue)
+    : (payload.package != null ? String(payload.package) : "")
+  const signType = payload.signType != null ? String(payload.signType) : "RSA"
+  const paySign = payload.paySign != null ? String(payload.paySign) : ""
+
+  if (!timeStamp || !nonceStr || !packageValue || !paySign) return null
+
+  return {
+    timeStamp,
+    nonceStr,
+    package: packageValue,
+    signType,
+    paySign
+  }
+}
+
+function requestWechatPayment(payArgs) {
+  return new Promise((resolve, reject) => {
+    wx.requestPayment({
+      ...payArgs,
+      success: () => resolve(),
+      fail: (err) => {
+        const error = err || new Error("微信支付失败")
+        const message = String((err && err.errMsg) || "")
+        if (message.toLowerCase().includes("cancel")) {
+          error.__userCanceled = true
+        }
+        reject(error)
+      }
+    })
+  })
 }
 
 function toStatNumber(value, fallback = 0) {
@@ -219,6 +274,14 @@ function buildMemberPlansFromUpgradePage(payload, fallbackPlans) {
 
     return {
       id: planId,
+      planId:
+        subscriptionPlan.planId != null
+          ? subscriptionPlan.planId
+          : (subscriptionPlan.id != null
+            ? subscriptionPlan.id
+            : (item.planId != null
+              ? item.planId
+              : (item.subscriptionPlanId != null ? item.subscriptionPlanId : ""))),
       levelId: item.levelId != null ? String(item.levelId) : "",
       title: `${isCurrent ? "当前：" : (isRecommended ? "推荐：" : "")}${levelName}`,
       price: toDisplayPrice(subscriptionPlan.priceAmount, 0),
@@ -246,6 +309,16 @@ function pickPlanDetails(plans, selectedPlanId) {
     memberBenefits: Array.isArray(matched.benefitItems) ? matched.benefitItems : [],
     memberWelfares: Array.isArray(matched.perkItems) ? matched.perkItems : []
   }
+}
+
+function pickSelectedMemberPlan(plans, selectedPlanId) {
+  if (!Array.isArray(plans) || !plans.length) return null
+  return plans.find((item) => String(item.id) === String(selectedPlanId || "")) || plans[0] || null
+}
+
+function shouldShowOpenMemberAction(plan) {
+  if (!plan || typeof plan !== "object") return false
+  return Number(plan.price) > 0
 }
 
 function pickSelectedPlanId(plans, payload, fallbackSelectedPlanId) {
@@ -279,7 +352,9 @@ function getInitialProfileViewData() {
     user: profile.user,
     quickEntry: profile.quickEntry,
     stats: profile.stats,
-    featureMenus: profile.featureMenus
+    featureMenus: profile.featureMenus,
+    showOpenMemberAction: false,
+    openingMemberSubscription: false
   }
 }
 
@@ -298,6 +373,8 @@ Page({
     memberPlans: cloneDeep(DEFAULT_MEMBER_PLANS),
     memberBenefits: [],
     memberWelfares: [],
+    showOpenMemberAction: false,
+    openingMemberSubscription: false,
     upgradePageFetchSuccess: false,
     memberFaqs: [
       {
@@ -501,12 +578,14 @@ Page({
     const nextPlans = buildMemberPlansFromUpgradePage(upgradeData, this.data.memberPlans)
     const nextSelectedPlanId = pickSelectedPlanId(nextPlans, upgradeData, this.data.selectedMemberPlanId)
     const planDetails = pickPlanDetails(nextPlans, nextSelectedPlanId)
+    const selectedPlan = pickSelectedMemberPlan(nextPlans, nextSelectedPlanId)
 
     const patch = {
       memberPlans: nextPlans,
       selectedMemberPlanId: nextSelectedPlanId,
       memberBenefits: planDetails.memberBenefits,
-      memberWelfares: planDetails.memberWelfares
+      memberWelfares: planDetails.memberWelfares,
+      showOpenMemberAction: shouldShowOpenMemberAction(selectedPlan)
     }
 
     if (upgradeData.userId != null) {
@@ -599,20 +678,95 @@ Page({
   },
   selectMemberPlan(e) {
     const { id } = e.currentTarget.dataset
+    const selectedPlan = pickSelectedMemberPlan(this.data.memberPlans, id)
     const planDetails = pickPlanDetails(this.data.memberPlans, id)
     this.setData({
       selectedMemberPlanId: id,
       memberBenefits: planDetails.memberBenefits,
-      memberWelfares: planDetails.memberWelfares
+      memberWelfares: planDetails.memberWelfares,
+      showOpenMemberAction: shouldShowOpenMemberAction(selectedPlan)
     })
   },
   confirmMemberUpgrade() {
-    const current = this.data.memberPlans.find((item) => item.id === this.data.selectedMemberPlanId)
-    if (!current) return
-    wx.showToast({
-      title: `已选择${current.title}，支付流程待接入`,
-      icon: "none"
+    if (this.data.openingMemberSubscription) return
+
+    const current = pickSelectedMemberPlan(this.data.memberPlans, this.data.selectedMemberPlanId)
+    if (!current || !shouldShowOpenMemberAction(current)) return
+
+    const planId = current.planId || current.levelId || current.id
+    if (!planId) {
+      wx.showToast({
+        title: "会员方案数据异常",
+        icon: "none"
+      })
+      return
+    }
+
+    this.setData({ openingMemberSubscription: true })
+
+    post(paths.member.subscriptionOpen, { planId }, {
+      showLoading: true,
+      loadingTitle: "开通中"
     })
+      .then((res) => {
+        const openPayload = unwrapResponseData(res)
+        const payArgs = toWechatPayArgs(openPayload)
+        if (payArgs) {
+          return requestWechatPayment(payArgs)
+        }
+
+        const orderId = openPayload && openPayload.orderId != null ? String(openPayload.orderId) : ""
+        const payRequired = !openPayload || openPayload.payRequired !== false
+
+        if (!payRequired) {
+          return Promise.resolve()
+        }
+
+        if (!orderId) {
+          throw new Error("支付订单信息缺失")
+        }
+
+        return post(paths.order.indentPayWechatCreate, {
+          orderId
+        }, {
+          showLoading: true,
+          loadingTitle: "拉起支付中"
+        }).then((payRes) => {
+          const nextPayArgs = toWechatPayArgs(unwrapResponseData(payRes))
+          if (!nextPayArgs) {
+            throw new Error("微信支付参数不完整")
+          }
+          return requestWechatPayment(nextPayArgs)
+        })
+      })
+      .then(() => {
+        this.setData({ showMemberSheet: false })
+        wx.showToast({
+          title: "支付成功",
+          icon: "success"
+        })
+        this.refreshProfileDataAndUI()
+      })
+      .catch((err) => {
+        if (err && err.__userCanceled) {
+          wx.showToast({
+            title: "已取消支付",
+            icon: "none"
+          })
+          return
+        }
+
+        const isHttpOrBizError = !!(err && (err.statusCode || err.code != null))
+        if (!isHttpOrBizError) {
+          wx.showToast({
+            title: "支付失败，请稍后重试",
+            icon: "none"
+          })
+        }
+      })
+      .finally(() => {
+        this.setData({ openingMemberSubscription: false })
+      })
   },
   noop() {}
 })

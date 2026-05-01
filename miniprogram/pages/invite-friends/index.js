@@ -1,6 +1,7 @@
 const { fetchUserInfo, getCachedUserInfo } = require('../../http/auth')
 const { initMiniNav, backWithFallback } = require('../../utils/mini-nav')
 const request = require('../../utils/request')
+const paths = require('../../http/paths')
 
 const DEFAULT_INVITE_CODE = 'HEYIZYO1'
 const DEFAULT_POSTER_USER_ID = '20260327'
@@ -52,12 +53,6 @@ const REWARD_STEPS = [
   { title: '用餐时间', reward: '新人优惠券' }
 ]
 
-const RECORDS = [
-  { id: 'u1', user: '123*****326', time: '2026-03-19 15:32:31', status: '已注册' },
-  { id: 'u2', user: '123*****326', time: '2026-03-19 15:32:31', status: '已购买' },
-  { id: 'u3', user: '123*****326', time: '2026-03-19 15:32:31', status: '已购买' }
-]
-
 function toDisplayText(value, fallback = '') {
   if (value === null || value === undefined) return fallback
   const text = String(value).trim()
@@ -89,6 +84,65 @@ function resolveInviteViewData(userInfo) {
       safeUserInfo.userId,
       profile.userId
     ], DEFAULT_POSTER_USER_ID)
+  }
+}
+
+function toSafeNumber(value, fallback = 0) {
+  const nextValue = Number(value)
+  return Number.isFinite(nextValue) ? nextValue : fallback
+}
+
+function pickArray(candidates) {
+  for (let i = 0; i < candidates.length; i += 1) {
+    const current = candidates[i]
+    if (Array.isArray(current)) return current
+  }
+  return []
+}
+
+function normalizeInviteRecord(item, index) {
+  const safeItem = item && typeof item === 'object' ? item : {}
+  return {
+    id: pickFirstText([
+      safeItem.id,
+      safeItem.recordId,
+      safeItem.userId,
+      safeItem.bindTime
+    ], `record-${index}`),
+    user: pickFirstText([
+      safeItem.displayName,
+      safeItem.nickName,
+      safeItem.nickname,
+      safeItem.userName,
+      safeItem.phone
+    ], ''),
+    time: pickFirstText([
+      safeItem.bindTime,
+      safeItem.createTime,
+      safeItem.createdTime
+    ], ''),
+    status: pickFirstText([
+      safeItem.rewardStatusName,
+      safeItem.rewardStatus,
+      safeItem.statusName
+    ], '')
+  }
+}
+
+function resolveReferralIndexViewData(rawData) {
+  const safeData = rawData && typeof rawData === 'object' ? rawData : {}
+  const rawRecords = safeData.records && typeof safeData.records === 'object' ? safeData.records : {}
+  const recordItems = pickArray([
+    rawRecords.Items,
+    rawRecords.items,
+    safeData.Items,
+    safeData.items,
+    safeData.records
+  ])
+
+  return {
+    inviteCount: toSafeNumber(safeData.referralCount, 0),
+    records: recordItems.map((item, index) => normalizeInviteRecord(item, index))
   }
 }
 
@@ -151,7 +205,7 @@ Page({
     navTitle: '邀请好友',
     title: '邀请好友',
     subTitle: '分享给好友，双方都得积分奖励',
-    inviteCount: 3,
+    inviteCount: 0,
     totalPoints: 200,
     inviteCode: DEFAULT_INVITE_CODE,
     posterUserId: DEFAULT_POSTER_USER_ID,
@@ -163,7 +217,7 @@ Page({
     channels: CHANNELS,
     summaryCards: SUMMARY_CARDS,
     rewardSteps: REWARD_STEPS,
-    records: RECORDS
+    records: []
   },
 
   onLoad() {
@@ -171,6 +225,7 @@ Page({
     this.enableShareMenu()
     this.syncInviteDataFromLocal()
     this.refreshInviteData()
+    this.loadReferralIndex()
   },
 
   onShow() {
@@ -211,6 +266,25 @@ Page({
       })
       .catch((err) => {
         console.warn('[invite-friends] 刷新邀请资料失败:', err)
+      })
+  },
+
+  loadReferralIndex() {
+    return request.get(paths.marketing.referralCodeIndex, null, {
+      showLoading: false,
+      silentBizErrorToast: true,
+      silentHttpErrorToast: true,
+      silentNetworkErrorToast: true
+    })
+      .then((res) => {
+        this.setData(resolveReferralIndexViewData((res && res.data) || null))
+      })
+      .catch((err) => {
+        console.warn('[invite-friends] 获取邀请记录失败:', err)
+        this.setData({
+          inviteCount: 0,
+          records: []
+        })
       })
   },
 

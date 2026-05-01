@@ -1,4 +1,6 @@
 const { initMiniNav, backWithFallback } = require('../../utils/mini-nav')
+const request = require('../../utils/request')
+const paths = require('../../http/paths')
 const {
   USER_AGREEMENT_KIND,
   PRIVACY_POLICY_KIND,
@@ -23,11 +25,21 @@ const RESULT_STATS = [
   { label: '食养配方', value: '1000+' }
 ]
 
-const CONTACTS = [
-  { label: '客服电话', value: '400-123-4567' },
-  { label: '客服邮箱', value: 'support@heyishiyang.com' },
-  { label: '工作时间', value: '周一至周日 09:00-21:00' }
-]
+function normalizeText(value) {
+  if (value === undefined || value === null) return ''
+  return String(value).trim()
+}
+
+function buildContacts(rawConfig) {
+  const config = rawConfig && typeof rawConfig === 'object' ? rawConfig : {}
+  const contacts = [
+    { label: '客服电话', value: normalizeText(config.servicePhone) },
+    { label: '客服邮箱', value: normalizeText(config.serviceEmail) },
+    { label: '工作时间', value: normalizeText(config.workTime) }
+  ]
+
+  return contacts.filter((item) => item.value)
+}
 
 Page({
   data: {
@@ -53,11 +65,30 @@ Page({
     values: CORE_VALUES,
     teamStats: TEAM_STATS,
     resultStats: RESULT_STATS,
-    contacts: CONTACTS
+    contacts: []
   },
 
   onLoad() {
     initMiniNav(this)
+    this.loadContactUsConfig()
+  },
+
+  loadContactUsConfig() {
+    request.get(paths.auth.contactUs, null, {
+      showLoading: false,
+      silentBizErrorToast: true,
+      silentHttpErrorToast: true,
+      silentNetworkErrorToast: true
+    })
+      .then((res) => {
+        this.setData({
+          contacts: buildContacts((res && res.data) || null)
+        })
+      })
+      .catch((error) => {
+        console.warn('[about-us] 获取联系我们配置失败:', error)
+        this.setData({ contacts: [] })
+      })
   },
 
   handleBack() {

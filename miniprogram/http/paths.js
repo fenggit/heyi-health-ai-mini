@@ -12,6 +12,8 @@ const paths = {
     updateNickname: '/uc/app/profile/nickname',
     // 修改头像
     updateAvatar: '/uc/app/profile/avatar',
+    // 联系我们配置
+    contactUs: '/uc/app/profile/contact-us',
     // 游客 session
     guestSession: '/auth/mini/guest/session'
   },
@@ -30,6 +32,8 @@ const paths = {
     pointsRules: '/uc/app/member/points/rules',
     // 会员升级页
     upgradePage: '/uc/app/member/points/upgrade-page',
+    // 开通会员订阅
+    subscriptionOpen: '/uc/app/member/subscription/open',
     // 积分兑换优惠券
     exchangeCoupon: '/uc/app/member/points/exchange/coupon'
   },
@@ -38,6 +42,8 @@ const paths = {
     pointsGoodsAvailable: '/marketing/app/points-goods/available',
     // 我的优惠券列表
     myCoupons: '/marketing/app/coupon/my',
+    // 邀请好友首页
+    referralCodeIndex: '/marketing/app/referral-code/index',
     // 订单可用优惠券列表
     orderAvailableCoupons: '/order/app/marketing/coupon/available',
     // 活动列表

@@ -73,7 +73,7 @@
         <block wx:for="{{records}}" wx:key="id">
           <view class="invite-record-row">
             <view>
-              <view class="invite-record-row__user">用户 {{item.user}}</view>
+              <view class="invite-record-row__user">{{item.user}}</view>
               <view class="invite-record-row__time">{{item.time}}</view>
             </view>
             <view class="invite-record-row__status">{{item.status}}</view>
