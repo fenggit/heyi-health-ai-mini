@@ -49,9 +49,10 @@ const STORAGE_ASSISTANT_SESSION_KEY = 'assistantSessionId'
  * @param {object} params
  * @param {string} params.phoneCode    - getPhoneNumber 回调中的 code
  * @param {string} [params.guestToken] - 可选，授权获取完整报告时传递
+ * @param {string} [params.referralCode] - 可选，扫码/推荐码
  * @returns {Promise<RLoginVo>}
  */
-function wxPhoneLogin({ phoneCode, guestToken } = {}) {
+function wxPhoneLogin({ phoneCode, guestToken, referralCode } = {}) {
   return new Promise((resolve, reject) => {
     wx.login({
       success: (loginRes) => {
@@ -69,6 +70,9 @@ function wxPhoneLogin({ phoneCode, guestToken } = {}) {
 
         if (guestToken) {
           body.guestToken = guestToken
+        }
+        if (referralCode) {
+          body.referralCode = referralCode
         }
 
         request.post(paths.auth.miniPhoneLogin, body, { withAuth: false })
@@ -311,10 +315,11 @@ function fetchUserInfo() {
  * @param {object} params
  * @param {string} params.phoneCode    - getPhoneNumber 回调中的 code
  * @param {string} [params.guestToken] - 可选，授权获取完整报告时传递
+ * @param {string} [params.referralCode] - 可选，扫码/推荐码
  * @returns {Promise<RLoginVo>}
  */
-function login({ phoneCode, guestToken } = {}) {
-  return wxPhoneLogin({ phoneCode, guestToken }).then((res) => {
+function login({ phoneCode, guestToken, referralCode } = {}) {
+  return wxPhoneLogin({ phoneCode, guestToken, referralCode }).then((res) => {
     const token = (res.data && res.data.access_token) || ''
     request.setAuthToken(token)
     const app = getApp()

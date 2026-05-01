@@ -6,6 +6,15 @@ const {
   getAgreementPopupData
 } = require('../../utils/agreement')
 
+function decodeSafe(value) {
+  if (!value) return ''
+  try {
+    return decodeURIComponent(value)
+  } catch (e) {
+    return value
+  }
+}
+
 Page({
   data: {
     agreed: false,
@@ -15,7 +24,15 @@ Page({
     popupContent: ''
   },
 
-  onLoad() {
+  onLoad(options = {}) {
+    const sceneParam = decodeSafe(options.scene || options.source || '').trim()
+    const referralCode = decodeSafe(options.referralCode || sceneParam).trim()
+    this._scene = sceneParam
+    this._referralCode = referralCode
+
+    console.log('[login] 扫码参数 scene:', sceneParam || '（无）')
+    console.log('[login] 登录 referralCode:', referralCode || '（无）')
+
     this._redirectIfLoggedIn()
   },
 
@@ -49,7 +66,10 @@ Page({
 
     wx.showLoading({ title: '登录中...', mask: true })
 
-    login({ phoneCode })
+    login({
+      phoneCode,
+      referralCode: this._referralCode
+    })
       .then((res) => {
         console.log('[login] 登录成功:', JSON.stringify(res))
         wx.hideLoading()
