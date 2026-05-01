@@ -3,6 +3,7 @@ const { get, post } = require("../../utils/request")
 const paths = require("../../http/paths")
 
 const DEFAULT_PAGE_SIZE = 10
+const SEARCH_DEBOUNCE_MS = 300
 const GOODS_TYPE_SINGLE = "SPU" // 商品
 const GOODS_TYPE_RECIPE_PACK = "RECIPE" // 配方
 
@@ -341,6 +342,10 @@ Page({
     this.syncCartCount()
   },
 
+  onUnload() {
+    this.clearSearchTimer()
+  },
+
   onPullDownRefresh() {
     Promise.all([
       this.loadMallData({ showLoading: false, keepActiveCategory: true }),
@@ -371,6 +376,12 @@ Page({
     this.setData({
       loadMoreText: text
     })
+  },
+
+  clearSearchTimer() {
+    if (!this._searchTimer) return
+    clearTimeout(this._searchTimer)
+    this._searchTimer = null
   },
 
   fetchCategoryList() {
@@ -484,7 +495,7 @@ Page({
     return this._mallDataPromise
   },
 
-  loadProductsByCategory({ categoryId, reset = false } = {}) {
+  loadProductsByCategory({ categoryId, reset = false, keyword } = {}) {
     const targetCategoryId = String(categoryId || this.data.activeCategoryId || "")
     if (!targetCategoryId) return Promise.resolve()
     if (this.data.isLoadingProducts && !reset) return this._productPagePromise || Promise.resolve()
@@ -492,17 +503,23 @@ Page({
 
     const nextPageNum = reset ? 1 : this.data.pageNum + 1
     const pageSize = this.data.pageSize || DEFAULT_PAGE_SIZE
-    const requestKey = `${targetCategoryId}-${nextPageNum}-${Date.now()}`
+    const requestKeyword = String(keyword != null ? keyword : this.data.searchKeyword || "").trim()
+    const requestKey = `${targetCategoryId}-${requestKeyword}-${nextPageNum}-${Date.now()}`
     this._latestProductRequestKey = requestKey
 
     this.setData({ isLoadingProducts: true })
     this.refreshLoadMoreText()
 
-    this._productPagePromise = get(paths.mall.spuPage, {
+    const requestParams = {
       categoryId: targetCategoryId,
       pageNum: nextPageNum,
       pageSize
-    })
+    }
+    if (requestKeyword) {
+      requestParams.keyword = requestKeyword
+    }
+
+    this._productPagePromise = get(paths.mall.spuPage, requestParams)
       .then((res) => {
         if (this._latestProductRequestKey !== requestKey) return
         const payload = unwrapResponseData(res)
@@ -559,17 +576,48 @@ Page({
 
     this.loadProductsByCategory({
       categoryId: this.data.activeCategoryId,
-      reset: false
+      reset: false,
+      keyword: this.data.searchKeyword
     })
   },
 
   onInputSearch(e) {
+    const keyword = e.detail.value
     this.setData(
       {
-        searchKeyword: e.detail.value
+        searchKeyword: keyword
       },
       () => {
-        this.applyProductFilters()
+        this.scheduleSearch(keyword)
+      }
+    )
+  },
+
+  scheduleSearch(keyword) {
+    this.clearSearchTimer()
+    this._searchTimer = setTimeout(() => {
+      this._searchTimer = null
+      this.reloadProductsForActiveCategory({ keyword })
+    }, SEARCH_DEBOUNCE_MS)
+  },
+
+  reloadProductsForActiveCategory({ keyword = "" } = {}) {
+    if (!this.data.activeCategoryId) return
+
+    this.setData(
+      {
+        sourceProducts: [],
+        products: [],
+        pageNum: 0,
+        hasMore: true
+      },
+      () => {
+        this.refreshLoadMoreText()
+        this.loadProductsByCategory({
+          categoryId: this.data.activeCategoryId,
+          reset: true,
+          keyword
+        })
       }
     )
   },
@@ -655,11 +703,14 @@ Page({
     if (!nextCategoryId) return
     if (nextCategoryId === this.data.activeCategoryId && this.data.sourceProducts.length) return
 
+    this.clearSearchTimer()
+
     this.setData(
       {
         activeCategory: Number.isFinite(nextIndex) ? nextIndex : 0,
         activeCategoryKey: String(key || nextCategoryId),
         activeCategoryId: nextCategoryId,
+        searchKeyword: "",
         sourceProducts: [],
         products: [],
         pageNum: 0,
@@ -669,7 +720,8 @@ Page({
         this.refreshLoadMoreText()
         this.loadProductsByCategory({
           categoryId: nextCategoryId,
-          reset: true
+          reset: true,
+          keyword: ""
         })
       }
     )
@@ -698,17 +750,8 @@ Page({
   },
 
   applyProductFilters() {
-    const { sourceProducts, searchKeyword } = this.data
-    const normalizedKeyword = (searchKeyword || "").trim().toLowerCase()
-
-    const nextProducts = sourceProducts.filter((product) => {
-      if (!normalizedKeyword) return true
-      const matchedText = `${product.name}${product.badge || ""}`.toLowerCase()
-      return matchedText.includes(normalizedKeyword)
-    })
-
     this.setData({
-      products: nextProducts
+      products: this.data.sourceProducts
     })
   },
 

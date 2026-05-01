@@ -1,5 +1,5 @@
 const { initMiniNav, backWithFallback } = require('../../utils/mini-nav')
-const { get, post } = require('../../utils/request')
+const { get, post, put } = require('../../utils/request')
 const paths = require('../../http/paths')
 
 const TAB_LIST = [
@@ -332,6 +332,41 @@ Page({
   viewDetail(e) {
     const { id } = e.currentTarget.dataset
     wx.showToast({ title: '订单 ' + id + ' 详情待接入', icon: 'none' })
+  },
+
+  cancelOrder(e) {
+    if (this._cancelingOrder) return
+
+    const { orderId } = e.currentTarget.dataset
+    const cancelOrderId = toOptionalLong(orderId)
+    if (cancelOrderId == null) {
+      wx.showToast({ title: '订单号异常，无法取消', icon: 'none' })
+      return
+    }
+
+    wx.showModal({
+      title: '取消订单',
+      content: '确认取消该订单吗？',
+      confirmColor: '#fb2c36',
+      success: ({ confirm }) => {
+        if (!confirm) return
+
+        this._cancelingOrder = true
+        put(paths.order.indentCancel, {
+          orderId: cancelOrderId
+        }, {
+          showLoading: true,
+          loadingTitle: '取消中'
+        })
+          .then(() => {
+            wx.showToast({ title: '订单已取消', icon: 'success' })
+          })
+          .finally(() => {
+            this._cancelingOrder = false
+            this.loadOrders().catch(() => {})
+          })
+      }
+    })
   },
 
   payOrder(e) {

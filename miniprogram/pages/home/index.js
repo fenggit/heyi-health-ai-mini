@@ -31,26 +31,26 @@ const DEFAULT_HOME_DATA = {
     {
       id: "heart-rate",
       label: "心率",
-      value: "0",
+      value: "-",
       icon: "/assets/icons/heart.png"
     },
     {
       id: "steps",
       label: "步数",
-      value: "0",
+      value: "-",
       icon: "/assets/icons/steps.png"
     },
     {
       id: "sleep",
       label: "睡眠",
-      value: "0h",
+      value: "-",
       icon: "/assets/icons/sleep.png"
     }
   ],
   hydration: {
-    title: "今日果蔬汁摄入：",
-    value: "2/2 杯",
-    segments: createProgressSegments(10, 10)
+    title: "-",
+    value: "-/-",
+    segments: createProgressSegments(0, 10)
   },
   shortcuts: [
     {
@@ -118,14 +118,25 @@ function normalizeList(data) {
 }
 
 function normalizeHealthMetricValue(value, { sleep = false } = {}) {
-  const fallback = sleep ? "0h" : "0"
+  const fallback = "-"
   if (value === null || value === undefined || value === "") return fallback
 
   const text = String(value).trim()
   if (!text) return fallback
-  if (!sleep) return text
+  return text
+}
 
-  return /h$/i.test(text) ? text : `${text}h`
+function pickTodayBodyStatus(payload = {}) {
+  if (payload.todayBodyStatus && typeof payload.todayBodyStatus === "object") {
+    return payload.todayBodyStatus
+  }
+  return {}
+}
+
+function normalizeRatioPart(value) {
+  if (value === null || value === undefined || value === "") return "-"
+  const text = String(value).trim()
+  return text || "-"
 }
 
 function parseTagList(rawTags) {
@@ -189,6 +200,7 @@ function mapHealthMetrics(payload = {}) {
     steps: defaults[1],
     sleep: defaults[2]
   }
+  const todayBodyStatus = pickTodayBodyStatus(payload)
 
   const list = normalizeList(payload.healthMetrics || payload.healthMetricList || payload.todayHealthMetrics)
   if (list.length) {
@@ -220,13 +232,13 @@ function mapHealthMetrics(payload = {}) {
     })
   } else {
     defaults[0].value = normalizeHealthMetricValue(
-      payload.heartRate != null ? payload.heartRate : payload.hr
+      todayBodyStatus.heartRate != null ? todayBodyStatus.heartRate : (payload.heartRate != null ? payload.heartRate : payload.hr)
     )
     defaults[1].value = normalizeHealthMetricValue(
-      payload.steps != null ? payload.steps : payload.stepCount
+      todayBodyStatus.stepCount != null ? todayBodyStatus.stepCount : (payload.stepCount != null ? payload.stepCount : payload.steps)
     )
     defaults[2].value = normalizeHealthMetricValue(
-      payload.sleepHours != null ? payload.sleepHours : payload.sleepDuration,
+      todayBodyStatus.sleepHours != null ? todayBodyStatus.sleepHours : (payload.sleepHours != null ? payload.sleepHours : payload.sleepDuration),
       { sleep: true }
     )
   }
@@ -235,18 +247,44 @@ function mapHealthMetrics(payload = {}) {
 }
 
 function mapHydration(payload = {}) {
+  const todayBodyStatus = pickTodayBodyStatus(payload)
   const hydration = payload.hydration && typeof payload.hydration === "object" ? payload.hydration : {}
+  const actualIntake = todayBodyStatus.todayJuiceActualIntake != null
+    ? todayBodyStatus.todayJuiceActualIntake
+    : hydration.actualIntake
+  const targetIntake = todayBodyStatus.todayJuiceTargetIntake != null
+    ? todayBodyStatus.todayJuiceTargetIntake
+    : hydration.targetIntake
+  const juiceUnit = toDisplayText(todayBodyStatus.juiceUnit != null ? todayBodyStatus.juiceUnit : hydration.juiceUnit, "")
+  const actualNumber = Number(actualIntake)
+  const targetNumber = Number(targetIntake)
+
+  if (Number.isFinite(targetNumber) && targetNumber > 0 && Number.isFinite(actualNumber)) {
+    const hydrationProgress = Math.max(0, Math.min(100, Math.round((actualNumber * 100) / targetNumber)))
+
+    return {
+      data: {
+        title: normalizeRatioPart(actualIntake),
+        value: `${normalizeRatioPart(actualIntake)}/${normalizeRatioPart(targetIntake)}${juiceUnit}`,
+        segments: createProgressSegments(0, 10)
+      },
+      progress: hydrationProgress
+    }
+  }
+
   const total = Number(hydration.totalSegments)
   const filled = Number(hydration.filledSegments)
 
   if (!Number.isFinite(total) || total <= 0 || !Number.isFinite(filled)) {
     return {
       data: {
-        title: toDisplayText(hydration.title, DEFAULT_HOME_DATA.hydration.title),
-        value: toDisplayText(hydration.value, DEFAULT_HOME_DATA.hydration.value),
+        title: normalizeRatioPart(actualIntake) === "-" ? toDisplayText(hydration.title, DEFAULT_HOME_DATA.hydration.title) : normalizeRatioPart(actualIntake),
+        value: normalizeRatioPart(actualIntake) === "-" && normalizeRatioPart(targetIntake) === "-"
+          ? toDisplayText(hydration.value, DEFAULT_HOME_DATA.hydration.value)
+          : `${normalizeRatioPart(actualIntake)}/${normalizeRatioPart(targetIntake)}${juiceUnit}`,
         segments: cloneDeep(DEFAULT_HOME_DATA.hydration.segments)
       },
-      progress: 70
+      progress: 0
     }
   }
 
@@ -257,8 +295,10 @@ function mapHydration(payload = {}) {
 
   return {
     data: {
-      title: toDisplayText(hydration.title, DEFAULT_HOME_DATA.hydration.title),
-      value: toDisplayText(hydration.value, DEFAULT_HOME_DATA.hydration.value),
+      title: normalizeRatioPart(actualIntake) === "-" ? toDisplayText(hydration.title, DEFAULT_HOME_DATA.hydration.title) : normalizeRatioPart(actualIntake),
+      value: normalizeRatioPart(actualIntake) === "-" && normalizeRatioPart(targetIntake) === "-"
+        ? toDisplayText(hydration.value, DEFAULT_HOME_DATA.hydration.value)
+        : `${normalizeRatioPart(actualIntake)}/${normalizeRatioPart(targetIntake)}${juiceUnit}`,
       segments
     },
     progress: hydrationProgress

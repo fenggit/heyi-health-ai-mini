@@ -86,6 +86,8 @@ const paths = {
   order: {
     // 创建订单
     indentCreate: '/order/app/indent/create',
+    // 取消订单
+    indentCancel: '/order/app/indent/cancel',
     // 创建微信支付单
     indentPayWechatCreate: '/order/app/indent/pay/wechat/create',
     // 订单列表
