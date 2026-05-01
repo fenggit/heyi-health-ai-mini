@@ -6,7 +6,7 @@
   <view class="login-top">
     <view class="login-logo-wrap">
       <view class="login-logo">
-        <text class="login-logo-text">合</text>
+        <text class="login-logo-text">天</text>
       </view>
       <text class="login-app-name">天元食养</text>
     </view>
