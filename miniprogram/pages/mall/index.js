@@ -8,7 +8,7 @@ const GOODS_TYPE_SINGLE = "SPU" // 商品
 const GOODS_TYPE_RECIPE_PACK = "RECIPE" // 配方
 
 const STATIC_MALL_DATA = {
-  mallTitle: "合一商城",
+  mallTitle: "天元商城",
   city: "定位中",
   searchPlaceholder: "关键词搜索",
   activityBanners: [

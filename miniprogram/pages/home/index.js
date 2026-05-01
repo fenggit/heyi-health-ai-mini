@@ -167,6 +167,25 @@ function parseTagList(rawTags) {
     .filter(Boolean)
 }
 
+function parseCustomTagList(customTags) {
+  if (Array.isArray(customTags)) {
+    return customTags
+      .map((item) => {
+        if (!item || typeof item !== "object") return ""
+        return item.tagName || ""
+      })
+      .map((item) => String(item || "").trim())
+      .filter(Boolean)
+  }
+
+  if (customTags && typeof customTags === "object") {
+    const tagName = String(customTags.tagName || "").trim()
+    return tagName ? [tagName] : []
+  }
+
+  return []
+}
+
 function mapBannerList(rawBannerList) {
   const list = normalizeList(rawBannerList)
   return list
@@ -310,7 +329,7 @@ function mapRecommendation(todayRecommend = {}) {
   const hasSource = Object.keys(source).length > 0
   if (!hasSource) return {}
 
-  const tags = parseTagList(source.tagJson || source.tags || source.tagList)
+  const tags = parseCustomTagList(source.customTags)
   const recipeIdRaw = source.recipeId != null ? source.recipeId : source.id
   const recipeId = recipeIdRaw != null && recipeIdRaw !== "" ? String(recipeIdRaw) : ""
   if (!recipeId) return {}
@@ -319,7 +338,7 @@ function mapRecommendation(todayRecommend = {}) {
     recipeId,
     title: "AI推荐：今日专属果蔬汁",
     actionText: "查看详情",
-    image: toDisplayText(source.coverImage || source.coverUrl || source.imageUrl || source.image, ""),
+    image: toDisplayText(source.bannerImage, ""),
     name: toDisplayText(source.recipeName || source.name, ""),
     description: toDisplayText(source.recommendReason || source.intro || source.description, ""),
     tags
