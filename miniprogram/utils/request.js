@@ -2,7 +2,7 @@ const STORAGE_TOKEN_KEY = 'token'
 const STORAGE_USER_INFO_KEY = 'userInfo'
 const STORAGE_ASSISTANT_SESSION_KEY = 'assistantSessionId'
 const DEFAULT_TIMEOUT = 10000
-const HOST = 'https://api.tyhctech.com'
+const HOST = 'https://api.tyyhtech.com'
 
 let authToken = ''
 let unauthorizedRedirecting = false

@@ -43,7 +43,7 @@ miniprogram/
 - help-center / about-us / settings — 设置类页面
 
 ## 后端接口
-- 接口域名：`https://api.tyhctech.com`
+- 接口域名：`https://api.tyyhtech.com`
 - 所有路径常量统一在 `miniprogram/http/paths.js` 维护
 - 按业务模块分组（auth、assessment 等）
 - 接口响应结构：`{ code, msg, data }`，code=200 为成功
