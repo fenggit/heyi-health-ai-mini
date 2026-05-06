@@ -19,7 +19,7 @@
 
       <view class="tabbar-item tabbar-item--center" bindtap="openAiChat">
         <view class="tabbar-item__text-wrap">
-          <text class="tabbar-item__text">AI问答</text>
+          <text class="tabbar-item__text">AI食养</text>
         </view>
       </view>
 
