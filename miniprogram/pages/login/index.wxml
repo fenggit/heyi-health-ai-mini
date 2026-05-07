@@ -20,7 +20,7 @@
         open-type="{{agreed ? 'getPhoneNumber' : ''}}"
         bindgetphonenumber="onGetPhoneNumber"
         bindtap="onLoginTap"
-      >微信授权登录</button>
+      >手机号快捷登录</button>
 
       <view class="login-agreement" bindtap="toggleAgreed">
         <my-checkbox checked="{{agreed}}" shape="square" />
