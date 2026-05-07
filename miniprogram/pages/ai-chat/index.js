@@ -26,7 +26,7 @@ const STATIC_PAGE_DATA = {
   title: "哈喽，我是天天！",
   subTitle: "你的AI食养顾问",
   capabilities: ["进行趣味性生活状态分析", "提供个性化饮食建议", "解答饮食健康问题", "快速访问各项功能"],
-  noticeText: "提示: 本服务仅供娱乐与生活参考，不能替代医疗建议~",
+  noticeText: "提示: 本服务由AI生成，仅供参考，不能替代医疗建议~",
   quickActions: [
     {
       id: "start-analysis",
