@@ -1,0 +1,66 @@
+<view class="drink-page">
+  <image class="drink-page-bg" src="/assets/bg_img.png" mode="widthFix" />
+
+  <!-- my-header 组件：自动处理状态栏 + 胶囊，返回打卡中心 -->
+  <my-header title="打卡中心" show-back bindback="onBack" />
+
+  <!-- 状态栏 + 导航栏占位，高度由 headerHeight 撑开 -->
+  <view style="height: {{headerHeight}}px;"></view>
+
+  <view class="drink-content">
+    <!-- 页面标题行 -->
+    <view class="drink-head">
+      <view class="drink-head__title-row">
+        <text class="drink-head__title">喝汁打卡</text>
+        <view class="drink-head__tag">每日打卡</view>
+      </view>
+    </view>
+
+    <!-- 统计卡片 -->
+    <view class="drink-stats-card card-panel">
+      <view class="drink-stats">
+        <view class="drink-stat">
+          <text class="drink-stat__value">{{totalCount}}</text>
+          <text class="drink-stat__label">累计打卡</text>
+        </view>
+        <view class="drink-stat__divider"></view>
+        <view class="drink-stat">
+          <text class="drink-stat__value">{{continuousDays}}</text>
+          <text class="drink-stat__label">连续天数</text>
+        </view>
+        <view class="drink-stat__divider"></view>
+        <view class="drink-stat">
+          <text class="drink-stat__value">{{monthCount}}</text>
+          <text class="drink-stat__label">本月打卡</text>
+        </view>
+      </view>
+
+      <!-- 今日打卡按钮 -->
+      <view class="drink-checkin-btn" bindtap="onCheckin">
+        <text class="drink-checkin-btn__text">今日打卡</text>
+      </view>
+    </view>
+
+    <!-- 打卡记录 -->
+    <view class="drink-records">
+      <title-view text="打卡记录" />
+      <view class="drink-record-list">
+        <block wx:for="{{records}}" wx:key="id">
+          <view class="drink-record-item card-panel">
+            <!-- 图片区域：空白占位 -->
+            <view class="drink-record-item__img-placeholder"></view>
+            <view class="drink-record-item__body">
+              <text class="drink-record-item__name">{{item.name}}</text>
+              <text class="drink-record-item__time">{{item.time}}</text>
+              <text class="drink-record-item__note">{{item.note}}</text>
+            </view>
+            <!-- my-checkbox 组件，可点击切换打卡状态 -->
+            <view class="drink-record-item__check">
+              <my-checkbox checked="{{item.checked}}" shape="circle" data-id="{{item.id}}" bindchange="onRecordCheckChange" />
+            </view>
+          </view>
+        </block>
+      </view>
+    </view>
+  </view>
+</view>

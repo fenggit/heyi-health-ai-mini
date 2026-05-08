@@ -12,13 +12,17 @@ Component({
         text: "商城",
         path: "/pages/mall/index"
       },
-      // {
-      //   text: "食养",
-      //   path: "/pages/diet/index"
-      // },
+      {
+        text: "打卡",
+        path: "/pages/checkin/index"
+      },
       {
         text: "我的",
         path: "/pages/profile/index"
+      },
+      {
+        text: "食养",
+        path: "/pages/diet/index"
       }
     ]
   },
@@ -58,7 +62,7 @@ Component({
       const { path, index } = e.currentTarget.dataset
       const next = Number(index)
 
-      if (path === "/pages/profile/index" && !this.requireLogin("“我的”")) {
+      if ((path === "/pages/profile/index" || path === "/pages/checkin/index" || path === "/pages/diet/index") && !this.requireLogin(tabLabel(path))) {
         return
       }
 
@@ -90,3 +94,12 @@ Component({
     }
   }
 })
+
+function tabLabel(path) {
+  const map = {
+    "/pages/profile/index": "“我的”",
+    "/pages/checkin/index": "“打卡”",
+    "/pages/diet/index": "“食养”"
+  }
+  return map[path] || "该功能"
+}

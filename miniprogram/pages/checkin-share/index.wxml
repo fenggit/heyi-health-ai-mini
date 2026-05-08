@@ -1,0 +1,57 @@
+<view class="share-page">
+  <image class="share-page-bg" src="/assets/bg_img.png" mode="widthFix" />
+
+  <!-- my-header：自动处理状态栏 + 胶囊 -->
+  <my-header title="打卡中心" show-back bindback="onBack" />
+
+  <!-- 导航栏占位 -->
+  <view style="height: {{headerHeight}}px;"></view>
+
+  <view class="share-content">
+    <!-- 页面标题行 -->
+    <view class="share-head">
+      <view class="share-head__title-row">
+        <text class="share-head__title">内容分享</text>
+        <view class="share-head__tag">心得分享</view>
+      </view>
+    </view>
+
+    <!-- 内容卡片列表 -->
+    <view class="share-list">
+      <block wx:for="{{posts}}" wx:key="id">
+        <view class="share-card card-panel">
+          <!-- 卡片头部：头像 + 用户名 + 时间 -->
+          <view class="share-card__header">
+            <view class="share-card__avatar-wrap">
+              <image class="share-card__avatar-img" src="/assets/checkin/checkin_user_icon.png" mode="aspectFill" />
+            </view>
+            <text class="share-card__username">{{item.username}}</text>
+            <text class="share-card__time">{{item.time}}</text>
+          </view>
+
+          <!-- 图片占位 -->
+          <view class="share-card__img-placeholder"></view>
+
+          <!-- 标题行 + 点赞 -->
+          <view class="share-card__title-row">
+            <text class="share-card__title">{{item.title}}</text>
+            <view class="share-card__like" data-id="{{item.id}}" bindtap="onLikeTap">
+              <view class="share-card__like-icon {{item.liked ? 'share-card__like-icon--on' : ''}}"></view>
+              <text class="share-card__like-count {{item.liked ? 'share-card__like-count--on' : ''}}">{{item.likeCount}}</text>
+            </view>
+          </view>
+
+          <!-- 话题标签 -->
+          <view class="share-card__tags">
+            <block wx:for="{{item.tags}}" wx:key="*this" wx:for-item="tag">
+              <view class="share-card__tag">#{{tag}}</view>
+            </block>
+          </view>
+
+          <!-- 正文 -->
+          <text class="share-card__content">{{item.content}}</text>
+        </view>
+      </block>
+    </view>
+  </view>
+</view>

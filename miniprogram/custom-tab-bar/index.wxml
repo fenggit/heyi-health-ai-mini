@@ -24,7 +24,7 @@
       </view>
 
       <block wx:for="{{tabs}}" wx:key="path" wx:for-item="tab" wx:for-index="index">
-        <block wx:if="{{index >= 2}}">
+        <block wx:if="{{index >= 2 && index <= 3}}">
           <view
             class="tabbar-item {{selected === index ? 'tabbar-item--active' : ''}}"
             data-path="{{tab.path}}"

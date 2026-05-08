@@ -85,7 +85,7 @@ Page({
     if (typeof this.getTabBar === "function") {
       const tabBar = this.getTabBar()
       if (tabBar) {
-        tabBar.setData({ selected: 2 })
+        tabBar.setData({ selected: 4 })
       }
     }
   },

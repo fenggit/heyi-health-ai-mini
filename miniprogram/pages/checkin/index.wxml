@@ -1,0 +1,60 @@
+<view class="checkin-page design-page design-page--with-tab">
+  <image class="checkin-page-bg" src="/assets/bg_img.png" mode="widthFix" />
+
+  <!-- 状态栏占位，与其他页面保持一致 -->
+  <view class="page-top-gap" style="height: {{topInset}}px;"></view>
+
+  <!-- 导航栏标题行 -->
+  <view class="checkin-title-row">
+    <text class="checkin-brand">天元食养</text>
+  </view>
+
+  <view class="checkin-content">
+    <!-- 页面标题 + 副标题标签 -->
+    <view class="checkin-head">
+      <view class="checkin-head__title-row">
+        <text class="checkin-head__title">{{pageTitle}}</text>
+        <view class="checkin-head__subtitle-tag">{{pageSubtitle}}</view>
+      </view>
+    </view>
+
+    <!-- 统计卡片 -->
+    <view class="checkin-card checkin-card--stats card-panel">
+      <view class="checkin-card__head">
+        <title-view text="我的打卡统计：" />
+        <view class="checkin-card__status">进行中</view>
+      </view>
+      <view class="checkin-stats">
+        <block wx:for="{{stats}}" wx:key="label">
+          <view class="checkin-stat">
+            <text class="checkin-stat__label">{{item.label}}</text>
+            <view class="checkin-stat__value-tag">
+              <text class="checkin-stat__value">{{item.value}}</text>
+              <text class="checkin-stat__unit"> {{item.unit}}</text>
+            </view>
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <!-- 打卡计划卡片 -->
+    <view class="checkin-card checkin-card--plan card-panel">
+      <view class="checkin-card__head">
+        <title-view text="打卡计划" />
+      </view>
+      <view class="checkin-plan-list">
+        <block wx:for="{{plans}}" wx:key="id">
+          <view class="checkin-plan-item" data-id="{{item.id}}" bindtap="onPlanTap">
+            <view class="checkin-plan-item__left">
+              <view class="checkin-plan-item__icon-wrap">
+                <image class="checkin-plan-item__icon" src="{{item.icon}}" mode="aspectFit" />
+              </view>
+              <text class="checkin-plan-item__name">{{item.name}}</text>
+            </view>
+            <text class="checkin-plan-item__arrow">›</text>
+          </view>
+        </block>
+      </view>
+    </view>
+  </view>
+</view>
