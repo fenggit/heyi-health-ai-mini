@@ -19,6 +19,26 @@
   z-index: 0;
 }
 
+.login-back {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  z-index: 2;
+}
+
+.login-back__inner {
+  display: flex;
+  align-items: center;
+  padding-left: 24rpx;
+  box-sizing: border-box;
+}
+
+.login-back__icon {
+  width: 12rpx;
+  height: 20rpx;
+}
+
 /* 上半区：50%高度，logo 垂直水平居中 */
 .login-top {
   position: relative;

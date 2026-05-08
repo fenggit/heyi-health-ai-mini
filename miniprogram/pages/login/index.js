@@ -1,5 +1,6 @@
 const { login } = require('../../http/auth')
 const { getAuthToken } = require('../../utils/request')
+const { getLayoutMetrics } = require('../../utils/layout')
 const {
   USER_AGREEMENT_KIND,
   PRIVACY_POLICY_KIND,
@@ -17,6 +18,8 @@ function decodeSafe(value) {
 
 Page({
   data: {
+    statusBarHeight: 20,
+    navBarHeight: 44,
     agreed: false,
     popupShow: false,
     popupTitle: '',
@@ -25,6 +28,8 @@ Page({
   },
 
   onLoad(options = {}) {
+    this.syncLayout()
+
     const sceneParam = decodeSafe(options.scene || options.source || '').trim()
     const referralCode = decodeSafe(options.referralCode || sceneParam).trim()
     this._scene = sceneParam
@@ -40,8 +45,25 @@ Page({
     this._redirectIfLoggedIn()
   },
 
+  syncLayout() {
+    const { statusBarHeight, navBarHeight } = getLayoutMetrics()
+    this.setData({
+      statusBarHeight,
+      navBarHeight
+    })
+  },
+
   toggleAgreed() {
     this.setData({ agreed: !this.data.agreed })
+  },
+
+  handleBack() {
+    const pages = getCurrentPages()
+    if (pages.length > 1) {
+      wx.navigateBack()
+      return
+    }
+    wx.switchTab({ url: '/pages/home/index' })
   },
 
   onLoginTap() {
