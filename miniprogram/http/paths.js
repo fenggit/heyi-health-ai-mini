@@ -91,7 +91,9 @@ const paths = {
     // 创建微信支付单
     indentPayWechatCreate: '/order/app/indent/pay/wechat/create',
     // 订单列表
-    indentList: '/order/app/indent/list'
+    indentList: '/order/app/indent/list',
+    // 订单详情
+    indentDetail: (orderId) => `/order/app/indent/${encodeURIComponent(orderId)}`
   },
   recipe: {
     // 首页聚合数据

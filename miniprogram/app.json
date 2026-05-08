@@ -18,6 +18,7 @@
     "pages/my-coupons/index",
     "pages/settings/index",
     "pages/my-orders/index",
+    "pages/order-detail/index",
     "pages/my-favorites/index",
     "pages/invite-friends/index",
     "pages/ai-chat/index",

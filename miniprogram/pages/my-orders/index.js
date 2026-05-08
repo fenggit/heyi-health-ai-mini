@@ -192,7 +192,7 @@ function mapOrderItem(item, index) {
     salePrice: formatPrice(raw.salePrice),
     count: buyQty,
     buyQty,
-    image: normalizeText(raw.image || raw.skuImage || raw.spuImage || raw.coverImage || raw.picUrl || '/assets/mall/product-apple.png')
+    image: normalizeText(raw.image || raw.skuImage || raw.spuImage || raw.coverImage || raw.picUrl || '')
   }
 }
 
@@ -330,8 +330,9 @@ Page({
   },
 
   viewDetail(e) {
-    const { id } = e.currentTarget.dataset
-    wx.showToast({ title: '订单 ' + id + ' 详情待接入', icon: 'none' })
+    const { orderId } = e.currentTarget.dataset
+    if (!orderId) return
+    wx.navigateTo({ url: `/pages/order-detail/index?orderId=${orderId}` })
   },
 
   cancelOrder(e) {

@@ -1,0 +1,356 @@
+@import "../profile-sub/common.wxss";
+
+/* ========== 物流区域 ========== */
+/*
+  设计稿：page05_wrap 352×116，top:96
+  上半（高44px）：状态标签 + 预计送达，padding-top:12px
+  下半（高72px）：矩形17549，白色半透明(0.3)+毛玻璃，收件人+地址
+*/
+.logistics-block {
+  position: relative;
+  width: 702rpx;
+  border-radius: 24rpx;
+  /* 不用 overflow:hidden，让地址块圆角自然显示 */
+}
+
+.logistics-block__bg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 24rpx;
+}
+
+/* 上半：状态行 */
+.logistics-top {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 24rpx 32rpx 20rpx;
+}
+
+.status-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40rpx;
+  padding: 0 16rpx;
+  border-radius: 12rpx;
+  font-size: 24rpx;
+  font-weight: 700;
+  line-height: 40rpx;
+  flex-shrink: 0;
+}
+
+.status-tag--pending {
+  color: #1e293b;
+  background: #f4d900;
+}
+
+.status-tag--paid {
+  color: #1e293b;
+  background: #f4d900;
+}
+
+/* 设计稿：黑底 #131313，绿字 #cdff71 */
+.status-tag--shipping {
+  color: #cdff71;
+  background: #131313;
+}
+
+.status-tag--completed {
+  color: #ffffff;
+  background: #00c950;
+}
+
+.status-tag--cancelled {
+  color: #ffffff;
+  background: #94a3b8;
+}
+
+.logistics-eta {
+  color: #1e293b;
+  font-size: 24rpx;
+  line-height: 40rpx;
+  font-weight: 500;
+}
+
+/* 下半：地址区域，独立半透明白色背景叠加 */
+/* 设计稿：矩形17549 高72px → 144rpx，fill rgba(252,249,235,0.3) + 毛玻璃 */
+.logistics-addr-block {
+  position: relative;
+  z-index: 1;
+  background: rgba(252, 249, 235, 0.30);
+  border: 2rpx solid #ffffff;
+  border-radius: 24rpx;
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  padding: 20rpx 32rpx 24rpx;
+}
+
+.logistics-addr-row {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  margin-bottom: 12rpx;
+}
+
+.receiver-name {
+  color: #1e293b;
+  font-size: 28rpx;
+  font-weight: 700;
+  line-height: 40rpx;
+}
+
+.receiver-phone {
+  color: #1e293b;
+  font-size: 28rpx;
+  line-height: 40rpx;
+}
+
+.logistics-addr-detail {
+  display: flex;
+  align-items: flex-start;
+  gap: 8rpx;
+}
+
+.addr-pin-icon {
+  width: 28rpx;
+  height: 28rpx;
+  flex-shrink: 0;
+  margin-top: 6rpx;
+}
+
+.addr-text {
+  flex: 1;
+  color: #1e293b;
+  font-size: 28rpx;
+  font-weight: 500;
+  line-height: 40rpx;
+}
+
+/* ========== 订单商品卡片 ========== */
+.goods-card {
+  margin-top: 16rpx;
+  padding: 32rpx;
+}
+
+.goods-list {
+  margin-top: 24rpx;
+}
+
+.goods-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 20rpx 0;
+  border-bottom: 2rpx solid rgba(203, 213, 225, 0.5);
+}
+
+.goods-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.goods-item__img-wrap {
+  flex-shrink: 0;
+  margin-right: 20rpx;
+}
+
+.goods-item__img {
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 16rpx;
+  display: block;
+}
+
+.goods-item__img--placeholder {
+  background: #e2e8f0;
+}
+
+.goods-item__info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  min-width: 0;
+  padding-top: 4rpx;
+}
+
+.goods-item__name {
+  color: #1e293b;
+  font-size: 28rpx;
+  font-weight: 700;
+  line-height: 40rpx;
+}
+
+.goods-item__spec {
+  color: #94a3b8;
+  font-size: 24rpx;
+  line-height: 36rpx;
+}
+
+.goods-item__count {
+  color: #94a3b8;
+  font-size: 24rpx;
+  line-height: 36rpx;
+}
+
+.goods-item__count-num {
+  font-weight: 600;
+}
+
+.goods-item__price-wrap {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-end;
+  margin-left: 12rpx;
+  padding-top: 4rpx;
+}
+
+.goods-item__currency {
+  color: #1e293b;
+  font-size: 22rpx;
+  line-height: 40rpx;
+  font-weight: 700;
+  opacity: 0.55;
+}
+
+.goods-item__price {
+  color: #1e293b;
+  font-size: 30rpx;
+  font-weight: 700;
+  line-height: 40rpx;
+}
+
+/* ========== 费用明细 ========== */
+.fee-divider-line {
+  height: 2rpx;
+  background: rgba(203, 213, 225, 0.6);
+  margin: 24rpx 0 8rpx;
+}
+
+.fee-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18rpx 0;
+  border-bottom: 2rpx solid rgba(203, 213, 225, 0.35);
+}
+
+.fee-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.fee-row--total {
+  padding-top: 22rpx;
+}
+
+.fee-row__label {
+  color: #1e293b;
+  font-size: 28rpx;
+  font-weight: 500;
+  line-height: 40rpx;
+}
+
+.fee-row__label--bold {
+  font-weight: 700;
+}
+
+.fee-row__right {
+  display: flex;
+  align-items: flex-end;
+}
+
+.fee-row__currency {
+  color: #1e293b;
+  font-size: 22rpx;
+  line-height: 40rpx;
+  font-weight: 700;
+  opacity: 0.55;
+}
+
+.fee-row__value {
+  color: #1e293b;
+  font-size: 36rpx;
+  font-weight: 700;
+  line-height: 42rpx;
+}
+
+.fee-row__currency--red {
+  color: #fb2c36;
+  opacity: 1;
+  font-size: 22rpx;
+  font-weight: 700;
+}
+
+.fee-row__value--red {
+  color: #fb2c36;
+  font-size: 36rpx;
+  font-weight: 700;
+}
+
+.fee-row__currency--muted {
+  color: #1e293b;
+  opacity: 0.55;
+}
+
+.fee-row__value--large {
+  color: #1e293b;
+  font-size: 44rpx;
+  font-weight: 700;
+}
+
+/* ========== 订单信息卡片 ========== */
+.order-info-card {
+  margin-top: 16rpx;
+  padding: 32rpx;
+}
+
+.order-info-list {
+  margin-top: 24rpx;
+}
+
+.order-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18rpx 0;
+  border-bottom: 2rpx solid rgba(203, 213, 225, 0.4);
+}
+
+.order-info-row--last {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.order-info-row__label {
+  color: #1e293b;
+  font-size: 28rpx;
+  font-weight: 500;
+  line-height: 40rpx;
+  flex-shrink: 0;
+}
+
+.order-info-row__value {
+  color: #1e293b;
+  font-size: 26rpx;
+  line-height: 40rpx;
+  text-align: right;
+  flex: 1;
+  margin-left: 20rpx;
+}
+
+/* ========== 空状态 ========== */
+.empty-state {
+  padding: 120rpx 0;
+  text-align: center;
+}
+
+.empty-state__text {
+  color: #94a3b8;
+  font-size: 28rpx;
+}
