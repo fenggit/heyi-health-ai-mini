@@ -1178,6 +1178,9 @@ Page({
         return requestWechatPayment(payArgs)
       })
       .then(() => {
+        if (createdOrderId) {
+          get(paths.order.indentPayResult(createdOrderId)).catch(() => {})
+        }
         wx.showToast({
           title: "支付成功",
           icon: "success"

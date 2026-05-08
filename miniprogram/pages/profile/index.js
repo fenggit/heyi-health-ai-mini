@@ -704,6 +704,8 @@ Page({
 
     this.setData({ openingMemberSubscription: true })
 
+    let resolvedOrderId = ""
+
     post(paths.member.subscriptionOpen, { planId }, {
       showLoading: true,
       loadingTitle: "开通中"
@@ -726,6 +728,8 @@ Page({
           throw new Error("支付订单信息缺失")
         }
 
+        resolvedOrderId = orderId
+
         return post(paths.order.indentPayWechatCreate, {
           orderId
         }, {
@@ -740,6 +744,9 @@ Page({
         })
       })
       .then(() => {
+        if (resolvedOrderId) {
+          get(paths.order.indentPayResult(resolvedOrderId)).catch(() => {})
+        }
         this.setData({ showMemberSheet: false })
         wx.showToast({
           title: "支付成功",

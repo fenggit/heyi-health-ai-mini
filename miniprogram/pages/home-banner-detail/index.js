@@ -593,6 +593,8 @@ Page({
       }
       await requestWechatPayment(payResult.payArgs)
 
+      get(paths.order.indentPayResult(nextOrderId)).catch(() => {})
+
       this.patchActivitySignupState(target.id, {
         signupStatus: SIGNUP_STATUS.PAID,
         orderId: nextOrderId
