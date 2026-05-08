@@ -58,6 +58,13 @@ function clearAuthToken() {
   wx.removeStorageSync(STORAGE_TOKEN_KEY)
 }
 
+function forceHideAllLoading() {
+  requestLoadingCount = 0
+  try {
+    wx.hideLoading()
+  } catch (e) {}
+}
+
 function handleUnauthorized(message = '登录已失效，请重新登录') {
   clearAuthToken()
   const app = typeof getApp === 'function' ? getApp() : null
@@ -71,6 +78,14 @@ function handleUnauthorized(message = '登录已失效，请重新登录') {
 
   if (unauthorizedRedirecting) return
   unauthorizedRedirecting = true
+
+  forceHideAllLoading()
+
+  const resetUnauthorizedRedirecting = (delay = 800) => {
+    setTimeout(() => {
+      unauthorizedRedirecting = false
+    }, delay)
+  }
 
   setTimeout(() => {
     wx.showToast({ title: message, icon: 'none', duration: 2000 })
@@ -86,18 +101,39 @@ function handleUnauthorized(message = '登录已失效，请重新登录') {
   }
 
   if (alreadyOnLogin) {
-    unauthorizedRedirecting = false
+    resetUnauthorizedRedirecting(300)
     return
   }
 
+  const redirectUrl = '/pages/login/index'
+  const fallbackNavigateToLogin = () => {
+    wx.navigateTo({
+      url: redirectUrl,
+      fail: () => {
+        wx.redirectTo({
+          url: redirectUrl,
+          complete: () => {
+            resetUnauthorizedRedirecting(500)
+          }
+        })
+      },
+      complete: () => {
+        resetUnauthorizedRedirecting(500)
+      }
+    })
+  }
+
   wx.reLaunch({
-    url: '/pages/login/index',
+    url: redirectUrl,
+    fail: () => {
+      fallbackNavigateToLogin()
+    },
     complete: () => {
-      setTimeout(() => {
-        unauthorizedRedirecting = false
-      }, 500)
+      resetUnauthorizedRedirecting(500)
     }
   })
+
+  resetUnauthorizedRedirecting(2000)
 }
 
 function normalizeUrl(url, baseUrl = '') {

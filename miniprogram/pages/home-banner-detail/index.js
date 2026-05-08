@@ -486,8 +486,32 @@ Page({
       confirmText: "我知道了"
     })
   },
+  requireLoginForAction(featureName = "活动报名") {
+    const app = getApp()
+    const isLogin = !!(app && app.globalData && app.globalData.isLogin)
+    if (isLogin) return true
+
+    wx.showModal({
+      title: "温馨提示",
+      content: `登录后才可使用${featureName}功能，是否前往登录？`,
+      confirmText: "去登录",
+      cancelText: "再看看",
+      success: (res) => {
+        if (!res.confirm) return
+        const pages = getCurrentPages()
+        const current = pages[pages.length - 1]
+        if (current && current.route === "pages/login/index") return
+        wx.navigateTo({
+          url: "/pages/login/index"
+        })
+      }
+    })
+
+    return false
+  },
   async onActionTap(e) {
     if (this._actionLoading) return
+    if (!this.requireLoginForAction()) return
 
     const { id } = e.currentTarget.dataset
     const target = this.getActivityById(id)
