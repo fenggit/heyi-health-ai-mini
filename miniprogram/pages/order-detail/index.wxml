@@ -1,0 +1,110 @@
+<view class="order-detail-page design-page page-with-nav">
+  <image class="page-bg" src="/assets/bg_img.png" mode="widthFix" />
+
+  <my-header title="订单详情" bind:back="handleBack" />
+
+  <view class="page-top-gap" style="height: {{topInset}}px;"></view>
+
+  <view class="page-wrap page-wrap--no-title">
+
+    <!-- 物流区域 -->
+    <view class="logistics-block" wx:if="{{order}}">
+      <!-- 大背景图 -->
+      <image class="logistics-block__bg" src="/assets/my_order_header_bg.png" mode="scaleToFill" />
+
+      <!-- 上半：状态 + 预计送达 -->
+      <view class="logistics-top">
+        <view class="status-tag {{order.statusClass}}">{{order.statusText}}</view>
+        <text class="logistics-eta" wx:if="{{order.estimatedDelivery}}">约 {{order.estimatedDelivery}} 送达</text>
+      </view>
+
+      <!-- 下半：地址区域，独立半透明背景 -->
+      <view class="logistics-addr-block">
+        <view class="logistics-addr-row">
+          <text class="receiver-name">{{order.receiverName || '--'}}</text>
+          <text class="receiver-phone">{{order.receiverPhone}}</text>
+        </view>
+        <view class="logistics-addr-detail">
+          <image class="addr-pin-icon" src="/assets/mall/icon-location.png" mode="aspectFit" />
+          <text class="addr-text">送至：{{order.receiverAddress || '--'}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 订单商品卡片 -->
+    <view class="glass-card goods-card" wx:if="{{order}}">
+      <title-view text="订单商品" />
+      <view class="goods-list">
+        <view class="goods-item" wx:for="{{order.items}}" wx:key="id">
+          <view class="goods-item__img-wrap">
+            <image wx:if="{{item.image}}" class="goods-item__img" src="{{item.image}}" mode="aspectFill" />
+            <view wx:else class="goods-item__img goods-item__img--placeholder"></view>
+          </view>
+          <view class="goods-item__info">
+            <text class="goods-item__name">{{item.title}}</text>
+            <text class="goods-item__spec" wx:if="{{item.skuSpec}}">{{item.skuSpec}}</text>
+            <text class="goods-item__count">数量：<text class="goods-item__count-num">x{{item.count}}</text></text>
+          </view>
+          <view class="goods-item__price-wrap">
+            <text class="goods-item__currency">￥</text>
+            <text class="goods-item__price">{{item.price}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 费用明细 -->
+      <view class="fee-divider-line"></view>
+      <view class="fee-list">
+        <view class="fee-row">
+          <text class="fee-row__label">商品总价</text>
+          <view class="fee-row__right">
+            <text class="fee-row__currency">￥</text>
+            <text class="fee-row__value">{{order.goodsAmount}}</text>
+          </view>
+        </view>
+        <view class="fee-row">
+          <text class="fee-row__label">配送费</text>
+          <view class="fee-row__right">
+            <text class="fee-row__currency">￥</text>
+            <text class="fee-row__value">{{order.deliveryAmount}}</text>
+          </view>
+        </view>
+        <view class="fee-row">
+          <text class="fee-row__label">优惠券</text>
+          <view class="fee-row__right">
+            <text class="fee-row__currency fee-row__currency--red">- ￥</text>
+            <text class="fee-row__value fee-row__value--red">{{order.couponAmount}}</text>
+          </view>
+        </view>
+        <view class="fee-row fee-row--total">
+          <text class="fee-row__label fee-row__label--bold">合计金额</text>
+          <view class="fee-row__right">
+            <text class="fee-row__currency fee-row__currency--muted">￥</text>
+            <text class="fee-row__value fee-row__value--large">{{order.payAmount}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 订单信息卡片 -->
+    <view class="glass-card order-info-card" wx:if="{{order}}">
+      <title-view text="订单信息" />
+      <view class="order-info-list">
+        <view class="order-info-row">
+          <text class="order-info-row__label">订单编号</text>
+          <text class="order-info-row__value">{{order.orderNo}}</text>
+        </view>
+        <view class="order-info-row order-info-row--last">
+          <text class="order-info-row__label">下单时间</text>
+          <text class="order-info-row__value">{{order.createTime}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{!loading && !order}}">
+      <text class="empty-state__text">暂无订单信息</text>
+    </view>
+
+  </view>
+</view>
