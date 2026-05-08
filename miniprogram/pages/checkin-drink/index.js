@@ -40,10 +40,7 @@ Page({
   },
 
   onCheckin() {
-    wx.showToast({
-      title: '打卡成功',
-      icon: 'success'
-    })
+    wx.navigateTo({ url: '/pages/drink-checkin-new/index' })
   },
 
   // checkbox 点击切换打卡状态

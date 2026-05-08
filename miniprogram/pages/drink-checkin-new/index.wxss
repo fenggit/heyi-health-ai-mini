@@ -1,0 +1,250 @@
+.new-page {
+  background: transparent;
+  min-height: 100vh;
+  position: relative;
+}
+
+.new-page-bg {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 750rpx;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.new-content {
+  position: relative;
+  z-index: 1;
+  height: calc(100vh - var(--header-height, 64px));
+  box-sizing: border-box;
+  padding-bottom: 40rpx;
+}
+
+/* ===== section 通用 ===== */
+.new-section {
+  width: 702rpx;
+  margin: 16rpx auto 0;
+  border-radius: 24rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.96);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 32rpx;
+  box-sizing: border-box;
+}
+
+/* ===== 打卡时间 ===== */
+.new-section--time {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 36rpx 32rpx;
+}
+
+.new-time__label {
+  color: #94a3b8;
+  font-size: 24rpx;
+  line-height: 34rpx;
+  font-weight: 400;
+}
+
+.new-time__clock {
+  color: #1e293b;
+  font-size: 72rpx;
+  line-height: 1.2;
+  font-weight: 700;
+  font-family: "DIN", "Source Han Sans CN", sans-serif;
+  margin-top: 8rpx;
+}
+
+.new-time__date {
+  color: #94a3b8;
+  font-size: 24rpx;
+  line-height: 34rpx;
+  font-weight: 400;
+  margin-top: 8rpx;
+}
+
+/* ===== section 标题 ===== */
+.new-section__title-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.new-section__title {
+  color: #1e293b;
+  font-size: 28rpx;
+  line-height: 40rpx;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 24rpx;
+}
+
+.new-section__title-row .new-section__title {
+  margin-bottom: 0;
+}
+
+.new-section__required {
+  color: #fb2c36;
+  font-size: 28rpx;
+  line-height: 40rpx;
+  font-weight: 700;
+  margin-left: 6rpx;
+}
+
+/* ===== 类型选择网格 ===== */
+.new-type-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.new-type-item {
+  height: 72rpx;
+  padding: 0 24rpx;
+  border-radius: 16rpx;
+  border: 2rpx solid #e2e8f0;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 160rpx;
+}
+
+.new-type-item--active {
+  border-color: #2bc383;
+  background: rgba(43, 195, 131, 0.08);
+}
+
+.new-type-item__text {
+  color: #1e293b;
+  font-size: 28rpx;
+  line-height: 1;
+  font-weight: 500;
+}
+
+.new-type-item--active .new-type-item__text {
+  color: #2bc383;
+  font-weight: 700;
+}
+
+/* ===== 上传照片 ===== */
+.new-photo-area {
+  margin-top: 0;
+}
+
+.new-photo-placeholder {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 16rpx;
+  border: 2rpx dashed #cbd5e1;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+}
+
+.new-photo-placeholder__icon {
+  width: 48rpx;
+  height: 48rpx;
+  opacity: 0.4;
+}
+
+.new-photo-placeholder__text {
+  color: #94a3b8;
+  font-size: 24rpx;
+  line-height: 34rpx;
+}
+
+.new-photo-preview {
+  position: relative;
+  width: 160rpx;
+  height: 160rpx;
+}
+
+.new-photo-preview__img {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 16rpx;
+}
+
+.new-photo-preview__remove {
+  position: absolute;
+  top: -12rpx;
+  right: -12rpx;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  color: #ffffff;
+  font-size: 28rpx;
+  line-height: 40rpx;
+  text-align: center;
+}
+
+/* ===== 打卡笔记 ===== */
+.new-note-input {
+  width: 100%;
+  min-height: 160rpx;
+  border-radius: 16rpx;
+  background: #f1f5f9;
+  padding: 20rpx 24rpx;
+  box-sizing: border-box;
+  color: #1e293b;
+  font-size: 28rpx;
+  line-height: 44rpx;
+  font-weight: 400;
+}
+
+.new-note-input__placeholder {
+  color: #94a3b8;
+  font-size: 28rpx;
+}
+
+.new-note-count {
+  display: block;
+  text-align: right;
+  color: #94a3b8;
+  font-size: 24rpx;
+  line-height: 34rpx;
+  margin-top: 8rpx;
+}
+
+/* ===== 底部按钮 ===== */
+.new-footer {
+  width: 702rpx;
+  margin: 32rpx auto 0;
+  padding-bottom: 20rpx;
+  display: flex;
+  gap: 24rpx;
+}
+
+.new-btn {
+  flex: 1;
+  height: 88rpx;
+  border-radius: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+}
+
+.new-btn--share {
+  background: linear-gradient(135deg, #4effe2 0%, #cef94c 100%);
+}
+
+.new-btn--submit {
+  background: linear-gradient(135deg, #7cee89 0%, #2bc383 100%);
+}
+
+.new-btn__text {
+  color: #1e293b;
+  font-size: 32rpx;
+  line-height: 1;
+  font-weight: 700;
+}

@@ -46,10 +46,7 @@ Page({
   },
 
   onCheckin() {
-    wx.showToast({
-      title: '打卡成功',
-      icon: 'success'
-    })
+    wx.navigateTo({ url: '/pages/fasting-checkin-new/index' })
   },
 
   onRecordCheckChange(e) {
