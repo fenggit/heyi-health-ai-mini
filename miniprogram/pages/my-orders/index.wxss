@@ -46,7 +46,6 @@
 
 .order-card {
   margin-top: 16rpx;
-  min-height: 460rpx;
   padding: 32rpx;
 }
 
