@@ -330,8 +330,9 @@ Page({
   },
 
   viewDetail(e) {
-    const { id } = e.currentTarget.dataset
-    wx.showToast({ title: '订单 ' + id + ' 详情待接入', icon: 'none' })
+    const { orderId } = e.currentTarget.dataset
+    if (!orderId) return
+    wx.navigateTo({ url: `/pages/order-detail/index?orderId=${orderId}` })
   },
 
   cancelOrder(e) {
