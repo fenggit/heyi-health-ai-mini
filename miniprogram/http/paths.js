@@ -93,7 +93,9 @@ const paths = {
     // 订单列表
     indentList: '/order/app/indent/list',
     // 订单详情
-    indentDetail: (orderId) => `/order/app/indent/${encodeURIComponent(orderId)}`
+    indentDetail: (orderId) => `/order/app/indent/${encodeURIComponent(orderId)}`,
+    // 支付结果查询
+    indentPayResult: (orderId) => `/order/app/indent/pay/result/${encodeURIComponent(orderId)}`
   },
   recipe: {
     // 首页聚合数据

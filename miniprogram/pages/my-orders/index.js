@@ -165,7 +165,7 @@ function mapOrderStatus(rawStatus) {
     return { statusKey: 'pending', statusText: '待付款', statusClass: 'order-status--pending' }
   }
   if (upper === 'PAID' || source.indexOf('已付款') >= 0) {
-    return { statusKey: 'pending', statusText: '已付款', statusClass: 'order-status--pending' }
+    return { statusKey: 'paid', statusText: '已付款', statusClass: 'order-status--paid' }
   }
   if (upper === 'DELIVERED' || source.indexOf('已发货') >= 0) {
     return { statusKey: 'shipping', statusText: '已发货', statusClass: 'order-status--shipping' }
@@ -399,6 +399,7 @@ Page({
         return requestWechatPayment(payArgs)
       })
       .then(() => {
+        get(paths.order.indentPayResult(payOrderId)).catch(() => {})
         wx.showToast({ title: '支付成功', icon: 'success' })
       })
       .catch((err) => {

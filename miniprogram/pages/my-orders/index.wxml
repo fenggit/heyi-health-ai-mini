@@ -51,8 +51,7 @@
           </view>
         </view>
 
-        <view class="order-actions" hidden="{{order.statusText !== '待付款'}}">
-          <view class="order-btn order-btn--line" data-id="{{order.id}}" bindtap="viewDetail" hidden="{{true}}">订单详情</view>
+        <view wx:if="{{order.statusText === '待付款'}}" class="order-actions">
           <view class="order-btn order-btn--line" data-id="{{order.id}}" data-order-id="{{order.orderId}}" catchtap="cancelOrder">取消</view>
           <view class="order-btn order-btn--line" data-id="{{order.id}}" data-order-id="{{order.orderId}}" catchtap="payOrder">支付</view>
         </view>
