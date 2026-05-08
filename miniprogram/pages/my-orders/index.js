@@ -192,7 +192,7 @@ function mapOrderItem(item, index) {
     salePrice: formatPrice(raw.salePrice),
     count: buyQty,
     buyQty,
-    image: normalizeText(raw.image || raw.skuImage || raw.spuImage || raw.coverImage || raw.picUrl || '/assets/mall/product-apple.png')
+    image: normalizeText(raw.image || raw.skuImage || raw.spuImage || raw.coverImage || raw.picUrl || '')
   }
 }
 

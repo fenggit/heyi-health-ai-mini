@@ -27,7 +27,8 @@
         <view class="order-thumb-row">
           <block wx:for="{{order.items}}" wx:key="image" wx:for-item="product">
             <view class="order-thumb-item">
-              <image class="order-thumb-item__image" src="{{product.image}}" mode="aspectFill" />
+              <image wx:if="{{product.image}}" class="order-thumb-item__image" src="{{product.image}}" mode="aspectFill" />
+              <view wx:else class="order-thumb-item__image order-thumb-item__image--empty"></view>
               <view class="order-thumb-item__count">x{{product.count}}</view>
             </view>
           </block>

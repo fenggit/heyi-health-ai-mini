@@ -113,6 +113,11 @@
   width: 156rpx;
   height: 120rpx;
   border-radius: 24rpx;
+  display: block;
+}
+
+.order-thumb-item__image--empty {
+  background: #f1f5f9;
 }
 
 .order-thumb-item__count {
