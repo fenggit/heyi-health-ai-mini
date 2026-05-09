@@ -48,9 +48,9 @@ const SUMMARY_CARDS = [
 ]
 
 const REWARD_STEPS = [
-  { title: '好友注册成功', reward: '您获得 100 积分' },
-  { title: '体质类型', reward: '您获得 50 积分' },
-  { title: '用餐时间', reward: '新人优惠券' }
+  { title: '好友注册成功', reward: '好友获得100积分' },
+  { title: '推荐人奖励', reward: '您获得100积分' },
+  { title: '新人优惠券', reward: '3元无门槛优惠券' }
 ]
 
 function toDisplayText(value, fallback = '') {
