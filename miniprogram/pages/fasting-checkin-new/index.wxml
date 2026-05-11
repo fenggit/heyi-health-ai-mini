@@ -19,10 +19,10 @@
         <text class="new-section__required">*</text>
       </view>
       <view class="new-type-grid">
-        <block wx:for="{{fastingTypes}}" wx:key="id">
+        <block wx:for="{{fastingTypes}}" wx:key="code">
           <view
-            class="new-type-item {{selectedType === item.id ? 'new-type-item--active' : ''}}"
-            data-id="{{item.id}}"
+            class="new-type-item {{selectedTypeCode === item.code ? 'new-type-item--active' : ''}}"
+            data-code="{{item.code}}"
             bindtap="onTypeSelect"
           >
             <text class="new-type-item__text">{{item.label}}</text>
@@ -93,10 +93,10 @@
     <view class="new-section card-panel">
       <text class="new-section__title">身体感受（选填）</text>
       <view class="new-feeling-grid">
-        <block wx:for="{{feelings}}" wx:key="id">
+        <block wx:for="{{feelings}}" wx:key="code">
           <view
             class="new-feeling-item {{item.checked ? 'new-feeling-item--active' : ''}}"
-            data-id="{{item.id}}"
+            data-code="{{item.code}}"
             bindtap="onFeelingToggle"
           >
             <text class="new-feeling-item__text">{{item.label}}</text>

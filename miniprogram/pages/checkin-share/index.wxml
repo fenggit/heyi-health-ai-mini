@@ -1,10 +1,7 @@
 <view class="share-page">
   <image class="share-page-bg" src="/assets/bg_img.png" mode="widthFix" />
 
-  <!-- my-header：自动处理状态栏 + 胶囊 -->
   <my-header title="打卡中心" show-back bindback="onBack" />
-
-  <!-- 导航栏占位 -->
   <view style="height: {{headerHeight}}px;"></view>
 
   <view class="share-content">
@@ -23,14 +20,28 @@
           <!-- 卡片头部：头像 + 用户名 + 时间 -->
           <view class="share-card__header">
             <view class="share-card__avatar-wrap">
-              <image class="share-card__avatar-img" src="/assets/checkin/checkin_user_icon.png" mode="aspectFill" />
+              <image
+                wx:if="{{item.avatarUrl}}"
+                class="share-card__avatar-img"
+                src="{{item.avatarUrl}}"
+                mode="aspectFill"
+              />
+              <image
+                wx:else
+                class="share-card__avatar-img"
+                src="/assets/checkin/checkin_user_icon.png"
+                mode="aspectFill"
+              />
             </view>
             <text class="share-card__username">{{item.username}}</text>
             <text class="share-card__time">{{item.time}}</text>
           </view>
 
-          <!-- 图片占位 -->
-          <view class="share-card__img-placeholder"></view>
+          <!-- 封面图 -->
+          <view wx:if="{{item.coverImageUrl}}" class="share-card__img-wrap">
+            <image class="share-card__img" src="{{item.coverImageUrl}}" mode="aspectFill" />
+          </view>
+          <view wx:else class="share-card__img-placeholder"></view>
 
           <!-- 标题行 + 点赞 -->
           <view class="share-card__title-row">
@@ -42,16 +53,22 @@
           </view>
 
           <!-- 话题标签 -->
-          <view class="share-card__tags">
+          <view wx:if="{{item.tags.length}}" class="share-card__tags">
             <block wx:for="{{item.tags}}" wx:key="*this" wx:for-item="tag">
               <view class="share-card__tag">#{{tag}}</view>
             </block>
           </view>
 
           <!-- 正文 -->
-          <text class="share-card__content">{{item.content}}</text>
+          <text wx:if="{{item.content}}" class="share-card__content">{{item.content}}</text>
         </view>
       </block>
+
+      <!-- 底部状态 -->
+      <view class="share-footer">
+        <text wx:if="{{loading}}" class="share-footer__text">加载中...</text>
+        <text wx:elif="{{!hasMore && posts.length}}" class="share-footer__text">没有更多了</text>
+      </view>
     </view>
   </view>
 </view>

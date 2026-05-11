@@ -1,45 +1,109 @@
 const { getLayoutMetrics } = require("../../utils/layout")
+const request = require("../../utils/request")
+const paths = require("../../http/paths")
+
+const PAGE_SIZE = 10
+
+/**
+ * 格式化时间：date-time → "M月D日" 或 "今天"
+ */
+function formatTime(dateTimeStr) {
+  if (!dateTimeStr) return ''
+  const now = new Date()
+  const todayStr = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, '0'),
+    String(now.getDate()).padStart(2, '0')
+  ].join('-')
+
+  const datePart = String(dateTimeStr).slice(0, 10)
+  if (datePart === todayStr) return '今天'
+
+  const parts = datePart.split('-')
+  if (parts.length === 3) {
+    const m = parseInt(parts[1], 10)
+    const d = parseInt(parts[2], 10)
+    return `${m}月${d}日`
+  }
+  return datePart
+}
+
+function mapRecord(item) {
+  return {
+    id: item.shareRecordId,
+    username: item.userNickNameSnapshot || '',
+    avatarUrl: item.userAvatarSnapshot || '',
+    time: formatTime(item.createTime),
+    title: item.title || '',
+    content: item.contentText || '',
+    coverImageUrl: item.coverImageUrl || '',
+    imageUrls: Array.isArray(item.imageUrls) ? item.imageUrls : [],
+    tags: Array.isArray(item.tagNames) ? item.tagNames : [],
+    likeCount: item.likeCount || 0,
+    liked: !!item.liked,
+    sourceTypeName: item.sourceTypeName || ''
+  }
+}
 
 Page({
   data: {
     headerHeight: 64,
-    posts: [
-      {
-        id: 1,
-        username: '健康生活家',
-        time: '1天前',
-        title: '轻断食打卡 - 第30天',
-        likeCount: 128,
-        liked: false,
-        tags: ['轻断食打卡', '16:8轻断食'],
-        content: '坚持了30天的16:8轻断食，体重减5kg，整个人的精神状态很好！今天的断食时间从20:00到12:00，16小时，感觉状态很棒!'
-      },
-      {
-        id: 2,
-        username: '果蔬爱好者',
-        time: '1天前',
-        title: '喝汁打卡 - 绿色果蔬汁',
-        likeCount: 128,
-        liked: false,
-        tags: ['喝汁打卡', '果蔬汁'],
-        content: ''
-      }
-    ]
+    posts: [],
+    pageNum: 1,
+    hasMore: true,
+    loading: false
   },
 
   onLoad() {
     this.syncLayout()
+    this.loadList(1)
   },
 
   syncLayout() {
     const { headerHeight } = getLayoutMetrics()
-    this.setData({
-      headerHeight: headerHeight || 64
-    })
+    this.setData({ headerHeight: headerHeight || 64 })
   },
 
   onBack() {
     wx.navigateBack()
+  },
+
+  loadList(pageNum) {
+    if (this.data.loading) return
+    this.setData({ loading: true })
+
+    if (pageNum === 1) {
+      wx.showLoading({ title: '加载中...', mask: true })
+    }
+
+    request.get(paths.checkin.shareList, { pageNum, pageSize: PAGE_SIZE })
+      .then((res) => {
+        const data = (res && res.data) || {}
+        const list = Array.isArray(data.rows) ? data.rows : (Array.isArray(data.records) ? data.records : [])
+        const total = data.total || 0
+        const records = list.map(mapRecord)
+
+        const posts = pageNum === 1 ? records : this.data.posts.concat(records)
+        const hasMore = posts.length < total
+
+        this.setData({ posts, pageNum, hasMore })
+      })
+      .catch((err) => {
+        console.error('[checkin-share] 加载失败:', err)
+        if (pageNum === 1) {
+          wx.showToast({ title: '加载失败，请重试', icon: 'none' })
+        }
+      })
+      .finally(() => {
+        wx.hideLoading()
+        this.setData({ loading: false })
+      })
+  },
+
+  /** 滚动到底部加载下一页 */
+  onReachBottom() {
+    if (!this.data.hasMore || this.data.loading) return
+    this.loadList(this.data.pageNum + 1)
   },
 
   onLikeTap(e) {

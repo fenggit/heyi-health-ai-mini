@@ -47,16 +47,23 @@
       <view class="drink-record-list">
         <block wx:for="{{records}}" wx:key="id">
           <view class="drink-record-item card-panel">
-            <!-- 图片区域：空白占位 -->
-            <view class="drink-record-item__img-placeholder"></view>
+            <!-- 图片区域：有图显图，无图显占位 -->
+            <view class="drink-record-item__img-wrap">
+              <image
+                wx:if="{{item.imageUrl}}"
+                class="drink-record-item__img"
+                src="{{item.imageUrl}}"
+                mode="aspectFill"
+              />
+              <view wx:else class="drink-record-item__img-placeholder"></view>
+            </view>
             <view class="drink-record-item__body">
               <text class="drink-record-item__name">{{item.name}}</text>
               <text class="drink-record-item__time">{{item.time}}</text>
-              <text class="drink-record-item__note">{{item.note}}</text>
+              <text wx:if="{{item.note}}" class="drink-record-item__note">{{item.note}}</text>
             </view>
-            <!-- my-checkbox 组件，可点击切换打卡状态 -->
-            <view class="drink-record-item__check">
-              <my-checkbox checked="{{item.checked}}" shape="circle" data-id="{{item.id}}" bindchange="onRecordCheckChange" />
+            <view class="drink-record-item__check" catchtap="noop">
+              <my-checkbox checked="{{true}}" shape="circle" />
             </view>
           </view>
         </block>

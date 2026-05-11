@@ -211,3 +211,28 @@
   line-height: 42rpx;
   font-weight: 400;
 }
+
+/* ===== 封面图（真实图片） ===== */
+.share-card__img-wrap {
+  width: 100%;
+  height: 426rpx;
+  overflow: hidden;
+}
+
+.share-card__img {
+  width: 100%;
+  height: 426rpx;
+}
+
+/* ===== 底部加载状态 ===== */
+.share-footer {
+  padding: 24rpx 0 8rpx;
+  display: flex;
+  justify-content: center;
+}
+
+.share-footer__text {
+  color: #94a3b8;
+  font-size: 24rpx;
+  line-height: 34rpx;
+}

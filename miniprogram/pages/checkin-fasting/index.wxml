@@ -58,15 +58,14 @@
               <!-- 名称 + 时长标签 -->
               <view class="fasting-record-item__title-row">
                 <text class="fasting-record-item__name">{{item.name}}</text>
-                <view class="fasting-record-item__duration-tag">{{item.duration}}</view>
+                <view wx:if="{{item.duration}}" class="fasting-record-item__duration-tag">{{item.duration}}</view>
               </view>
               <text class="fasting-record-item__time">{{item.time}}</text>
-              <text class="fasting-record-item__detail">{{item.detail}}</text>
+              <text wx:if="{{item.detail}}" class="fasting-record-item__detail">{{item.detail}}</text>
               <text wx:if="{{item.note}}" class="fasting-record-item__note">{{item.note}}</text>
             </view>
-            <!-- my-checkbox 可点击切换 -->
-            <view class="fasting-record-item__check">
-              <my-checkbox checked="{{item.checked}}" shape="circle" data-id="{{item.id}}" bindchange="onRecordCheckChange" />
+            <view class="fasting-record-item__check" catchtap="noop">
+              <my-checkbox checked="{{true}}" shape="circle" />
             </view>
           </view>
         </block>

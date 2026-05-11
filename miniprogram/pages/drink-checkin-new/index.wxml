@@ -13,17 +13,17 @@
       <text class="new-time__date">{{currentDate}}</text>
     </view>
 
-    <!-- 果蔬汁类型（必填） -->
+    <!-- 果蔬汁（必填） -->
     <view class="new-section card-panel">
       <view class="new-section__title-row">
-        <text class="new-section__title">果蔬汁类型</text>
+        <text class="new-section__title">果蔬汁</text>
         <text class="new-section__required">*</text>
       </view>
       <view class="new-type-grid">
-        <block wx:for="{{juiceTypes}}" wx:key="id">
+        <block wx:for="{{juiceOptions}}" wx:key="key">
           <view
-            class="new-type-item {{selectedType === item.id ? 'new-type-item--active' : ''}}"
-            data-id="{{item.id}}"
+            class="new-type-item {{selectedOption && selectedOption.key === item.key ? 'new-type-item--active' : ''}}"
+            data-key="{{item.key}}"
             bindtap="onTypeSelect"
           >
             <text class="new-type-item__text">{{item.label}}</text>

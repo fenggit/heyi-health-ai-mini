@@ -153,19 +153,31 @@
   box-sizing: border-box;
 }
 
-/* 左侧空白图片占位 */
-.drink-record-item__img-placeholder {
+/* 左侧图片区域 */
+.drink-record-item__img-wrap {
   width: 180rpx;
   height: 212rpx;
   flex-shrink: 0;
   border-radius: 24rpx 0 0 24rpx;
+  overflow: hidden;
+}
+
+.drink-record-item__img {
+  width: 180rpx;
+  height: 212rpx;
+}
+
+/* 无图时占位 */
+.drink-record-item__img-placeholder {
+  width: 180rpx;
+  height: 212rpx;
   background: rgba(244, 247, 250, 0.8);
 }
 
 /* 右侧文字区 */
 .drink-record-item__body {
   flex: 1;
-  padding: 24rpx 16rpx 24rpx 24rpx;
+  padding: 24rpx 24rpx 24rpx 24rpx;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -197,7 +209,7 @@
   font-weight: 400;
 }
 
-/* 右侧 checkbox 区域 */
+/* 已打卡 checkbox 区域（只读） */
 .drink-record-item__check {
   width: 80rpx;
   flex-shrink: 0;
