@@ -149,16 +149,11 @@
   gap: 8rpx;
 }
 
-.new-photo-placeholder__icon {
-  width: 48rpx;
-  height: 48rpx;
-  opacity: 0.4;
-}
-
-.new-photo-placeholder__text {
+.new-photo-placeholder__plus {
   color: #94a3b8;
-  font-size: 24rpx;
-  line-height: 34rpx;
+  font-size: 56rpx;
+  line-height: 1;
+  font-weight: 300;
 }
 
 .new-photo-preview {
@@ -234,10 +229,6 @@
   gap: 12rpx;
 }
 
-.new-btn--share {
-  background: linear-gradient(135deg, #4effe2 0%, #cef94c 100%);
-}
-
 .new-btn--submit {
   background: linear-gradient(135deg, #7cee89 0%, #2bc383 100%);
 }
@@ -247,4 +238,20 @@
   font-size: 32rpx;
   line-height: 1;
   font-weight: 700;
+}
+
+/* ===== 分享到内容 toggle ===== */
+.new-section--share-toggle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16rpx;
+  padding: 24rpx 32rpx;
+}
+
+.new-share-toggle__label {
+  color: #475569;
+  font-size: 28rpx;
+  line-height: 40rpx;
+  font-weight: 500;
 }

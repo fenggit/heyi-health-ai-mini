@@ -30,7 +30,8 @@ Page({
     ],
     selectedType: '',
     photoPath: '',
-    note: ''
+    note: '',
+    shareToContent: true
   },
 
   onLoad() {
@@ -56,7 +57,7 @@ Page({
     wx.chooseMedia({
       count: 1,
       mediaType: ['image'],
-      sourceType: ['album', 'camera'],
+      sourceType: ['album'],
       success: (res) => {
         const path = res.tempFiles[0].tempFilePath
         this.setData({ photoPath: path })
@@ -72,12 +73,8 @@ Page({
     this.setData({ note: e.detail.value })
   },
 
-  onShare() {
-    if (!this.data.selectedType) {
-      wx.showToast({ title: '请选择果蔬汁类型', icon: 'none' })
-      return
-    }
-    wx.showToast({ title: '分享功能待接入', icon: 'none' })
+  onShareToggle() {
+    this.setData({ shareToContent: !this.data.shareToContent })
   },
 
   onSubmit() {

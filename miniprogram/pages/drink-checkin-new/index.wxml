@@ -37,8 +37,7 @@
       <text class="new-section__title">上传照片（选填）</text>
       <view class="new-photo-area">
         <view wx:if="{{!photoPath}}" class="new-photo-placeholder" bindtap="onChoosePhoto">
-          <image class="new-photo-placeholder__icon" src="/assets/analysis/camera_icon@2x.png" mode="aspectFit" />
-          <text class="new-photo-placeholder__text">拍照</text>
+          <text class="new-photo-placeholder__plus">+</text>
         </view>
         <view wx:else class="new-photo-preview" bindtap="onChoosePhoto">
           <image class="new-photo-preview__img" src="{{photoPath}}" mode="aspectFill" />
@@ -62,11 +61,14 @@
       <text class="new-note-count">{{note.length}}/200</text>
     </view>
 
+    <!-- 是否分享到内容 -->
+    <view class="new-section new-section--share-toggle card-panel" bindtap="onShareToggle">
+      <my-checkbox shape="square" checked="{{shareToContent}}" bindchange="onShareToggle" />
+      <text class="new-share-toggle__label">分享到内容</text>
+    </view>
+
     <!-- 底部按钮 -->
     <view class="new-footer">
-      <view class="new-btn new-btn--share" bindtap="onShare">
-        <text class="new-btn__text">分享</text>
-      </view>
       <view class="new-btn new-btn--submit" bindtap="onSubmit">
         <text class="new-btn__text">打卡</text>
       </view>

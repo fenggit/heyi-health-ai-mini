@@ -44,7 +44,8 @@ Page({
       { id: 'excellent', label: '非常棒' }
     ],
     selectedFeelings: [],
-    note: ''
+    note: '',
+    shareToContent: true
   },
 
   onLoad() {
@@ -108,16 +109,8 @@ Page({
     this.setData({ note: e.detail.value })
   },
 
-  onShare() {
-    if (!this.data.selectedType) {
-      wx.showToast({ title: '请选择断食类型', icon: 'none' })
-      return
-    }
-    if (!this.data.startTime || !this.data.endTime) {
-      wx.showToast({ title: '请设置断食时间', icon: 'none' })
-      return
-    }
-    wx.showToast({ title: '分享功能待接入', icon: 'none' })
+  onShareToggle() {
+    this.setData({ shareToContent: !this.data.shareToContent })
   },
 
   onSubmit() {

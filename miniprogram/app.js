@@ -25,6 +25,13 @@ App({
    *     memberInfo.currentLevelId   {number} 当前会员等级 ID
    *     memberInfo.currentLevelName {string} 当前会员等级名称
    *     memberInfo.totalPoints      {number} 总积分
+   *   stat {object} 数据统计
+   *     stat.juiceCheckInTotalCount   {number} 喝汁累计打卡次数
+   *     stat.fastingCheckInTotalCount {number} 轻断食累计打卡次数
+   *     stat.favoriteRecipeCount      {number} 收藏食谱数
+   *     stat.historyOrderCount        {number} 历史订单数
+   *     stat.couponCount              {number} 优惠券数
+   *     stat.referralCount            {number} 邀请好友数
    *
    * guestSession — 游客 session 信息（来自 getGuestToken 响应 data）
    *   guestToken     {string}  游客令牌
