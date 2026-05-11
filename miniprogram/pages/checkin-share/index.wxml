@@ -37,11 +37,10 @@
             <text class="share-card__time">{{item.time}}</text>
           </view>
 
-          <!-- 封面图 -->
+          <!-- 封面图：无图不显示 -->
           <view wx:if="{{item.coverImageUrl}}" class="share-card__img-wrap">
             <image class="share-card__img" src="{{item.coverImageUrl}}" mode="aspectFill" />
           </view>
-          <view wx:else class="share-card__img-placeholder"></view>
 
           <!-- 标题行 + 点赞 -->
           <view class="share-card__title-row">
