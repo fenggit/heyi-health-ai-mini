@@ -89,7 +89,7 @@ Page({
     } else if (id === 'fasting') {
       wx.navigateTo({ url: '/pages/checkin-fasting/index' })
     } else if (id === 'share') {
-      wx.navigateTo({ url: '/pages/checkin-share/index' })
+      wx.navigateTo({ url: '/pages/checkin-list/index' })
     }
   }
 })

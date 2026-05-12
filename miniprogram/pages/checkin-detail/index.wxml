@@ -1,0 +1,129 @@
+<view class="sd-page">
+  <image class="sd-bg" src="/assets/bg_img.png" mode="widthFix" />
+
+  <my-header title="分享详情" show-back bindback="onBack" />
+  <view style="height: {{headerHeight}}px;"></view>
+
+  <block wx:if="{{detail}}">
+    <scroll-view class="sd-scroll" scroll-y>
+
+      <!-- 封面图 -->
+      <view wx:if="{{detail.coverImageUrl}}" class="sd-cover-wrap">
+        <image class="sd-cover" src="{{detail.coverImageUrl}}" mode="aspectFill" />
+      </view>
+
+      <!-- 主卡片 -->
+      <view class="sd-card card-panel">
+
+        <!-- 用户信息行 -->
+        <view class="sd-user-row">
+          <view class="sd-avatar-wrap">
+            <image
+              wx:if="{{detail.avatarUrl}}"
+              class="sd-avatar"
+              src="{{detail.avatarUrl}}"
+              mode="aspectFill"
+            />
+            <image
+              wx:else
+              class="sd-avatar"
+              src="/assets/checkin/checkin_user_icon.png"
+              mode="aspectFill"
+            />
+          </view>
+          <view class="sd-user-info">
+            <text class="sd-username">{{detail.username}}</text>
+            <text class="sd-time">{{detail.time}}</text>
+          </view>
+          <view class="sd-source-tag">{{detail.sourceTypeName}}</view>
+        </view>
+
+        <!-- 标题 -->
+        <text class="sd-title">{{detail.title}}</text>
+
+        <!-- 摘要 -->
+        <text wx:if="{{detail.summary}}" class="sd-summary">{{detail.summary}}</text>
+
+        <!-- 话题标签 -->
+        <view wx:if="{{detail.tags.length}}" class="sd-tags">
+          <block wx:for="{{detail.tags}}" wx:key="*this" wx:for-item="tag">
+            <view class="sd-tag">#{{tag}}</view>
+          </block>
+        </view>
+
+        <!-- 正文 -->
+        <text wx:if="{{detail.content}}" class="sd-content">{{detail.content}}</text>
+
+        <!-- 多图 -->
+        <view wx:if="{{detail.imageUrls.length > 1}}" class="sd-images">
+          <block wx:for="{{detail.imageUrls}}" wx:key="*this" wx:for-item="imgUrl">
+            <image class="sd-image" src="{{imgUrl}}" mode="aspectFill" />
+          </block>
+        </view>
+
+      </view>
+
+      <!-- 打卡快照卡片 -->
+      <view wx:if="{{detail.snapshot}}" class="sd-card sd-snapshot-card card-panel">
+        <text class="sd-snapshot-title">打卡详情</text>
+
+        <!-- 轻断食快照 -->
+        <block wx:if="{{detail.sourceType === 'FASTING_CHECK_IN'}}">
+          <view class="sd-snapshot-row" wx:if="{{detail.snapshot.fastingTypeName}}">
+            <text class="sd-snapshot-label">断食类型</text>
+            <text class="sd-snapshot-value">{{detail.snapshot.fastingTypeName}}</text>
+          </view>
+          <view class="sd-snapshot-row" wx:if="{{detail.snapshot.startTime}}">
+            <text class="sd-snapshot-label">开始时间</text>
+            <text class="sd-snapshot-value">{{detail.snapshot.startTime}}</text>
+          </view>
+          <view class="sd-snapshot-row" wx:if="{{detail.snapshot.endTime}}">
+            <text class="sd-snapshot-label">结束时间</text>
+            <text class="sd-snapshot-value">{{detail.snapshot.endTime}}</text>
+          </view>
+          <view class="sd-snapshot-row" wx:if="{{detail.snapshot.durationHours}}">
+            <text class="sd-snapshot-label">断食时长</text>
+            <text class="sd-snapshot-value">{{detail.snapshot.durationHours}} 小时</text>
+          </view>
+          <view class="sd-snapshot-row" wx:if="{{detail.snapshot.weightKg}}">
+            <text class="sd-snapshot-label">体重</text>
+            <text class="sd-snapshot-value">{{detail.snapshot.weightKg}} kg</text>
+          </view>
+          <view class="sd-snapshot-row" wx:if="{{detail.snapshot.bodyFatRate}}">
+            <text class="sd-snapshot-label">体脂率</text>
+            <text class="sd-snapshot-value">{{detail.snapshot.bodyFatRate}} %</text>
+          </view>
+          <view class="sd-snapshot-row" wx:if="{{detail.snapshot.feelingTagNames && detail.snapshot.feelingTagNames.length}}">
+            <text class="sd-snapshot-label">身体感受</text>
+            <text class="sd-snapshot-value">{{detail.snapshot.feelingTagNames.join('、')}}</text>
+          </view>
+        </block>
+
+        <!-- 喝汁快照 -->
+        <block wx:if="{{detail.sourceType === 'JUICE_CHECK_IN'}}">
+          <view class="sd-snapshot-row" wx:if="{{detail.snapshot.recipeName || detail.snapshot.juiceTypeName}}">
+            <text class="sd-snapshot-label">果蔬汁</text>
+            <text class="sd-snapshot-value">{{detail.snapshot.recipeName || detail.snapshot.juiceTypeName}}</text>
+          </view>
+          <view class="sd-snapshot-row" wx:if="{{detail.snapshot.checkInTime}}">
+            <text class="sd-snapshot-label">打卡时间</text>
+            <text class="sd-snapshot-value">{{detail.snapshot.checkInTime}}</text>
+          </view>
+        </block>
+
+        <text wx:if="{{detail.snapshot.note}}" class="sd-snapshot-note">{{detail.snapshot.note}}</text>
+      </view>
+
+      <view class="sd-bottom-gap"></view>
+    </scroll-view>
+
+    <!-- 底部点赞栏 -->
+    <view class="sd-bar">
+      <view class="sd-like-btn" bindtap="onLikeTap">
+        <view class="sd-like-icon {{detail.liked ? 'sd-like-icon--on' : ''}}"></view>
+        <text class="sd-like-count {{detail.liked ? 'sd-like-count--on' : ''}}">{{detail.likeCount}}</text>
+      </view>
+    </view>
+  </block>
+
+</view>

@@ -122,7 +122,7 @@
 
     <!-- 是否分享到内容 -->
     <view class="new-section new-section--share-toggle card-panel" bindtap="onShareToggle">
-      <my-checkbox shape="square" checked="{{shareToContent}}" bindchange="onShareToggle" />
+      <my-checkbox shape="square" checked="{{shareToContent}}" catchtap="onShareToggle" />
       <text class="new-share-toggle__label">分享到内容</text>
     </view>
 

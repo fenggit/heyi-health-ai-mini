@@ -16,7 +16,7 @@
     <!-- 内容卡片列表 -->
     <view class="share-list">
       <block wx:for="{{posts}}" wx:key="id">
-        <view class="share-card card-panel">
+        <view class="share-card card-panel" data-id="{{item.id}}" bindtap="onItemTap">
           <!-- 卡片头部：头像 + 用户名 + 时间 -->
           <view class="share-card__header">
             <view class="share-card__avatar-wrap">
@@ -45,7 +45,7 @@
           <!-- 标题行 + 点赞 -->
           <view class="share-card__title-row">
             <text class="share-card__title">{{item.title}}</text>
-            <view class="share-card__like" data-id="{{item.id}}" bindtap="onLikeTap">
+            <view class="share-card__like" data-id="{{item.id}}" catchtap="onLikeTap">
               <view class="share-card__like-icon {{item.liked ? 'share-card__like-icon--on' : ''}}"></view>
               <text class="share-card__like-count {{item.liked ? 'share-card__like-count--on' : ''}}">{{item.likeCount}}</text>
             </view>

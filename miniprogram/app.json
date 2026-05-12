@@ -35,9 +35,10 @@
     "pages/webview-page/index",
     "pages/checkin-drink/index",
     "pages/checkin-fasting/index",
-    "pages/checkin-share/index",
+    "pages/checkin-list/index",
     "pages/drink-checkin-new/index",
-    "pages/fasting-checkin-new/index"
+    "pages/fasting-checkin-new/index",
+    "pages/checkin-detail/index"
 
   ],
   "window": {

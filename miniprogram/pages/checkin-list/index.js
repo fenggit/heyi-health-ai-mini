@@ -59,6 +59,8 @@ Page({
     this.loadList(1)
   },
 
+  onShow() {},
+
   syncLayout() {
     const { headerHeight } = getLayoutMetrics()
     this.setData({ headerHeight: headerHeight || 64 })
@@ -89,7 +91,7 @@ Page({
         this.setData({ posts, pageNum, hasMore })
       })
       .catch((err) => {
-        console.error('[checkin-share] 加载失败:', err)
+        console.error('[checkin-list] 加载失败:', err)
         if (pageNum === 1) {
           wx.showToast({ title: '加载失败，请重试', icon: 'none' })
         }
@@ -106,15 +108,38 @@ Page({
     this.loadList(this.data.pageNum + 1)
   },
 
+  onItemTap(e) {
+    const { id } = e.currentTarget.dataset
+    wx.navigateTo({ url: `/pages/checkin-detail/index?id=${id}` })
+  },
+
   onLikeTap(e) {
     const { id } = e.currentTarget.dataset
+    const post = this.data.posts.find(item => item.id === id)
+    if (!post) return
+
+    const willLike = !post.liked
+    const url = willLike ? paths.checkin.shareLike(id) : paths.checkin.shareUnlike(id)
+
+    // 乐观更新
     const posts = this.data.posts.map(item => {
       if (item.id === id) {
-        const liked = !item.liked
-        return { ...item, liked, likeCount: liked ? item.likeCount + 1 : item.likeCount - 1 }
+        return { ...item, liked: willLike, likeCount: willLike ? item.likeCount + 1 : item.likeCount - 1 }
       }
       return item
     })
     this.setData({ posts })
+
+    request.post(url).catch((err) => {
+      console.error('[checkin-list] 点赞失败:', err)
+      // 回滚
+      const rollback = this.data.posts.map(item => {
+        if (item.id === id) {
+          return { ...item, liked: !willLike, likeCount: willLike ? item.likeCount - 1 : item.likeCount + 1 }
+        }
+        return item
+      })
+      this.setData({ posts: rollback })
+    })
   }
 })

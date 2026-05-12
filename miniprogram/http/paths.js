@@ -132,7 +132,13 @@ const paths = {
     // 轻断食打卡提交
     fastingCheckIn: '/uc/app/fasting-check-in/check-in',
     // 内容分享列表（分页）
-    shareList: '/uc/app/health/share/my/list'
+    shareList: '/uc/app/health/share/my/list',
+    // 内容分享详情
+    shareDetail: (id) => `/uc/app/health/share/${encodeURIComponent(id)}`,
+    // 点赞
+    shareLike: (id) => `/uc/app/health/share/${encodeURIComponent(id)}/like`,
+    // 取消点赞
+    shareUnlike: (id) => `/uc/app/health/share/${encodeURIComponent(id)}/unlike`
   },
   resource: {
     // 通用文件上传
