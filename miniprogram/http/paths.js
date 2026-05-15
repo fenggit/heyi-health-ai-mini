@@ -152,7 +152,15 @@ const paths = {
     // 提交问卷答案
     questionnaireSubmit: '/assessment/app/questionnaire/submit',
     // 获取测评结果详情
-    resultDetail: '/assessment/app/result/detail'
+    resultDetail: '/assessment/app/result/detail',
+    // AI 视觉分析：开始测评
+    aiStart: '/assessment/app/ai/start',
+    // AI 视觉分析：上传图片
+    aiStartWithImages: '/assessment/app/ai/start-with-images',
+    // AI 视觉分析：获取题目
+    aiInquiry: '/assessment/app/ai/inquiry',
+    // AI 视觉分析：提交答案
+    aiSubmit: '/assessment/app/ai/submit'
   }
 }
 

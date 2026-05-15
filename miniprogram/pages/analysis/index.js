@@ -137,9 +137,14 @@ Page({
     })
   },
   backHome() {
+    const app = getApp()
+    const isLogin = !!(app && app.globalData && app.globalData.isLogin)
+    if (!isLogin) {
+      wx.navigateTo({ url: '/pages/login/index' })
+      return
+    }
     this._ensureGuestToken().then((ok) => {
       if (!ok) return
-      const app = getApp()
       const guestToken = (!app.globalData.isLogin && app.globalData.guestSession)
         ? app.globalData.guestSession.guestToken : ''
       console.log('[analysis] 跳转 analysis-ai-image, guestToken:', guestToken)

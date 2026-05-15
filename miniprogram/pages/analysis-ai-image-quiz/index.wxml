@@ -1,0 +1,100 @@
+<view class="quiz-page design-page">
+  <image class="quiz-page-bg" src="/assets/bg_img.png" mode="widthFix" />
+
+  <view class="mini-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="mini-nav__inner" style="height: {{navBarHeight}}px;">
+      <view class="mini-nav__back" bindtap="handleBack">
+        <image class="mini-nav__back-icon" src="/assets/analysis/nav_back.png" mode="aspectFit" />
+      </view>
+    </view>
+    <view
+      class="mini-nav__capsule-space"
+      style="width: {{menuWidth}}px; height: {{menuHeight}}px; right: {{menuRight}}px; top: {{menuTop}}px;"
+    ></view>
+  </view>
+
+  <view class="page-top-gap" style="height: {{topInset}}px;"></view>
+
+  <view class="quiz-wrap">
+    <view class="quiz-head">
+      <view class="quiz-head__title">视觉AI分析</view>
+      <view class="quiz-head__subtitle">请根据实际情况选择</view>
+      <!-- <view class="quiz-head__tag">趣味分析</view> -->
+    </view>
+
+    <view class="quiz-step-card">
+      <image class="quiz-step-card__bg" src="/assets/analysis/page02_wrap@2x.png" mode="scaleToFill" />
+
+      <view class="quiz-step-row">
+        <view class="quiz-step-left">
+          <text class="quiz-step-label">步骤三：</text>
+          <view class="quiz-step-title-wrap">
+            <text class="quiz-step-title">完成答题</text>
+          </view>
+        </view>
+        <view class="quiz-step-divider"></view>
+        <view class="quiz-step-count">
+          <view class="quiz-step-count__line">
+            <text class="quiz-step-count__num">{{questions.length ? (currentIndex + 1) : 0}}</text>
+            <text class="quiz-step-count__rest"> / {{questions.length || 0}} 题</text>
+          </view>
+          <image class="quiz-step-count__dec" src="/assets/analysis/count_title02_dec@2x.png" mode="widthFix" />
+        </view>
+      </view>
+
+      <view class="quiz-progress-track">
+        <view
+          class="quiz-progress-fill"
+          style="width: {{questions.length ? ((currentIndex + 1) * 100 / questions.length) : 0}}%;"
+        ></view>
+        <view
+          class="quiz-progress-dot"
+          style="left: {{questions.length ? ((currentIndex + 1) * 100 / questions.length) : 0}}%;"
+        ></view>
+      </view>
+
+      <view class="quiz-step-notice">
+        本结果由AI生成，仅供娱乐与生活参考，不能替代医疗建议
+      </view>
+    </view>
+
+    <view class="quiz-card card-panel" wx:if="{{questions.length}}">
+      <view class="quiz-question-head">
+        <view class="quiz-question-badge">问</view>
+        <view class="quiz-question-title-wrap">
+          <title-view text="{{questions[currentIndex].title}}" dec-src="/assets/analysis/title_dec.png" />
+        </view>
+      </view>
+
+      <view class="quiz-options">
+        <block wx:for="{{questions[currentIndex].options}}" wx:key="optionCode">
+          <view
+            class="quiz-option {{selectedIndexes[currentIndex].indexOf(index) >= 0 ? 'quiz-option--active' : ''}}"
+            data-index="{{index}}"
+            bindtap="chooseOption"
+          >
+            <text class="quiz-option__text">{{item.optionText}}</text>
+            <view class="quiz-option__indicator {{selectedIndexes[currentIndex].indexOf(index) >= 0 ? 'quiz-option__indicator--active' : ''}}">
+              <text wx:if="{{selectedIndexes[currentIndex].indexOf(index) >= 0}}" class="quiz-option__check">✓</text>
+            </view>
+          </view>
+        </block>
+      </view>
+
+      <view class="quiz-actions {{currentIndex === 0 ? 'quiz-actions--single' : ''}}">
+        <view wx:if="{{currentIndex > 0}}" class="quiz-btn quiz-btn--ghost" bindtap="prevQuestion">上一题</view>
+        <view class="quiz-btn quiz-btn--primary" bindtap="nextQuestion">
+          {{currentIndex === questions.length - 1 ? "提交" : "下一题"}}
+        </view>
+      </view>
+
+      <view class="quiz-bottom-tip">
+        <view class="quiz-bottom-tip__divider"></view>
+        <view class="quiz-bottom-tip__text">
+          <text class="quiz-bottom-tip__label">小提示：</text>
+          <text>请根据您最近一个月的实际情况作答，以便获得更准确的体质分析结果。</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

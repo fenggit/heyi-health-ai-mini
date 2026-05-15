@@ -79,8 +79,7 @@
 .upload-page .upload-step-card {
   position: relative;
   margin-top: 20rpx;
-  height: 270rpx;
-  padding: 24rpx 32rpx 0;
+  padding: 24rpx 32rpx 24rpx;
   border: 0;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -122,14 +121,13 @@
 
 .upload-step-intro {
   margin-top: 34rpx;
-  height: 182rpx;
   border-radius: 24rpx;
   border: 2rpx solid #ffffff;
   box-sizing: border-box;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   background: rgba(252, 249, 235, 0.3);
-  padding: 16rpx 30rpx 0 32rpx;
+  padding: 16rpx 30rpx 20rpx 32rpx;
 }
 
 .upload-step-intro__line,
@@ -158,11 +156,11 @@
 
 .upload-card {
   margin-top: 16rpx;
-  height: 566rpx;
   border-radius: 24rpx;
   background: rgba(255, 255, 255, 0.7);
   box-sizing: border-box;
   overflow: hidden;
+  padding-bottom: 32rpx;
 }
 
 .upload-card__head {
@@ -224,6 +222,10 @@
 
 .upload-actions {
   margin-top: 46rpx;
+}
+
+.upload-actions--has-preview {
+  margin-top: 24rpx;
 }
 
 .upload-action {
@@ -305,4 +307,14 @@
   font-size: 28rpx;
   line-height: 42rpx;
   text-decoration: underline;
+}
+
+.upload-disclaimer {
+  margin-top: 20rpx;
+  margin-bottom: 20rpx;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 22rpx;
+  line-height: 36rpx;
+  padding: 0 32rpx;
 }

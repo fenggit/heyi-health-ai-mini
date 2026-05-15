@@ -30,6 +30,7 @@
     "pages/analysis-auth/index",
     "pages/analysis-upload/index",
     "pages/analysis-ai-image/index",
+    "pages/analysis-ai-image-quiz/index",
     "pages/product-detail/index",
     "pages/food-detail/index",
     "pages/webview-page/index",

@@ -51,10 +51,10 @@
       <view wx:if="{{tongueImage}}" class="upload-photo-preview">
         <image class="upload-photo-preview__img" src="{{tongueImage}}" mode="aspectFill" />
       </view>
-      <view class="upload-actions">
+      <view class="upload-actions {{tongueImage ? 'upload-actions--has-preview' : ''}}">
         <view class="upload-action" bindtap="chooseTongueCamera">
           <view class="upload-action__content">
-            <image class="upload-action-icon" src="/assets/analysis/image_icon@2x.png" mode="aspectFit" />
+            <image class="upload-action-icon" src="/assets/analysis/camera_icon@2x.png" mode="aspectFit" />
             <text class="upload-action__text">拍摄舌苔照片</text>
           </view>
         </view>
@@ -78,6 +78,40 @@
           <image class="upload-card__icon" src="/assets/analysis/camera_icon@2x.png" mode="aspectFit" />
         </view>
         <view class="upload-card__meta">
+          <view class="upload-card__title">舌下拍照</view>
+          <view class="upload-card__desc">{{sublingualDesc}}</view>
+        </view>
+      </view>
+      <view wx:if="{{sublingualImage}}" class="upload-photo-preview">
+        <image class="upload-photo-preview__img" src="{{sublingualImage}}" mode="aspectFill" />
+      </view>
+      <view class="upload-actions {{sublingualImage ? 'upload-actions--has-preview' : ''}}">
+        <view class="upload-action" bindtap="chooseSublingualCamera">
+          <view class="upload-action__content">
+            <image class="upload-action-icon" src="/assets/analysis/camera_icon@2x.png" mode="aspectFit" />
+            <text class="upload-action__text">拍摄舌下照片</text>
+          </view>
+        </view>
+        <view class="upload-action" bindtap="chooseSublingualAlbum">
+          <view class="upload-action__content">
+            <image class="upload-action-icon" src="/assets/analysis/upload_icon@2x.png" mode="aspectFit" />
+            <text class="upload-action__text">从相册获取</text>
+          </view>
+        </view>
+      </view>
+      <view class="upload-tip-divider"></view>
+      <view class="upload-tip">
+        <text class="upload-tip__label">拍摄提示：</text>
+        <text>{{sublingualTip}}</text>
+      </view>
+    </view>
+
+    <view class="card-panel upload-card">
+      <view class="upload-card__head">
+        <view class="upload-card__icon-wrap">
+          <image class="upload-card__icon" src="/assets/analysis/camera_icon@2x.png" mode="aspectFit" />
+        </view>
+        <view class="upload-card__meta">
           <view class="upload-card__title">面色拍照</view>
           <view class="upload-card__desc">{{faceDesc}}</view>
         </view>
@@ -85,10 +119,10 @@
       <view wx:if="{{faceImage}}" class="upload-photo-preview">
         <image class="upload-photo-preview__img" src="{{faceImage}}" mode="aspectFill" />
       </view>
-      <view class="upload-actions">
+      <view class="upload-actions {{faceImage ? 'upload-actions--has-preview' : ''}}">
         <view class="upload-action" bindtap="chooseFaceCamera">
           <view class="upload-action__content">
-            <image class="upload-action-icon" src="/assets/analysis/image_icon@2x.png" mode="aspectFit" />
+            <image class="upload-action-icon" src="/assets/analysis/camera_icon@2x.png" mode="aspectFit" />
             <text class="upload-action__text">拍摄面部照片</text>
           </view>
         </view>
@@ -107,6 +141,6 @@
     </view>
 
     <view class="upload-btn upload-btn--primary" bindtap="finish">完成分析</view>
-    <view class="upload-link" bindtap="skipAndFinish">跳过拍照，直接生成报告</view>
+    <view class="upload-disclaimer">本结果由AI生成，仅供娱乐与生活参考，不能替代医疗建议。</view>
   </view>
 </view>
