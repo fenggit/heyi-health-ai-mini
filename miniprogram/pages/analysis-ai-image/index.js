@@ -2,6 +2,15 @@ const { getLayoutMetrics } = require("../../utils/layout")
 const { post, uploadFile } = require("../../utils/request")
 const paths = require("../../http/paths")
 
+/**
+ * 调用 POST /assessment/app/ai/inquiry 获取题目
+ */
+function fetchInquiry({ recordId, guestToken }) {
+  const body = { recordId }
+  if (guestToken) body.guestToken = guestToken
+  return post(paths.assessment.aiInquiry, body)
+}
+
 const MOCK_UPLOAD_DATA = {
   title: "视觉AI分析",
   subTitle: "通过舌苔和面色辅助判断体质",
@@ -198,16 +207,31 @@ Page({
     wx.switchTab({ url: "/pages/home/index" })
   },
 
-  _goQuiz() {
+  async _goQuiz() {
     if (!this._recordId) {
       wx.showToast({ title: '测评未初始化，请重试', icon: 'none' })
       return
     }
-    const recordId = encodeURIComponent(this._recordId)
-    const guestToken = encodeURIComponent(this._guestToken || '')
-    wx.navigateTo({
-      url: `/pages/analysis-ai-image-quiz/index?recordId=${recordId}&guestToken=${guestToken}`
-    })
+    wx.showLoading({ title: '分析中...', mask: true })
+    try {
+      const res = await fetchInquiry({
+        recordId: this._recordId,
+        guestToken: this._guestToken
+      })
+      const inquiryData = (res && res.data) || {}
+      const recordId = encodeURIComponent(this._recordId)
+      const guestToken = encodeURIComponent(this._guestToken || '')
+      // 将 inquiry 返回数据序列化后通过 URL 参数传递
+      const inquiryParam = encodeURIComponent(JSON.stringify(inquiryData))
+      wx.redirectTo({
+        url: `/pages/analysis-ai-image-quiz/index?recordId=${recordId}&guestToken=${guestToken}&inquiryData=${inquiryParam}`
+      })
+    } catch (err) {
+      console.error('[analysis-ai-image] inquiry 失败', err)
+      wx.showToast({ title: '获取题目失败，请重试', icon: 'none' })
+    } finally {
+      wx.hideLoading()
+    }
   },
 
   finish() {

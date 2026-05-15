@@ -3,29 +3,13 @@ const { post } = require("../../utils/request")
 const paths = require("../../http/paths")
 
 /**
- * 获取 AI 视觉分析题目
+ * 获取 AI 视觉分析题目（降级用，正常由上一页传入数据）
  * POST /assessment/app/ai/inquiry
  */
 function fetchInquiry({ recordId, guestToken }) {
   const body = { recordId }
   if (guestToken) body.guestToken = guestToken
-  return post(paths.assessment.aiInquiry, body).then((res) => {
-    const data = (res && res.data) || {}
-    const questions = (data.questions || []).map((q) => ({
-      title: q.title || '',
-      questionType: q.questionType || 'single',
-      requiredFlag: q.requiredFlag === 'Y',
-      sortNo: q.sortNo || 0,
-      options: (q.options || [])
-        .slice()
-        .sort((a, b) => (a.sortNo || 0) - (b.sortNo || 0))
-        .map((opt) => ({
-          optionCode: opt.optionCode,   // 保留原始值，可能为空字符串
-          optionText: opt.optionText || ''
-        }))
-    }))
-    return { questions }
-  })
+  return post(paths.assessment.aiInquiry, body)
 }
 
 /**
@@ -51,8 +35,9 @@ Page({
     menuRight: 12,
     currentIndex: 0,
     questions: [],
-    // selectedIndexes: number[][] 每题选中的 option 下标列表（用下标避免空字符串 key 问题）
-    selectedIndexes: []
+    selectedIndexes: [],
+    // 当前题目已选中的 option 下标列表，供模板直接使用
+    currentSelectedIndexes: []
   },
 
   _recordId: null,
@@ -63,7 +48,41 @@ Page({
     this._guestToken = (options && options.guestToken) ? decodeURIComponent(options.guestToken) : ''
     console.log('[ai-image-quiz] onLoad, recordId:', this._recordId, 'guestToken:', this._guestToken)
     this.syncLayout()
+
+    // 优先使用上一页传入的 inquiry 数据，避免重复请求
+    if (options && options.inquiryData) {
+      try {
+        const inquiryData = JSON.parse(decodeURIComponent(options.inquiryData))
+        this._applyInquiryData(inquiryData)
+        return
+      } catch (e) {
+        console.warn('[ai-image-quiz] 解析 inquiryData 失败，降级请求接口', e)
+      }
+    }
     this.loadQuestions()
+  },
+
+  /**
+   * 将 inquiry 接口返回的 data 对象解析并渲染到页面
+   */
+  _applyInquiryData(data) {
+    const rawQuestions = (data.detail && data.detail.questions) || []
+    const questions = rawQuestions.map((q) => ({
+      title: q.title || '',
+      questionType: q.questionType || 'single',
+      requiredFlag: q.requiredFlag === 'Y',
+      sortNo: q.sortNo || 0,
+      options: (q.options || [])
+        .slice()
+        .sort((a, b) => (a.sortNo || 0) - (b.sortNo || 0))
+        .map((opt) => ({
+          optionCode: opt.optionCode,
+          optionText: opt.optionText || '',
+          checked: false
+        }))
+    }))
+    const selectedIndexes = questions.map(() => [])
+    this.setData({ questions, selectedIndexes, currentSelectedIndexes: [] })
   },
 
   syncLayout() {
@@ -103,13 +122,11 @@ Page({
     }
     wx.showLoading({ title: '加载中', mask: true })
     try {
-      const { questions } = await fetchInquiry({
+      const res = await fetchInquiry({
         recordId: this._recordId,
         guestToken: this._guestToken
       })
-      // 每题初始化为空数组
-      const selectedIndexes = questions.map(() => [])
-      this.setData({ questions, selectedIndexes })
+      this._applyInquiryData((res && res.data) || {})
     } catch (err) {
       console.error('[ai-image-quiz] 加载题目失败', err)
       wx.showToast({ title: '加载失败，请重试', icon: 'none' })
@@ -122,22 +139,28 @@ Page({
     const optIdx = Number(e.currentTarget.dataset.index)
     const { currentIndex, questions, selectedIndexes } = this.data
     const q = questions[currentIndex]
-    const next = selectedIndexes.map((arr) => arr.slice())
+    if (!q) return
 
-    if (q.questionType === 'single') {
-      // 单选：直接替换为当前下标
-      next[currentIndex] = [optIdx]
-    } else {
-      // 多选：切换
-      const cur = next[currentIndex]
-      const pos = cur.indexOf(optIdx)
-      if (pos >= 0) {
-        cur.splice(pos, 1)
-      } else {
-        cur.push(optIdx)
-      }
-    }
-    this.setData({ selectedIndexes: next })
+    // 单选：选中当前项，取消其他项
+    const newOptions = q.options.map((opt, i) => ({
+      ...opt,
+      checked: i === optIdx
+    }))
+    const next = [optIdx]
+
+    const newSelectedIndexes = selectedIndexes.map((v, i) => i === currentIndex ? next : v)
+    this.setData({
+      [`questions[${currentIndex}].options`]: newOptions,
+      selectedIndexes: newSelectedIndexes,
+      currentSelectedIndexes: next
+    })
+  },
+
+  // 判断某题某选项是否选中
+  isSelected(questionIndex, optionIndex) {
+    const { selectedIndexes } = this.data
+    const arr = selectedIndexes[questionIndex]
+    return Array.isArray(arr) && arr.indexOf(optionIndex) >= 0
   },
 
   handleBack() {
@@ -151,7 +174,11 @@ Page({
 
   prevQuestion() {
     if (this.data.currentIndex <= 0) return
-    this.setData({ currentIndex: this.data.currentIndex - 1 })
+    const newIndex = this.data.currentIndex - 1
+    this.setData({
+      currentIndex: newIndex,
+      currentSelectedIndexes: this.data.selectedIndexes[newIndex] || []
+    })
   },
 
   nextQuestion() {
@@ -164,7 +191,11 @@ Page({
       return
     }
     if (currentIndex < questions.length - 1) {
-      this.setData({ currentIndex: currentIndex + 1 })
+      const newIndex = currentIndex + 1
+      this.setData({
+        currentIndex: newIndex,
+        currentSelectedIndexes: selectedIndexes[newIndex] || []
+      })
       return
     }
     this._submitQuiz()
@@ -178,7 +209,7 @@ Page({
       const idxList = selectedIndexes[i] || []
       idxList.forEach((optIdx) => {
         const opt = q.options[optIdx]
-        if (opt) answers.push(opt.optionCode)
+        if (opt && opt.optionCode) answers.push(opt.optionCode)
       })
     })
     console.log('[ai-image-quiz] 提交 answers:', answers)

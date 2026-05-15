@@ -69,14 +69,12 @@
       <view class="quiz-options">
         <block wx:for="{{questions[currentIndex].options}}" wx:key="optionCode">
           <view
-            class="quiz-option {{selectedIndexes[currentIndex].indexOf(index) >= 0 ? 'quiz-option--active' : ''}}"
+            class="quiz-option {{item.checked ? 'quiz-option--active' : ''}}"
             data-index="{{index}}"
             bindtap="chooseOption"
           >
             <text class="quiz-option__text">{{item.optionText}}</text>
-            <view class="quiz-option__indicator {{selectedIndexes[currentIndex].indexOf(index) >= 0 ? 'quiz-option__indicator--active' : ''}}">
-              <text wx:if="{{selectedIndexes[currentIndex].indexOf(index) >= 0}}" class="quiz-option__check">✓</text>
-            </view>
+            <my-checkbox checked="{{item.checked}}" shape="circle" />
           </view>
         </block>
       </view>

@@ -40,7 +40,6 @@
     "pages/drink-checkin-new/index",
     "pages/fasting-checkin-new/index",
     "pages/checkin-detail/index"
-
   ],
   "window": {
     "backgroundColor": "#F4F5F8",
