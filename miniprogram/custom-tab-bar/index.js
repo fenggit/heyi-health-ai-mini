@@ -62,7 +62,7 @@ Component({
       const { path, index } = e.currentTarget.dataset
       const next = Number(index)
 
-      if ((path === "/pages/profile/index" || path === "/pages/checkin/index" || path === "/pages/diet/index") && !this.requireLogin(tabLabel(path))) {
+      if ((path === "/pages/profile/index" || path === "/pages/diet/index") && !this.requireLogin(tabLabel(path))) {
         return
       }
 
@@ -83,10 +83,6 @@ Component({
       })
     },
     openAiChat() {
-      if (!this.requireLogin("AI食养")) {
-        return
-      }
-
       const pages = getCurrentPages()
       const current = pages[pages.length - 1]
       if (current && current.route === "pages/ai-chat/index") return

@@ -348,6 +348,7 @@ Page({
     quickActions: [],
     messages: [],
     sessionId: "",
+    isLogin: false,
     pageLoading: true,
     sendLoading: false,
     inputMode: "text",
@@ -364,14 +365,58 @@ Page({
     this._initialPageLoadingVisible = false
     this.initVoiceRecognition()
     this.syncLayout()
-    this.showInitialPageLoading()
-    this.loadPageData()
+
+    const app = getApp()
+    const isLogin = !!(app && app.globalData && app.globalData.isLogin)
+    this.setData({ isLogin })
+
+    if (isLogin) {
+      this.showInitialPageLoading()
+      this.loadPageData()
+    } else {
+      // 未登录：只渲染静态内容，不请求任何接口
+      this.setData(
+        Object.assign({}, STATIC_PAGE_DATA, {
+          messages: [],
+          pageLoading: false
+        })
+      )
+    }
+  },
+  // 弹出登录提示，引导用户去登录
+  promptLogin() {
+    wx.showModal({
+      title: "温馨提示",
+      content: "登录后才可使用 AI 食养，是否前往登录？",
+      confirmText: "去登录",
+      cancelText: "再看看",
+      success: (res) => {
+        if (!res.confirm) return
+        wx.navigateTo({ url: "/pages/login/index" })
+      }
+    })
+  },
+  // 检查登录，未登录则弹提示并返回 false
+  requireLogin() {
+    if (this.data.isLogin) return true
+    this.promptLogin()
+    return false
   },
   onReady() {
     this.measureInputDock()
   },
   onShow() {
     this.measureInputDock()
+    // 每次页面显示时同步登录状态（如从登录页返回后）
+    const app = getApp()
+    const isLogin = !!(app && app.globalData && app.globalData.isLogin)
+    const wasLogin = this.data.isLogin
+    this.setData({ isLogin })
+    // 刚完成登录，触发数据加载
+    if (!wasLogin && isLogin) {
+      this.showInitialPageLoading()
+      this.loadPageData()
+    }
   },
   onUnload() {
     this._pageUnloaded = true
@@ -862,6 +907,7 @@ Page({
     })
   },
   focusInput() {
+    if (!this.requireLogin()) return
     if (this.data.inputMode !== "text") return
     this.setData({
       inputFocus: true
@@ -937,6 +983,7 @@ Page({
     }
   },
   async sendText() {
+    if (!this.requireLogin()) return
     const value = (this.data.draftText || "").trim()
     if (!value) {
       wx.showToast({
@@ -951,6 +998,7 @@ Page({
     })
   },
   switchToVoice() {
+    if (!this.requireLogin()) return
     if (!this.data.voiceEntryEnabled) {
       wx.showToast({
         title: VOICE_UNAVAILABLE_MESSAGE,
@@ -981,6 +1029,7 @@ Page({
     )
   },
   onVoiceHoldStart(e) {
+    if (!this.requireLogin()) return
     const touch = (e.touches && e.touches[0]) || null
     this.voiceStartY = touch ? touch.clientY : 0
     logAiChat("voice.holdStart", {
@@ -1041,6 +1090,9 @@ Page({
   tapQuickAction(e) {
     const { path, routeType } = e.currentTarget.dataset
     if (!path) return
+
+    // 个人中心需要登录
+    if (path === "/pages/profile/index" && !this.requireLogin()) return
 
     if (routeType === "tab") {
       wx.switchTab({ url: path })
