@@ -52,6 +52,34 @@
   font-weight: 500;
 }
 
+.my-plan-empty {
+  margin-top: 24rpx;
+  padding: 64rpx 36rpx;
+  border-radius: 24rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.96);
+  background: rgba(255, 255, 255, 0.72);
+  text-align: center;
+  box-sizing: border-box;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.my-plan-empty__title {
+  display: block;
+  color: #1e293b;
+  font-size: 32rpx;
+  line-height: 1.5;
+  font-weight: 700;
+}
+
+.my-plan-empty__desc {
+  display: block;
+  margin-top: 12rpx;
+  color: #64748b;
+  font-size: 26rpx;
+  line-height: 1.7;
+}
+
 .info-card,
 .day-card {
   margin-top: 16rpx;
@@ -341,6 +369,10 @@
   height: 180rpx;
   display: block;
   object-fit: cover;
+}
+
+.recipe-item__cover--placeholder {
+  background: linear-gradient(180deg, #e5e7eb 0%, #d1d5db 100%);
 }
 
 /* 中间内容区 */

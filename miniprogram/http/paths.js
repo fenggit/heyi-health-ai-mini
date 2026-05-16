@@ -100,6 +100,8 @@ const paths = {
   recipe: {
     // 首页聚合数据
     homeIndex: '/recipe/app/home/index',
+    // 当前食养计划
+    currentDietPlan: '/recipe/app/diet-plan/current',
     // 配方详情
     formulaDetail: (recipeId) => `/recipe/app/formula/${encodeURIComponent(recipeId)}/detail`,
     // AI 助手：创建会话

@@ -16,14 +16,15 @@
         <text class="my-plan-hero__sub">{{cycleLabel}}</text>
       </view>
 
+      <block wx:if="{{hasPlan}}">
       <view class="progress-card">
         <image class="progress-card__bg" src="/assets/diet-plan/page06_wrap.png" mode="scaleToFill" />
         <view class="progress-card__content">
           <view class="progress-card__head">
             <view>
               <view class="progress-top-row">
-                <text class="progress-top-row__label">周计划：</text>
-                <text class="progress-top-row__meta">第 <text class="progress-top-row__num">{{progress.day}}</text> / {{progress.totalDays}} 天</text>
+                <text class="progress-top-row__label">{{cycleLabel}}：</text>
+                <text class="progress-top-row__meta">第 {{progress.day}} / <text class="progress-top-row__num">{{progress.totalDays}}</text> 天</text>
                 <view class="progress-status">{{progress.status}}</view>
               </view>
             </view>
@@ -39,10 +40,10 @@
           </view>
         </view>
 
-        <view class="reminder-strip">{{reminder}}</view>
+        <view wx:if="{{reminder}}" class="reminder-strip">{{reminder}}</view>
       </view>
 
-      <view class="info-card">
+      <view wx:if="{{info.length}}" class="info-card">
         <text class="info-card__title">计划信息</text>
         <block wx:for="{{info}}" wx:key="label">
           <view class="info-card__line">
@@ -54,30 +55,30 @@
 
       <view class="day-card">
         <view class="day-card__tag-row">
-          <view class="day-card__tag">✦ 7天食养方案</view>
+          <view class="day-card__tag">✦ {{dayTagText}}</view>
           <text class="day-card__link">右滑查看~</text>
         </view>
 
         <swiper
           class="day-swiper"
-          style="height: {{swiperHeight}}rpx;"
+          style="height: {{swiperHeight}}px;"
           circular="{{false}}"
           current="{{currentDay}}"
           bindchange="onSwiperChange"
           skip-hidden-item-layout="{{true}}"
         >
           <swiper-item wx:for="{{weekPlans}}" wx:key="index" class="day-swiper__item">
-            <view class="day-panel">
+            <view id="day-panel-{{index}}" class="day-panel">
               <view class="day-panel__head">
                 <view class="day-panel__title-wrap">
                   <text class="day-panel__title">{{item.title}}</text>
                   <view class="day-panel__title-underline"></view>
                 </view>
-                <view class="day-card__status">{{item.status}}</view>
+                <view wx:if="{{item.status}}" class="day-card__status">{{item.status}}</view>
               </view>
 
               <view class="recipe-list">
-                <block wx:for="{{item.recipes}}" wx:for-item="recipe" wx:key="id">
+                <block wx:for="{{item.recipes}}" wx:for-item="recipe" wx:key="key">
                   <view class="recipe-item">
                     <view class="recipe-item__bg-wrap">
                       <view class="recipe-item__img-col">
@@ -85,12 +86,13 @@
                           <image class="recipe-item__meal-icon" src="{{recipe.mealIcon}}" mode="aspectFit" />
                           <text class="recipe-item__meal-text">{{recipe.meal}} {{recipe.mealTime}}</text>
                         </view>
-                        <image class="recipe-item__cover" src="/assets/diet-plan/recipe_img.png" mode="aspectFill" />
+                        <image wx:if="{{recipe.coverImage}}" class="recipe-item__cover" src="{{recipe.coverImage}}" mode="aspectFill" />
+                        <view wx:else class="recipe-item__cover recipe-item__cover--placeholder"></view>
                       </view>
 
                       <view class="recipe-item__body">
                         <text class="recipe-item__name">{{recipe.name}}</text>
-                        <view class="recipe-item__tags">
+                        <view wx:if="{{recipe.tags.length}}" class="recipe-item__tags">
                           <block wx:for="{{recipe.tags}}" wx:for-item="tag" wx:key="*this">
                             <text class="recipe-item__tag">{{tag}}</text>
                           </block>
@@ -106,16 +108,22 @@
 
         <view class="day-dots">
           <view class="day-dots__track">
-            <view class="day-dots__fill" style="width: calc({{(currentDay + 1) * 100 / 7}}%)"></view>
+            <view class="day-dots__fill" style="width: {{dayDotsPercent}}%"></view>
           </view>
         </view>
       </view>
 
       <view class="scroll-spacer"></view>
+      </block>
+
+      <view wx:elif="{{!loading}}" class="my-plan-empty">
+        <text class="my-plan-empty__title">还没有制定计划</text>
+        <text class="my-plan-empty__desc">完成食养定制后，这里会展示每日计划和配方安排。</text>
+      </view>
     </view>
   </scroll-view>
 
-  <view class="my-plan-action-dock">
+  <view wx:if="{{hasPlan}}" class="my-plan-action-dock">
     <view class="my-plan-action-dock__inner">
       <view class="btn-row__btn btn-row__btn--primary" bindtap="buyAll">购买食材</view>
     </view>

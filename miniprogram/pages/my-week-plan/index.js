@@ -1,66 +1,199 @@
+const { get } = require("../../utils/request")
+const paths = require("../../http/paths")
 const { getLayoutMetrics } = require("../../utils/layout")
 
+const DEFAULT_TITLE = "我的食养计划"
 const MEAL_ICON_MAP = {
+  BREAKFAST: "/assets/diet-plan/icon_breakfast.png",
+  LUNCH: "/assets/diet-plan/icon_lunch.png",
+  DINNER: "/assets/diet-plan/icon_dinner.png",
   早餐: "/assets/diet-plan/icon_breakfast.png",
   午餐: "/assets/diet-plan/icon_lunch.png",
   晚餐: "/assets/diet-plan/icon_dinner.png"
 }
 
-// 生成7天mock数据
-function buildWeekPlans() {
-  const days = [
-    { day: "第一天", date: "3月19日", recipes: [
-      { id: "d1r1", name: "养胃气血汁水", tags: ["养脾胃", "补气血"], meal: "早餐", mealTime: "08:00", price: "68", unit: "/份", done: true },
-      { id: "d1r2", name: "清肝明目汁", tags: ["明目", "清肝火"], meal: "午餐", mealTime: "12:00", price: "58", unit: "/份", done: false }
-    ]},
-    { day: "第二天", date: "3月20日", recipes: [
-      { id: "d2r1", name: "健脾养胃粥", tags: ["健脾", "养胃"], meal: "早餐", mealTime: "08:00", price: "48", unit: "/份", done: false },
-      { id: "d2r2", name: "清热解毒汤", tags: ["清热", "解毒"], meal: "午餐", mealTime: "12:00", price: "62", unit: "/份", done: false }
-    ]},
-    { day: "第三天", date: "3月21日", recipes: [
-      { id: "d3r1", name: "补气养血羹", tags: ["补气", "养血"], meal: "早餐", mealTime: "08:00", price: "72", unit: "/份", done: false },
-      { id: "d3r2", name: "滋阴润肺汤", tags: ["滋阴", "润肺"], meal: "晚餐", mealTime: "18:00", price: "65", unit: "/份", done: false }
-    ]},
-    { day: "第四天", date: "3月22日", recipes: [
-      { id: "d4r1", name: "益气健脾粥", tags: ["益气", "健脾"], meal: "早餐", mealTime: "08:00", price: "55", unit: "/份", done: false },
-      { id: "d4r2", name: "养心安神汤", tags: ["养心", "安神"], meal: "午餐", mealTime: "12:00", price: "68", unit: "/份", done: false }
-    ]},
-    { day: "第五天", date: "3月23日", recipes: [
-      { id: "d5r1", name: "补肾强腰汤", tags: ["补肾", "强腰"], meal: "早餐", mealTime: "08:00", price: "78", unit: "/份", done: false },
-      { id: "d5r2", name: "疏肝理气茶", tags: ["疏肝", "理气"], meal: "午餐", mealTime: "12:00", price: "45", unit: "/份", done: false }
-    ]},
-    { day: "第六天", date: "3月24日", recipes: [
-      { id: "d6r1", name: "活血化瘀汤", tags: ["活血", "化瘀"], meal: "早餐", mealTime: "08:00", price: "70", unit: "/份", done: false },
-      { id: "d6r2", name: "清心降火饮", tags: ["清心", "降火"], meal: "晚餐", mealTime: "18:00", price: "52", unit: "/份", done: false }
-    ]},
-    { day: "第七天", date: "3月25日", recipes: [
-      { id: "d7r1", name: "固本培元粥", tags: ["固本", "培元"], meal: "早餐", mealTime: "08:00", price: "60", unit: "/份", done: false },
-      { id: "d7r2", name: "调和五脏汤", tags: ["调和", "五脏"], meal: "午餐", mealTime: "12:00", price: "75", unit: "/份", done: false }
-    ]}
-  ]
-  return days.map((d, i) => ({
-    index: i,
-    title: `${d.day}（${d.date}）`,
-    status: i === 0 ? "进行中" : "未开始",
-    recipes: d.recipes.map(r => ({
-      ...r,
-      mealIcon: MEAL_ICON_MAP[r.meal] || MEAL_ICON_MAP["早餐"]
-    }))
-  }))
+function normalizeText(value) {
+  if (value === undefined || value === null) return ""
+  return String(value).trim()
 }
 
-const MOCK_PLAN = {
-  cycleLabel: "周计划",
-  title: "我的食养计划",
-  introTag: "定制计划",
-  reminder: "今日提醒：早餐时间将在 08:00 提醒您，请提前准备食材",
-  progress: { day: 1, totalDays: 7, status: "进行中" },
-  info: [
-    { label: "体质类型", value: "平和质" },
-    { label: "用餐时间", value: "08:00 / 12:00 / 18:00" },
-    { label: "饮食偏好", value: "少油·低糖·高蛋白" },
-    { label: "开始日期", value: "2026-03-19" }
-  ]
+function toPositiveInt(value, fallback = 0) {
+  const num = Number(value)
+  if (!Number.isFinite(num) || num <= 0) return fallback
+  return Math.floor(num)
+}
+
+function unwrapResponseData(res) {
+  if (res && Object.prototype.hasOwnProperty.call(res, "data")) {
+    return res.data
+  }
+  return res
+}
+
+function parseTagList(rawValue) {
+  if (Array.isArray(rawValue)) {
+    return rawValue.map(normalizeText).filter(Boolean)
+  }
+
+  const text = normalizeText(rawValue)
+  if (!text) return []
+
+  try {
+    const parsed = JSON.parse(text)
+    if (Array.isArray(parsed)) {
+      return parsed.map(normalizeText).filter(Boolean)
+    }
+  } catch (e) {}
+
+  return text.split(/[、,，]/).map(normalizeText).filter(Boolean)
+}
+
+function formatMonthDay(dateText) {
+  const text = normalizeText(dateText)
+  const match = text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/)
+  if (!match) return text
+  return `${Number(match[2])}月${Number(match[3])}日`
+}
+
+function buildPreferencesDesc(plan) {
+  const preferenceText = normalizeText(plan && plan.preferencesDesc)
+  if (preferenceText) return preferenceText
+
+  if (!Array.isArray(plan && plan.preferences)) return ""
+  return plan.preferences.map(normalizeText).filter(Boolean).join("·")
+}
+
+function buildReminder(mealTimes) {
+  if (!Array.isArray(mealTimes) || !mealTimes.length) return ""
+  return "今日提醒：请提前准备食材"
+}
+
+function getCycleLabel(planType, totalDays) {
+  if (normalizeText(planType) === "SEVEN_DAY") return "计划"
+  if (totalDays > 0) return "计划"
+  return "计划"
+}
+
+function getPlanStatusText(planStatus) {
+  switch (normalizeText(planStatus)) {
+    case "COMPLETED":
+      return "已完成"
+    case "ACTIVE":
+      return "进行中"
+    default:
+      return "未开始"
+  }
+}
+
+function getDayStatusText(dayNo, currentDayNo) {
+  if (dayNo === currentDayNo) return "进行中"
+  if (dayNo < currentDayNo) return "已结束"
+  if (dayNo > currentDayNo) return "未开始"
+  return ""
+}
+
+function getEmptyPlanState() {
+  return {
+    title: DEFAULT_TITLE,
+    cycleLabel: "计划",
+    reminder: "",
+    progress: {
+      day: 0,
+      totalDays: 0,
+      status: ""
+    },
+    progressPercent: 0,
+    info: [],
+    weekPlans: [],
+    currentDay: 0,
+    swiperHeight: 0,
+    dayTagText: "",
+    dayDotsPercent: 0,
+    hasPlan: false,
+    loading: true
+  }
+}
+
+function buildInfoList(plan) {
+  const cycleText = [normalizeText(plan && plan.startDate), normalizeText(plan && plan.endDate)]
+    .filter(Boolean)
+    .join(" 至 ")
+
+  return [
+    { label: "体质类型", value: normalizeText(plan && plan.constitutionType) },
+    { label: "用餐时间", value: buildPreferencesDesc(plan) },
+    { label: "计划周期", value: cycleText }
+  ].filter((item) => item.value)
+}
+
+function normalizeRecipeItem(item, dayNo, index) {
+  const mealType = normalizeText(item && item.mealType)
+  const mealLabel = normalizeText(item && item.mealLabel) || mealType
+  const baseId = normalizeText(item && item.id) || normalizeText(item && item.refId) || `${dayNo}_${index}`
+
+  return {
+    key: `${dayNo}_${mealType}_${baseId}_${index}`,
+    name: normalizeText(item && item.refName),
+    tags: parseTagList(item && item.tagJson),
+    meal: mealLabel,
+    mealTime: normalizeText(item && item.mealTime),
+    mealIcon: MEAL_ICON_MAP[mealType] || MEAL_ICON_MAP[mealLabel] || MEAL_ICON_MAP.早餐,
+    coverImage: normalizeText(item && item.coverImage)
+  }
+}
+
+function normalizeWeekPlans(plan, currentDayNo) {
+  const days = Array.isArray(plan && plan.days) ? plan.days.slice() : []
+  days.sort((left, right) => toPositiveInt(left && left.dayNo) - toPositiveInt(right && right.dayNo))
+
+  return days.map((day, index) => {
+    const dayNo = toPositiveInt(day && day.dayNo, index + 1)
+    const recipes = Array.isArray(day && day.itemRefs)
+      ? day.itemRefs.map((item, recipeIndex) => normalizeRecipeItem(item, dayNo, recipeIndex))
+      : []
+
+    return {
+      dayNo,
+      title: `第${dayNo}天（${formatMonthDay(day && day.planDate)}）`,
+      status: getDayStatusText(dayNo, currentDayNo),
+      recipes
+    }
+  })
+}
+
+function normalizePlanData(plan) {
+  const days = Array.isArray(plan && plan.days) ? plan.days : []
+  const totalDays = toPositiveInt(plan && plan.totalDays, days.length)
+  const currentDayNo = Math.min(Math.max(toPositiveInt(plan && plan.currentDayNo, 1), 1), Math.max(totalDays, 1))
+  const weekPlans = normalizeWeekPlans(plan, currentDayNo)
+
+  return {
+    title: DEFAULT_TITLE,
+    cycleLabel: getCycleLabel(plan && plan.planType, totalDays),
+    reminder: buildReminder(plan && plan.mealTimes),
+    progress: {
+      day: currentDayNo,
+      totalDays,
+      status: getPlanStatusText(plan && plan.planStatus)
+    },
+    progressPercent: totalDays ? Math.round((currentDayNo * 100) / totalDays) : 0,
+    info: buildInfoList(plan),
+    weekPlans,
+    currentDay: Math.max(0, Math.min(currentDayNo - 1, Math.max(weekPlans.length - 1, 0))),
+    swiperHeight: 0,
+    dayTagText: totalDays ? `${totalDays}天食养方案` : "食养方案",
+    dayDotsPercent: totalDays ? ((currentDayNo * 100) / totalDays) : 0,
+    hasPlan: true,
+    loading: false
+  }
+}
+
+function getDayDotsPercent(currentIndex, totalDays) {
+  const safeTotalDays = toPositiveInt(totalDays, 0)
+  if (!safeTotalDays) return 0
+
+  const safeIndex = Math.max(0, Number(currentIndex) || 0)
+  return ((safeIndex + 1) * 100) / safeTotalDays
 }
 
 Page({
@@ -74,22 +207,19 @@ Page({
     menuTop: 26,
     menuRight: 12,
     safeBottom: 0,
-
-    cycleLabel: "",
-    title: "",
-    introTag: "",
-    reminder: "",
-    progress: {},
-    progressPercent: 0,
-    info: [],
-    weekPlans: [],
-    currentDay: 0,
-    swiperHeight: 500
+    ...getEmptyPlanState()
   },
 
   onLoad() {
     this.syncLayout()
-    this.loadPageData()
+  },
+
+  onShow() {
+    this.fetchCurrentPlan()
+  },
+
+  onUnload() {
+    clearTimeout(this._swiperHeightTimer)
   },
 
   syncLayout() {
@@ -97,7 +227,8 @@ Page({
     const windowInfo = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync()
     const windowWidth = (windowInfo && (windowInfo.windowWidth || windowInfo.screenWidth)) || 375
 
-    let menuWidth = 88, menuHeight = 32
+    let menuWidth = 88
+    let menuHeight = 32
     let menuTop = statusBarHeight + (navBarHeight - menuHeight) / 2
     let menuRight = 12
     if (wx.getMenuButtonBoundingClientRect) {
@@ -109,44 +240,91 @@ Page({
         menuRight = Math.max(10, windowWidth - menu.right)
       }
     }
+
     this.setData({
       topInset: Math.max(headerHeight + 8, 72),
-      statusBarHeight, navBarHeight, headerHeight,
-      menuWidth, menuHeight, menuTop, menuRight, safeBottom
+      statusBarHeight,
+      navBarHeight,
+      headerHeight,
+      menuWidth,
+      menuHeight,
+      menuTop,
+      menuRight,
+      safeBottom
     })
   },
 
-  loadPageData() {
-    const weekPlans = buildWeekPlans()
-    const WEEK_TOTAL = 7
-    const progressPercent = Math.max(0, Math.min(100, Math.round((MOCK_PLAN.progress.day * 100) / WEEK_TOTAL)))
+  async fetchCurrentPlan() {
+    this.setData({ loading: true })
 
-    // 计算 swiper 高度：取所有天中食谱数最多的那天
-    // 每条 item: 212rpx，间距 16rpx，头部(标题行): 60rpx
-    const maxRecipes = Math.max(...weekPlans.map(p => p.recipes.length))
-    const swiperHeight = 60 + maxRecipes * 212 + (maxRecipes - 1) * 16
+    try {
+      const res = await get(paths.recipe.currentDietPlan, null, {
+        showLoading: true,
+        loadingTitle: "加载中"
+      })
+      const plan = unwrapResponseData(res)
 
-    this.setData({
-      ...MOCK_PLAN,
-      progressPercent,
-      weekPlans,
-      currentDay: 0,
-      swiperHeight
-    })
+      if (!plan || typeof plan !== "object" || !normalizeText(plan.id)) {
+        this.setData({ ...getEmptyPlanState(), loading: false })
+        wx.showToast({ title: "还没有制定计划", icon: "none" })
+        return
+      }
+
+      const nextData = normalizePlanData(plan)
+      this.setData(nextData, () => {
+        this.updateSwiperHeight()
+      })
+    } catch (error) {
+      this.setData({ loading: false })
+    }
+  },
+
+  updateSwiperHeight(retryCount = 0) {
+    if (!this.data.hasPlan || !this.data.weekPlans.length) return
+
+    const selector = `#day-panel-${this.data.currentDay}`
+    wx.createSelectorQuery()
+      .in(this)
+      .select(selector)
+      .boundingClientRect((rect) => {
+        if (rect && rect.height) {
+          const nextHeight = Math.ceil(rect.height)
+          if (nextHeight !== this.data.swiperHeight) {
+            this.setData({ swiperHeight: nextHeight })
+          }
+          return
+        }
+
+        if (retryCount >= 3) return
+        clearTimeout(this._swiperHeightTimer)
+        this._swiperHeightTimer = setTimeout(() => {
+          this.updateSwiperHeight(retryCount + 1)
+        }, 80)
+      })
+      .exec()
   },
 
   onSwiperChange(e) {
     const idx = e.detail.current
+    const totalDays = toPositiveInt(this.data.progress && this.data.progress.totalDays, this.data.weekPlans.length)
     this.setData({
-      currentDay: idx
+      currentDay: idx,
+      dayDotsPercent: getDayDotsPercent(idx, totalDays)
+    }, () => {
+      this.updateSwiperHeight()
     })
   },
 
   handleBack() {
     const pages = getCurrentPages()
-    if (pages.length > 1) { wx.navigateBack(); return }
+    if (pages.length > 1) {
+      wx.navigateBack()
+      return
+    }
     wx.switchTab({ url: "/pages/diet/index" })
   },
 
-  buyAll() { wx.switchTab({ url: "/pages/mall/index" }) }
+  buyAll() {
+    wx.switchTab({ url: "/pages/mall/index" })
+  }
 })
