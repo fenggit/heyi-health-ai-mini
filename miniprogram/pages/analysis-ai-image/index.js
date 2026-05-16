@@ -13,13 +13,9 @@ function fetchInquiry({ recordId, guestToken }) {
 
 const MOCK_UPLOAD_DATA = {
   title: "视觉AI分析",
-  subTitle: "通过舌苔和面色辅助判断体质",
   intro:
-    "通过舌苔颜色、厚薄、湿润度和面部气色，AI可以辅助判断您的寒热虚实体质特征，结合问卷答题获得更精准的体质报告。",
+    "通过察言观色，AI可以辅助判断您的体质特征。结合问卷调查获得更精准的体质报告",
   introNotice: "本结果由AI生成，仅供娱乐与生活参考，不能替代医疗建议。",
-  tongueDesc: "辅助判断内热或虚寒",
-  sublingualDesc: "辅助判断气血运行状态",
-  faceDesc: "分析气色和面部特征",
   tongueTip: "张嘴伸舌，舌头平展，自然光线下拍摄，确保舌苔清晰可见。",
   sublingualTip: "抬起舌头，露出舌下静脉，自然光线下拍摄，确保舌下纹路清晰可见。",
   faceTip: "正面平视，表情自然，确保面部光线均匀，不要化浓妆。"
@@ -80,12 +76,8 @@ Page({
     menuTop: 26,
     menuRight: 12,
     title: "",
-    subTitle: "",
     intro: "",
     introNotice: "",
-    tongueDesc: "",
-    sublingualDesc: "",
-    faceDesc: "",
     tongueTip: "",
     sublingualTip: "",
     faceTip: "",

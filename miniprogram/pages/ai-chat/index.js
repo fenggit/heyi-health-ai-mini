@@ -44,7 +44,29 @@ const STATIC_PAGE_DATA = {
       id: "profile",
       label: "个人中心",
       path: "/pages/profile/index",
-      routeType: "tab"
+      routeType: "tab",
+      requiresLogin: true
+    },
+    {
+      id: "my-plan",
+      label: "我的计划",
+      path: "/pages/my-week-plan/index",
+      routeType: "navigate",
+      requiresLogin: true
+    },
+    {
+      id: "visual-analysis",
+      label: "AI视觉分析",
+      path: "/pages/analysis-ai-image/index",
+      routeType: "navigate",
+      requiresLogin: true
+    },
+    {
+      id: "checkin",
+      label: "打卡",
+      path: "/pages/checkin/index",
+      routeType: "tab",
+      requiresLogin: true
     }
   ]
 }
@@ -1088,11 +1110,10 @@ Page({
     this.stopVoiceRecognition({ silent: true })
   },
   tapQuickAction(e) {
-    const { path, routeType } = e.currentTarget.dataset
+    const { path, routeType, requiresLogin } = e.currentTarget.dataset
     if (!path) return
 
-    // 个人中心需要登录
-    if (path === "/pages/profile/index" && !this.requireLogin()) return
+    if (requiresLogin && !this.requireLogin()) return
 
     if (routeType === "tab") {
       wx.switchTab({ url: path })

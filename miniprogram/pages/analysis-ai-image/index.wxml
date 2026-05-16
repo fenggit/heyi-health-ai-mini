@@ -19,7 +19,6 @@
   <view class="upload-wrap">
     <view class="upload-head">
       <view class="upload-head__title">{{title}}</view>
-      <view class="upload-head__subtitle">{{subTitle}}</view>
       <view class="upload-head__tag">趣味分析</view>
     </view>
 
@@ -43,10 +42,7 @@
         <view class="upload-card__icon-wrap">
           <image class="upload-card__icon" src="/assets/analysis/camera_icon@2x.png" mode="aspectFit" />
         </view>
-        <view class="upload-card__meta">
-          <view class="upload-card__title">舌苔拍照</view>
-          <view class="upload-card__desc">{{tongueDesc}}</view>
-        </view>
+        <view class="upload-card__title">舌苔拍照</view>
       </view>
       <view wx:if="{{tongueImage}}" class="upload-photo-preview">
         <image class="upload-photo-preview__img" src="{{tongueImage}}" mode="aspectFill" />
@@ -77,10 +73,7 @@
         <view class="upload-card__icon-wrap">
           <image class="upload-card__icon" src="/assets/analysis/camera_icon@2x.png" mode="aspectFit" />
         </view>
-        <view class="upload-card__meta">
-          <view class="upload-card__title">舌下拍照</view>
-          <view class="upload-card__desc">{{sublingualDesc}}</view>
-        </view>
+        <view class="upload-card__title">舌下拍照</view>
       </view>
       <view wx:if="{{sublingualImage}}" class="upload-photo-preview">
         <image class="upload-photo-preview__img" src="{{sublingualImage}}" mode="aspectFill" />
@@ -111,10 +104,7 @@
         <view class="upload-card__icon-wrap">
           <image class="upload-card__icon" src="/assets/analysis/camera_icon@2x.png" mode="aspectFit" />
         </view>
-        <view class="upload-card__meta">
-          <view class="upload-card__title">面色拍照</view>
-          <view class="upload-card__desc">{{faceDesc}}</view>
-        </view>
+        <view class="upload-card__title">面色拍照</view>
       </view>
       <view wx:if="{{faceImage}}" class="upload-photo-preview">
         <image class="upload-photo-preview__img" src="{{faceImage}}" mode="aspectFill" />
