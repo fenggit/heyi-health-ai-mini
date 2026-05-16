@@ -1,6 +1,7 @@
 const { getLayoutMetrics } = require("../../utils/layout")
 const { navigateToReport } = require("../../utils/navigateReport")
 const { get, post } = require("../../utils/request")
+const { reportWechatPayResult } = require("../../utils/pay")
 const { fetchUserInfo, loadUserInfoFromStorage } = require("../../http/auth")
 const paths = require("../../http/paths")
 
@@ -113,6 +114,20 @@ function pickBizObject(data) {
   if (data.result && typeof data.result === "object") return data.result
   if (data.data && typeof data.data === "object") return data.data
   return data
+}
+
+function extractOrderId(data) {
+  const payload = pickBizObject(data)
+  const candidates = [payload.orderId, payload.id, payload.indentId]
+
+  for (let i = 0; i < candidates.length; i += 1) {
+    const candidate = candidates[i]
+    if (candidate != null && candidate !== "") {
+      return String(candidate)
+    }
+  }
+
+  return ""
 }
 
 function toWechatPayArgs(data) {
@@ -621,6 +636,10 @@ Page({
       return
     }
 
+    if (name === "会员签到") {
+      return
+    }
+
     const reportConfig = PROFILE_REPORT_MENU_MAP[name]
     if (reportConfig) {
       const userInfo = this._userInfo || {}
@@ -712,12 +731,15 @@ Page({
     })
       .then((res) => {
         const openPayload = unwrapResponseData(res)
+        const orderId = extractOrderId(openPayload)
+        if (orderId) {
+          resolvedOrderId = orderId
+        }
         const payArgs = toWechatPayArgs(openPayload)
         if (payArgs) {
           return requestWechatPayment(payArgs)
         }
 
-        const orderId = openPayload && openPayload.orderId != null ? String(openPayload.orderId) : ""
         const payRequired = !openPayload || openPayload.payRequired !== false
 
         if (!payRequired) {
@@ -743,10 +765,8 @@ Page({
           return requestWechatPayment(nextPayArgs)
         })
       })
+      .then(() => reportWechatPayResult(resolvedOrderId))
       .then(() => {
-        if (resolvedOrderId) {
-          get(paths.order.indentPayResult(resolvedOrderId)).catch(() => {})
-        }
         this.setData({ showMemberSheet: false })
         wx.showToast({
           title: "支付成功",

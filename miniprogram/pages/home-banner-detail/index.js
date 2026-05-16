@@ -1,5 +1,6 @@
 const { getLayoutMetrics } = require("../../utils/layout")
 const { get, post } = require("../../utils/request")
+const { reportWechatPayResult } = require("../../utils/pay")
 const paths = require("../../http/paths")
 
 const BOOKING_NOTES = [
@@ -592,8 +593,7 @@ Page({
         loadingShown = false
       }
       await requestWechatPayment(payResult.payArgs)
-
-      get(paths.order.indentPayResult(nextOrderId)).catch(() => {})
+      await reportWechatPayResult(nextOrderId)
 
       this.patchActivitySignupState(target.id, {
         signupStatus: SIGNUP_STATUS.PAID,

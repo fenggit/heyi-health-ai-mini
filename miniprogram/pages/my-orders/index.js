@@ -1,5 +1,6 @@
 const { initMiniNav, backWithFallback } = require('../../utils/mini-nav')
 const { get, post, put } = require('../../utils/request')
+const { reportWechatPayResult } = require('../../utils/pay')
 const paths = require('../../http/paths')
 
 const TAB_LIST = [
@@ -398,8 +399,8 @@ Page({
         }
         return requestWechatPayment(payArgs)
       })
+      .then(() => reportWechatPayResult(payOrderId))
       .then(() => {
-        get(paths.order.indentPayResult(payOrderId)).catch(() => {})
         wx.showToast({ title: '支付成功', icon: 'success' })
       })
       .catch((err) => {
