@@ -84,8 +84,7 @@ Page({
     info: [],
     weekPlans: [],
     currentDay: 0,
-    swiperHeight: 500,
-    allDone: false
+    swiperHeight: 500
   },
 
   onLoad() {
@@ -132,17 +131,14 @@ Page({
       progressPercent,
       weekPlans,
       currentDay: 0,
-      swiperHeight,
-      allDone: weekPlans[0].recipes.every(r => !!r.done)
+      swiperHeight
     })
   },
 
   onSwiperChange(e) {
     const idx = e.detail.current
-    const weekPlans = this.data.weekPlans
     this.setData({
-      currentDay: idx,
-      allDone: weekPlans[idx].recipes.every(r => !!r.done)
+      currentDay: idx
     })
   },
 
@@ -152,35 +148,5 @@ Page({
     wx.switchTab({ url: "/pages/diet/index" })
   },
 
-  toggleAllDone() {
-    const { currentDay, weekPlans } = this.data
-    const nextDone = !this.data.allDone
-    const plans = weekPlans.map((plan, i) => {
-      if (i !== currentDay) return plan
-      return { ...plan, recipes: plan.recipes.map(r => ({ ...r, done: nextDone })) }
-    })
-    this.setData({ weekPlans: plans, allDone: nextDone })
-  },
-
-  toggleRecipeDone(e) {
-    const { id } = e.currentTarget.dataset
-    const { checked } = e.detail
-    const { currentDay, weekPlans } = this.data
-    const plans = weekPlans.map((plan, i) => {
-      if (i !== currentDay) return plan
-      const recipes = plan.recipes.map(r => r.id === id ? { ...r, done: checked } : r)
-      return { ...plan, recipes }
-    })
-    this.setData({
-      weekPlans: plans,
-      allDone: plans[currentDay].recipes.every(r => !!r.done)
-    })
-  },
-
-  adjustPlan() { wx.navigateTo({ url: "/pages/diet-plan/index" }) },
-  buyAll() { wx.switchTab({ url: "/pages/mall/index" }) },
-  openRecipe(e) {
-    const { id } = e.currentTarget.dataset
-    wx.showToast({ title: `演示版：${id}详情待接入`, icon: "none" })
-  }
+  buyAll() { wx.switchTab({ url: "/pages/mall/index" }) }
 })

@@ -378,70 +378,6 @@
   line-height: 36rpx;
 }
 
-/* 价格行：¥价格 在左，+ 按钮在右 */
-.recipe-item__price-row {
-  margin-top: 12rpx;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.recipe-item__price {
-  display: flex;
-  align-items: baseline;
-  color: #fb2c36;
-}
-
-.recipe-item__price-symbol {
-  font-size: 24rpx;
-  opacity: 0.55;
-}
-
-.recipe-item__price-num {
-  font-size: 36rpx;
-  font-weight: 700;
-  margin: 0 4rpx;
-}
-
-.recipe-item__price-unit {
-  font-size: 24rpx;
-  color: #94a3b8;
-  font-weight: 500;
-}
-
-.recipe-item__plus {
-  width: 44rpx;
-  height: 44rpx;
-  border-radius: 50%;
-  background: linear-gradient(133deg, #7cee89 0%, #2bc383 100%);
-  color: #fff;
-  font-size: 40rpx;
-  line-height: 44rpx;
-  text-align: center;
-  flex-shrink: 0;
-}
-
-/* 右侧 checkbox 列 */
-.recipe-item__check {
-  width: 72rpx;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.finish-btn {
-  margin-top: 10rpx;
-  height: 80rpx;
-  border-radius: 20rpx;
-  background: rgba(0, 201, 80, 0.10);
-  color: #008435;
-  font-size: 32rpx;
-  line-height: 80rpx;
-  font-weight: 500;
-  text-align: center;
-}
-
 /* 7天滑动指示器 */
 .day-dots {
   display: flex;
@@ -530,7 +466,7 @@
   width: 638rpx;
   margin: 0 auto;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   padding: 24rpx 0 16rpx;
 }
 
@@ -540,7 +476,7 @@
 }
 
 .btn-row__btn {
-  width: 310rpx;
+  width: 638rpx;
   height: 80rpx;
   border-radius: 24rpx;
   text-align: center;
@@ -554,8 +490,3 @@
   font-weight: 700;
 }
 
-.btn-row__btn--ghost {
-  background: linear-gradient(90deg, #e9fbf1 0%, #ecfdf8 54%, #defefd 100%);
-  color: #1e293b;
-  font-weight: 500;
-}

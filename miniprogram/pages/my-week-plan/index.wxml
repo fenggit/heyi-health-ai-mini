@@ -95,19 +95,7 @@
                             <text class="recipe-item__tag">{{tag}}</text>
                           </block>
                         </view>
-                        <view class="recipe-item__price-row">
-                          <view class="recipe-item__price">
-                            <text class="recipe-item__price-symbol">¥</text>
-                            <text class="recipe-item__price-num">{{recipe.price}}</text>
-                            <text class="recipe-item__price-unit">{{recipe.unit}}</text>
-                          </view>
-                          <view class="recipe-item__plus" catchtap="openRecipe" data-id="{{recipe.id}}">+</view>
-                        </view>
                       </view>
-                    </view>
-
-                    <view class="recipe-item__check">
-                      <my-checkbox checked="{{recipe.done}}" shape="circle" bind:change="toggleRecipeDone" data-id="{{recipe.id}}" />
                     </view>
                   </view>
                 </block>
@@ -115,9 +103,6 @@
             </view>
           </swiper-item>
         </swiper>
-
-        <!-- 全部标记 & 滑动指示器：在 swiper 外 -->
-        <view class="finish-btn" bindtap="toggleAllDone">全部标记为已完成</view>
 
         <view class="day-dots">
           <view class="day-dots__track">
@@ -132,8 +117,7 @@
 
   <view class="my-plan-action-dock">
     <view class="my-plan-action-dock__inner">
-      <view class="btn-row__btn btn-row__btn--ghost" bindtap="adjustPlan">调整计划</view>
-      <view class="btn-row__btn btn-row__btn--primary" bindtap="buyAll">购买全部食材</view>
+      <view class="btn-row__btn btn-row__btn--primary" bindtap="buyAll">购买食材</view>
     </view>
     <view class="my-plan-action-dock__home-bar" style="height: {{safeBottom}}px;"></view>
   </view>
