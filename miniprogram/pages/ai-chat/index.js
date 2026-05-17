@@ -21,6 +21,7 @@ const STORAGE_ASSISTANT_SESSION_KEY = "assistantSessionId"
 const DEFAULT_REPLY = "你可以用语音或文字告诉我你的需求，我会尽力帮你！"
 const VOICE_MESSAGE_ICON = "/assets/analysis/chat/voice_icon.png"
 const VOICE_UNAVAILABLE_MESSAGE = "当前小程序未配置语音识别服务"
+const FEATURE_KEY_AI_ASSESSMENT = "ai-assessment"
 
 const STATIC_PAGE_DATA = {
   title: "哈喽，我是天天！",
@@ -69,6 +70,18 @@ const STATIC_PAGE_DATA = {
       requiresLogin: true
     }
   ]
+}
+
+function buildStaticPageData(functionMap = {}) {
+  const safeFunctionMap = functionMap && typeof functionMap === "object" ? functionMap : {}
+  const showAiAssessment = !!safeFunctionMap[FEATURE_KEY_AI_ASSESSMENT]
+
+  return Object.assign({}, STATIC_PAGE_DATA, {
+    quickActions: STATIC_PAGE_DATA.quickActions.filter((item) => {
+      if (item.id !== "visual-analysis") return true
+      return showAiAssessment
+    })
+  })
 }
 
 function padClock(value) {
@@ -391,6 +404,14 @@ Page({
     const app = getApp()
     const isLogin = !!(app && app.globalData && app.globalData.isLogin)
     this.setData({ isLogin })
+    this.syncFeatureSwitch()
+
+    if (app && typeof app.ensureFunctionMapLoaded === "function") {
+      app.ensureFunctionMapLoaded().then(() => {
+        if (this._pageUnloaded) return
+        this.syncFeatureSwitch()
+      })
+    }
 
     if (isLogin) {
       this.showInitialPageLoading()
@@ -398,7 +419,7 @@ Page({
     } else {
       // 未登录：只渲染静态内容，不请求任何接口
       this.setData(
-        Object.assign({}, STATIC_PAGE_DATA, {
+        Object.assign({}, buildStaticPageData(app && app.globalData ? app.globalData.functionMap : null), {
           messages: [],
           pageLoading: false
         })
@@ -434,6 +455,7 @@ Page({
     const isLogin = !!(app && app.globalData && app.globalData.isLogin)
     const wasLogin = this.data.isLogin
     this.setData({ isLogin })
+    this.syncFeatureSwitch()
     // 刚完成登录，触发数据加载
     if (!wasLogin && isLogin) {
       this.showInitialPageLoading()
@@ -735,10 +757,15 @@ Page({
       safeBottom
     })
   },
+  syncFeatureSwitch() {
+    const app = getApp()
+    const functionMap = app && app.globalData ? app.globalData.functionMap : null
+    this.setData(buildStaticPageData(functionMap))
+  },
   async loadPageData() {
     this._historyInitialized = false
     this.setData(
-      Object.assign({}, STATIC_PAGE_DATA, {
+      Object.assign({}, buildStaticPageData(getApp() && getApp().globalData ? getApp().globalData.functionMap : null), {
         messages: [],
         pageLoading: true
       })

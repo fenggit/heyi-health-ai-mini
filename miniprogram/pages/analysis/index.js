@@ -1,6 +1,8 @@
 const { getLayoutMetrics } = require("../../utils/layout")
 const { getGuestToken } = require("../../http/auth")
 
+const FEATURE_KEY_AI_ASSESSMENT = 'ai-assessment'
+
 const MOCK_ANALYSIS_INTRO = {
   introTitle: "开始前，请仔细阅读以下重要说明",
   introSubTitle: "使用须知与免责声明",
@@ -53,10 +55,12 @@ Page({
     aiContent: "",
     bullets: [],
     extras: [],
-    agreementText: ""
+    agreementText: "",
+    showAiAssessmentEntry: false
   },
   onLoad(options = {}) {
     this.syncLayout()
+    this.syncFeatureSwitch()
     this.loadPageData()
 
     const sceneParam = decodeSafe(options.scene || options.source || '').trim()
@@ -66,6 +70,15 @@ Page({
     const app = getApp()
     const isLogin = !!(app && app.globalData.isLogin)
     console.log('[analysis] 当前登录状态:', isLogin ? '已登录' : '未登录')
+
+    if (app && typeof app.ensureFunctionMapLoaded === 'function') {
+      app.ensureFunctionMapLoaded().then(() => {
+        this.syncFeatureSwitch()
+      })
+    }
+  },
+  onShow() {
+    this.syncFeatureSwitch()
   },
   // 未登录时获取游客 token，失败时静默记录，按钮点击时会重试
   _fetchGuestToken() {
@@ -126,6 +139,13 @@ Page({
       menuTop,
       menuRight
     })
+  },
+  syncFeatureSwitch() {
+    const app = getApp()
+    const functionMap = app && app.globalData ? app.globalData.functionMap : null
+    const showAiAssessmentEntry = !!(functionMap && functionMap[FEATURE_KEY_AI_ASSESSMENT])
+
+    this.setData({ showAiAssessmentEntry })
   },
   async loadPageData() {
     const payload = await fetchAnalysisIntro()

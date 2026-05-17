@@ -8,6 +8,8 @@ const paths = {
     miniPhoneLogin: '/auth/mini/phone/login',
     // 当前登录用户信息
     currentUserProfile: '/auth/user/profile/current',
+    // 功能开关是否启用
+    featureEnabled: '/uc/app/profile/feature-enabled',
     // 修改昵称
     updateNickname: '/uc/app/profile/nickname',
     // 修改头像

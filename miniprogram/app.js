@@ -1,5 +1,7 @@
 const request = require('./utils/request')
-const { fetchUserInfo, loadUserInfoFromStorage } = require('./http/auth')
+const { fetchUserInfo, fetchFeatureEnabled, loadUserInfoFromStorage } = require('./http/auth')
+
+const FEATURE_KEY_AI_ASSESSMENT = 'ai-assessment'
 
 App({
   /**
@@ -48,14 +50,48 @@ App({
     },
     isLogin: false,
     userInfo: null,
-    guestSession: null
+      guestSession: null,
+      functionMap: {
+        [FEATURE_KEY_AI_ASSESSMENT]: false
+      }
   },
   onLaunch(launchOptions = {}) {
     request.initAuthToken()
     this.globalData.layout = this.computeLayout()
     this.globalData.userInfo = loadUserInfoFromStorage()
+      this.ensureFunctionMapLoaded()
     this.checkLogin(launchOptions)
   },
+    ensureFunctionMapLoaded() {
+      if (this._functionMapPromise) return this._functionMapPromise
+
+      this._functionMapPromise = fetchFeatureEnabled(FEATURE_KEY_AI_ASSESSMENT)
+        .then((res) => {
+          const enabled = !!(res && res.data && res.data.enabled)
+          this.setFunctionEnabled(FEATURE_KEY_AI_ASSESSMENT, enabled)
+          console.log('[app] 功能开关加载成功:', FEATURE_KEY_AI_ASSESSMENT, enabled)
+          return this.globalData.functionMap
+        })
+        .catch((err) => {
+          this.setFunctionEnabled(FEATURE_KEY_AI_ASSESSMENT, false)
+          console.warn('[app] 功能开关加载失败:', err)
+          return this.globalData.functionMap
+        })
+
+      return this._functionMapPromise
+    },
+    setFunctionEnabled(featureKey, enabled) {
+      const nextFeatureKey = String(featureKey || '').trim()
+      if (!nextFeatureKey) return
+
+      const currentMap = this.globalData.functionMap && typeof this.globalData.functionMap === 'object'
+        ? this.globalData.functionMap
+        : {}
+
+      this.globalData.functionMap = Object.assign({}, currentMap, {
+        [nextFeatureKey]: !!enabled
+      })
+    },
   checkLogin(launchOptions = {}) {
     // 检查本地是否有 token，有则视为已登录
     const token = request.getAuthToken()
