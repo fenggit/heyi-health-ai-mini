@@ -2,6 +2,7 @@ const { getLayoutMetrics } = require("../../utils/layout")
 const request = require("../../utils/request")
 const paths = require("../../http/paths")
 const { fetchUserInfo } = require("../../http/auth")
+const { loadFastingCache, saveFastingCache } = require("../../utils/fasting-cache")
 
 function formatDate(date) {
   const y = date.getFullYear()
@@ -43,10 +44,20 @@ Page({
   onLoad() {
     const { headerHeight } = getLayoutMetrics()
     const now = new Date()
+
+    // 恢复本地缓存的3个字段
+    const cache = loadFastingCache()
+    const cachedTypeCode = cache.selectedTypeCode || ''
+    const cachedWeight = cache.weight || ''
+    const cachedBodyFat = cache.bodyFat || ''
+
     this.setData({
       headerHeight: headerHeight || 64,
       currentDate: formatDate(now),
-      durationHours: calcDuration('20:00', '12:00')
+      durationHours: calcDuration('20:00', '12:00'),
+      selectedTypeCode: cachedTypeCode,
+      weight: cachedWeight,
+      bodyFat: cachedBodyFat
     })
     this.loadOptions()
   },
@@ -90,6 +101,7 @@ Page({
   onTypeSelect(e) {
     const { code } = e.currentTarget.dataset
     this.setData({ selectedTypeCode: code })
+    saveFastingCache({ selectedTypeCode: code })
   },
 
   onStartTimeChange(e) {
@@ -114,11 +126,15 @@ Page({
   },
 
   onWeightInput(e) {
-    this.setData({ weight: e.detail.value })
+    const weight = e.detail.value
+    this.setData({ weight })
+    saveFastingCache({ weight })
   },
 
   onBodyFatInput(e) {
-    this.setData({ bodyFat: e.detail.value })
+    const bodyFat = e.detail.value
+    this.setData({ bodyFat })
+    saveFastingCache({ bodyFat })
   },
 
   onFeelingToggle(e) {

@@ -2,6 +2,7 @@ const { initMiniNav, backWithFallback } = require('../../utils/mini-nav')
 const request = require('../../utils/request')
 const paths = require('../../http/paths')
 const { clearUserInfoCache, loadUserInfoFromStorage, setCachedUserInfo } = require('../../http/auth')
+const { clearFastingCache } = require('../../utils/fasting-cache')
 
 const NICKNAME_OVERRIDE_KEY = 'profileNicknameOverride'
 const AVATAR_OVERRIDE_KEY = 'profileAvatarOverride'
@@ -301,6 +302,7 @@ Page({
           clearUserInfoCache()
           clearNicknameOverride()
           clearAvatarOverride()
+          clearFastingCache()
           const app = getApp()
           if (app && app.globalData) app.globalData.isLogin = false
           wx.reLaunch({ url: '/pages/login/index' })
