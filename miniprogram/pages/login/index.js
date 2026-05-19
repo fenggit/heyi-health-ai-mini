@@ -7,6 +7,8 @@ const {
   getAgreementPopupData
 } = require('../../utils/agreement')
 
+const REFERRAL_CODE_STORAGE_KEY = 'pending_referral_code'
+
 function decodeSafe(value) {
   if (!value) return ''
   try {
@@ -14,6 +16,44 @@ function decodeSafe(value) {
   } catch (e) {
     return value
   }
+}
+
+/**
+ * 保存待使用的邀请码到本地存储
+ * 用于用户通过分享链接进入但尚未登录的场景
+ */
+function savePendingReferralCode(code) {
+  if (!code) return
+  try {
+    wx.setStorageSync(REFERRAL_CODE_STORAGE_KEY, code)
+    console.log('[login] 临时存储邀请码:', code)
+  } catch (e) {
+    console.warn('[login] 存储邀请码失败:', e)
+  }
+}
+
+/**
+ * 读取并清除临时存储的邀请码
+ */
+function popPendingReferralCode() {
+  try {
+    const code = wx.getStorageSync(REFERRAL_CODE_STORAGE_KEY) || ''
+    if (code) wx.removeStorageSync(REFERRAL_CODE_STORAGE_KEY)
+    return code
+  } catch (e) {
+    return ''
+  }
+}
+
+/**
+ * 解析启动参数，返回 referralCode
+ *
+ * 方式1 — 小程序分享点击：options.referralCode 直接带邀请码，如 "LNHIG4H1"
+ * 方式2 — 二维码扫码：由 app.js onLaunch 负责存储，login 页无需处理
+ */
+function resolveReferralCode(options) {
+  const directCode = decodeSafe(options.referralCode || '').trim()
+  return directCode
 }
 
 Page({
@@ -30,13 +70,16 @@ Page({
   onLoad(options = {}) {
     this.syncLayout()
 
-    const sceneParam = decodeSafe(options.scene || options.source || '').trim()
-    const referralCode = decodeSafe(options.referralCode || sceneParam).trim()
-    this._scene = sceneParam
+    const referralCode = resolveReferralCode(options)
     this._referralCode = referralCode
 
-    console.log('[login] 扫码参数 scene:', sceneParam || '（无）')
+    console.log('[login] 启动 options:', JSON.stringify(options))
     console.log('[login] 登录 referralCode:', referralCode || '（无）')
+
+    // 有邀请码时先临时存储，防止已登录直接跳首页导致邀请码丢失
+    if (referralCode) {
+      savePendingReferralCode(referralCode)
+    }
 
     this._redirectIfLoggedIn()
   },
@@ -86,11 +129,14 @@ Page({
 
     const { code: phoneCode } = e.detail
 
+    // 优先用页面内存中的邀请码，兜底从 storage 读取（二维码扫码场景由 app.js 存入）
+    const referralCode = this._referralCode || popPendingReferralCode()
+
     wx.showLoading({ title: '登录中...', mask: true })
 
     login({
       phoneCode,
-      referralCode: this._referralCode
+      referralCode
     })
       .then((res) => {
         console.log('[login] 登录成功:', JSON.stringify(res))

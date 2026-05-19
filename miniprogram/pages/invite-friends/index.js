@@ -356,16 +356,23 @@ Page({
   buildSharePayload() {
     const inviteCode = toDisplayText(this.data.inviteCode, '')
     const encodedInviteCode = inviteCode ? encodeURIComponent(inviteCode) : ''
-    const path = encodedInviteCode
+
+    // 微信好友分享（onShareAppMessage）：path 直接带 referralCode=CODE
+    const friendPath = encodedInviteCode
       ? `${SHARE_HOME_PATH}?referralCode=${encodedInviteCode}`
       : SHARE_HOME_PATH
+
+    // 朋友圈分享（onShareTimeline）：query 使用 referralCode=CODE 格式
+    const momentsQuery = encodedInviteCode
+      ? `referralCode=${encodedInviteCode}`
+      : ''
 
     return {
       title: inviteCode
         ? `我在天元食养，输入推荐码 ${inviteCode} 一起领取专属福利`
         : '我在天元食养，邀请你一起开启健康食养计划',
-      path,
-      query: encodedInviteCode ? `referralCode=${encodedInviteCode}` : ''
+      path: friendPath,
+      query: momentsQuery
     }
   },
 

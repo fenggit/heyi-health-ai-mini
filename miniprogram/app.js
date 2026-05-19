@@ -3,6 +3,45 @@ const { fetchUserInfo, fetchFeatureEnabled, loadUserInfoFromStorage } = require(
 
 const FEATURE_KEY_AI_ASSESSMENT = 'ai-assessment'
 
+/** 临时邀请码的 storage key，与 login 页保持一致 */
+const REFERRAL_CODE_STORAGE_KEY = 'pending_referral_code'
+
+/**
+ * 从启动参数中提取邀请码并临时存储
+ *
+ * 方式1 — 小程序分享点击：launchOptions.query.referralCode = "LNHIG4H1"
+ * 方式2 — 二维码扫码：launchOptions.scene = 1011/1047，
+ *          launchOptions.query.scene decode 后是 "source=qr&code=LNHIG4H1"，原样存储
+ */
+function saveLaunchReferralCode(launchOptions) {
+  try {
+    const query = launchOptions.query || {}
+    const scene = launchOptions.scene
+
+    let referralCode = ''
+
+    // 方式1：小程序分享点击，referralCode 直接在 query 上
+    if (query.referralCode) {
+      try { referralCode = decodeURIComponent(query.referralCode) } catch (e) { referralCode = query.referralCode }
+      referralCode = referralCode.trim()
+    }
+
+    // 方式2：二维码扫码（scene 1011=扫小程序码，1047=扫普通二维码）
+    // query.scene 是二维码携带的原始数据，decode 后原样存储
+    if (!referralCode && (scene === 1011 || scene === 1047) && query.scene) {
+      try { referralCode = decodeURIComponent(query.scene) } catch (e) { referralCode = query.scene }
+      referralCode = referralCode.trim()
+    }
+
+    if (referralCode) {
+      wx.setStorageSync(REFERRAL_CODE_STORAGE_KEY, referralCode)
+      console.log('[app] 临时存储邀请码:', referralCode)
+    }
+  } catch (e) {
+    console.warn('[app] 存储邀请码失败:', e)
+  }
+}
+
 App({
   /**
    * 全局数据
@@ -59,7 +98,8 @@ App({
     request.initAuthToken()
     this.globalData.layout = this.computeLayout()
     this.globalData.userInfo = loadUserInfoFromStorage()
-      this.ensureFunctionMapLoaded()
+    this.ensureFunctionMapLoaded()
+    saveLaunchReferralCode(launchOptions)
     this.checkLogin(launchOptions)
   },
     ensureFunctionMapLoaded() {
