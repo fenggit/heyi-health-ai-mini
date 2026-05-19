@@ -1,6 +1,7 @@
 const STORAGE_TOKEN_KEY = 'token'
 const STORAGE_USER_INFO_KEY = 'userInfo'
 const STORAGE_ASSISTANT_SESSION_KEY = 'assistantSessionId'
+const STORAGE_REFERRAL_CODE_KEY = 'pending_referral_code'
 const DEFAULT_TIMEOUT = 10000
 const HOST = 'https://api.tyyhtech.com'
 
@@ -75,6 +76,7 @@ function handleUnauthorized(message = '登录已失效，请重新登录') {
   }
   wx.removeStorageSync(STORAGE_USER_INFO_KEY)
   wx.removeStorageSync(STORAGE_ASSISTANT_SESSION_KEY)
+  wx.removeStorageSync(STORAGE_REFERRAL_CODE_KEY)
 
   if (unauthorizedRedirecting) return
   unauthorizedRedirecting = true

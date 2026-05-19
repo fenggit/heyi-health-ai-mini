@@ -140,6 +140,8 @@ Page({
     })
       .then((res) => {
         console.log('[login] 登录成功:', JSON.stringify(res))
+        // 登录成功，清除临时存储的邀请码
+        try { wx.removeStorageSync(REFERRAL_CODE_STORAGE_KEY) } catch (e) {}
         wx.hideLoading()
         this._goHome()
       })

@@ -303,6 +303,7 @@ Page({
           clearNicknameOverride()
           clearAvatarOverride()
           clearFastingCache()
+          try { wx.removeStorageSync('pending_referral_code') } catch (e) {}
           const app = getApp()
           if (app && app.globalData) app.globalData.isLogin = false
           wx.reLaunch({ url: '/pages/login/index' })
