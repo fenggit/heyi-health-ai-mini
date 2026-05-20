@@ -33,7 +33,6 @@
     <view class="mall-banner card-panel" wx:if="{{activityBanners.length > 0}}">
       <swiper
         class="mall-banner-swiper"
-        current="{{bannerCurrent}}"
         circular
         autoplay
         interval="5000"

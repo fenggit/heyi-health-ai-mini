@@ -11,7 +11,6 @@
     <view class="card-panel activity-card" wx:if="{{activityBanners.length > 0}}">
       <swiper
         class="activity-swiper"
-        current="{{bannerCurrent}}"
         circular
         autoplay
         interval="5000"
