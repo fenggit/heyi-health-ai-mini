@@ -8,20 +8,21 @@
   </view>
 
   <view class="home-content">
-    <view class="card-panel activity-card">
+    <view class="card-panel activity-card" wx:if="{{activityBanners.length > 0}}">
       <swiper
         class="activity-swiper"
         current="{{bannerCurrent}}"
         circular
         autoplay
-        interval="4200"
-        duration="420"
+        interval="5000"
+        duration="300"
+        indicator-dots="{{false}}"
         bindchange="onBannerChange"
       >
         <block wx:for="{{activityBanners}}" wx:key="id">
           <swiper-item>
             <view class="activity-slide" data-id="{{item.id}}" bindtap="openActivityDetail">
-              <image class="activity-banner-image" src="{{item.image}}" mode="aspectFill" />
+              <image class="activity-banner-image" src="{{item.image}}" mode="aspectFill" lazy-load />
             </view>
           </swiper-item>
         </block>
