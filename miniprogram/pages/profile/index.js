@@ -5,6 +5,8 @@ const { reportWechatPayResult } = require("../../utils/pay")
 const { fetchUserInfo, loadUserInfoFromStorage } = require("../../http/auth")
 const paths = require("../../http/paths")
 
+const FEATURE_KEY_MEMBER_UPGRADE = 'member-upgrade'
+
 const CURRENT_PLAN_CHIP_BG = "/assets/profile-pages/vip/current_img@2x.png"
 const RECOMMEND_PLAN_CHIP_BG = "/assets/profile-pages/vip/recommend_img@2x.png"
 
@@ -431,6 +433,7 @@ Page({
     showOpenMemberAction: false,
     openingMemberSubscription: false,
     upgradePageFetchSuccess: false,
+    showMemberUpgradeAction: false,
     memberFaqs: [
       {
         id: "f1",
@@ -454,6 +457,14 @@ Page({
     this._lastRefreshTime = 0
     this.syncLayout()
     this.syncUserInfo({ fallbackToStorage: true })
+    this.syncMemberUpgradeSwitch()
+
+    const app = getApp()
+    if (app && typeof app.ensureFunctionMapLoaded === 'function') {
+      app.ensureFunctionMapLoaded().then(() => {
+        this.syncMemberUpgradeSwitch()
+      })
+    }
   },
   onShow() {
     const REFRESH_THROTTLE_MS = 30 * 1000
@@ -464,6 +475,8 @@ Page({
     if (needsRefresh) {
       this.refreshProfileDataAndUI({ showLoading: !this._hasLoadedProfileDataSuccessfully })
     }
+
+    this.syncMemberUpgradeSwitch()
 
     if (typeof this.getTabBar === "function") {
       const tabBar = this.getTabBar()
@@ -846,6 +859,12 @@ Page({
       .finally(() => {
         this.setData({ openingMemberSubscription: false })
       })
+  },
+  syncMemberUpgradeSwitch() {
+    const app = getApp()
+    const functionMap = app && app.globalData ? app.globalData.functionMap : null
+    const showMemberUpgradeAction = !!(functionMap && functionMap[FEATURE_KEY_MEMBER_UPGRADE])
+    diffSetData(this, { showMemberUpgradeAction })
   },
   noop() {}
 })

@@ -2,6 +2,7 @@ const request = require('./utils/request')
 const { fetchUserInfo, fetchFeatureEnabled, loadUserInfoFromStorage } = require('./http/auth')
 
 const FEATURE_KEY_AI_ASSESSMENT = 'ai-assessment'
+const FEATURE_KEY_MEMBER_UPGRADE = 'member-upgrade'
 
 /** 临时邀请码的 storage key，与 login 页保持一致 */
 const REFERRAL_CODE_STORAGE_KEY = 'pending_referral_code'
@@ -91,7 +92,8 @@ App({
     userInfo: null,
       guestSession: null,
       functionMap: {
-        [FEATURE_KEY_AI_ASSESSMENT]: false
+        [FEATURE_KEY_AI_ASSESSMENT]: false,
+        [FEATURE_KEY_MEMBER_UPGRADE]: false
       }
   },
   onLaunch(launchOptions = {}) {
@@ -105,17 +107,24 @@ App({
     ensureFunctionMapLoaded() {
       if (this._functionMapPromise) return this._functionMapPromise
 
-      this._functionMapPromise = fetchFeatureEnabled(FEATURE_KEY_AI_ASSESSMENT)
+      const loadOne = (key) => fetchFeatureEnabled(key)
         .then((res) => {
           const enabled = !!(res && res.data && res.data.enabled)
-          this.setFunctionEnabled(FEATURE_KEY_AI_ASSESSMENT, enabled)
-          console.log('[app] 功能开关加载成功:', FEATURE_KEY_AI_ASSESSMENT, enabled)
-          return this.globalData.functionMap
+          this.setFunctionEnabled(key, enabled)
+          console.log('[app] 功能开关加载成功:', key, enabled)
         })
         .catch((err) => {
-          this.setFunctionEnabled(FEATURE_KEY_AI_ASSESSMENT, false)
-          console.warn('[app] 功能开关加载失败:', err)
-          return this.globalData.functionMap
+          this.setFunctionEnabled(key, false)
+          console.warn('[app] 功能开关加载失败:', key, err)
+        })
+
+      this._functionMapPromise = Promise.all([
+        loadOne(FEATURE_KEY_AI_ASSESSMENT),
+        loadOne(FEATURE_KEY_MEMBER_UPGRADE)
+      ])
+        .then(() => this.globalData.functionMap)
+        .finally(() => {
+          this._functionMapPromise = null
         })
 
       return this._functionMapPromise
