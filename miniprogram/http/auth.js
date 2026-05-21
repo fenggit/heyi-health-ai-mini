@@ -311,6 +311,25 @@ function fetchUserInfo() {
 }
 
 /**
+ * 查询功能开关状态
+ * @param {string} featureKey
+ * @returns {Promise<{ code:number, msg:string, data:{ key?:string, enabled?:boolean } }>}
+ */
+function fetchFeatureEnabled(featureKey) {
+  const nextFeatureKey = String(featureKey || '').trim()
+  if (!nextFeatureKey) {
+    return Promise.reject(new Error('featureKey is required'))
+  }
+
+  return request.get(paths.auth.featureEnabled, { featureKey: nextFeatureKey }, {
+    withAuth: false,
+    silentBizErrorToast: true,
+    silentHttpErrorToast: true,
+    silentNetworkErrorToast: true
+  })
+}
+
+/**
  * 登录：调用 wxPhoneLogin 并在成功后设置 token、全局登录状态，再拉取用户信息
  * @param {object} params
  * @param {string} params.phoneCode    - getPhoneNumber 回调中的 code
@@ -338,6 +357,7 @@ function login({ phoneCode, guestToken, referralCode } = {}) {
 module.exports = {
   login,
   fetchUserInfo,
+  fetchFeatureEnabled,
   setCachedUserInfo,
   getCachedUserInfo,
   loadUserInfoFromStorage,

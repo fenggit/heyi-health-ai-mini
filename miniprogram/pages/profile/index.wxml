@@ -30,7 +30,7 @@
             <image class="profile-member__icon" src="/assets/profile/vip.png" mode="aspectFit" />
             <text>{{user.memberLevel}}：{{user.points}} 积分</text>
           </view>
-          <view class="profile-member__action" data-name="会员升级" bindtap="openItem">会员升级</view>
+          <view wx:if="{{showMemberUpgradeAction}}" class="profile-member__action" data-name="会员升级" bindtap="openItem">会员升级</view>
         </view>
       </view>
       <view class="profile-stats-head">

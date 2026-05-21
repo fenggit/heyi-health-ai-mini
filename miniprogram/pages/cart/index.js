@@ -1,5 +1,6 @@
 const { initMiniNav, backWithFallback } = require("../../utils/mini-nav")
 const { get, post, put, del } = require("../../utils/request")
+const { reportWechatPayResult } = require("../../utils/pay")
 const paths = require("../../http/paths")
 
 const DEFAULT_DELIVERY_ADDRESS = "请选择收货地址"
@@ -1177,10 +1178,8 @@ Page({
         wx.hideLoading()
         return requestWechatPayment(payArgs)
       })
+      .then(() => reportWechatPayResult(createdOrderId))
       .then(() => {
-        if (createdOrderId) {
-          get(paths.order.indentPayResult(createdOrderId)).catch(() => {})
-        }
         wx.showToast({
           title: "支付成功",
           icon: "success"

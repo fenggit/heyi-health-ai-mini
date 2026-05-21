@@ -1,0 +1,234 @@
+/* ===== 页面容器 ===== */
+.checkin-page {
+  background: transparent;
+}
+
+.checkin-page-bg {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 750rpx;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ===== 状态栏占位 + 导航栏标题行（与其他页面保持一致） ===== */
+.page-top-gap,
+.checkin-title-row,
+.checkin-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* 导航栏标题行：高度 44px，与胶囊同高，左侧 padding 对齐 */
+.checkin-title-row {
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  padding-left: 32rpx;
+  box-sizing: border-box;
+}
+
+.checkin-brand {
+  color: #1e293b;
+  font-size: 28rpx;
+  line-height: 40rpx;
+  font-weight: 700;
+}
+
+/* ===== 内容区 ===== */
+.checkin-content {
+  width: 702rpx;
+  margin: 0 auto;
+  padding-bottom: 40rpx;
+}
+
+/* ===== 页面标题区 ===== */
+/* 设计稿：打卡中心 top=92, 副标题 top=100，相对 topInset 约 16rpx 间距 */
+.checkin-head {
+  padding: 16rpx 0 24rpx;
+}
+
+.checkin-head__title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+/* 设计稿：fontSize=24px → 48rpx，lineHeight=30px → 60rpx */
+.checkin-head__title {
+  color: #1e293b;
+  font-size: 48rpx;
+  line-height: 60rpx;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* 设计稿：height=20px → 40rpx，cornerRadius=6px → 12rpx，背景 #CDFF71 */
+.checkin-head__subtitle-tag {
+  flex-shrink: 1;
+  height: 40rpx;
+  border-radius: 12rpx;
+  padding: 0 16rpx;
+  background: #cdff71;
+  color: #1e293b;
+  font-size: 24rpx;
+  line-height: 40rpx;
+  font-weight: 700;
+  margin-top: 12rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ===== 卡片通用（card-panel 已在 app.wxss 定义，这里补充局部覆盖） ===== */
+.checkin-page .card-panel {
+  border-radius: 24rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.96);
+  background: rgba(255, 255, 255, 0.72);
+  box-sizing: border-box;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.checkin-card {
+  padding: 24rpx 24rpx 20rpx;
+  margin-top: 16rpx;
+}
+
+/* ===== 卡片头部：标题 + 状态标签 ===== */
+.checkin-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+/* 设计稿：进行中 width=52px, height=20px, cornerRadius=6px, bg=#131313, color=#CDFF71 */
+.checkin-card__status {
+  height: 40rpx;
+  border-radius: 12rpx;
+  padding: 0 16rpx;
+  background: #131313;
+  color: #cdff71;
+  font-size: 24rpx;
+  line-height: 40rpx;
+  font-weight: 700;
+}
+
+/* ===== 统计区 ===== */
+.checkin-stats {
+  display: flex;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+/* 设计稿：每个统计卡片 width=159px, height=84px → 318rpx × 168rpx，cornerRadius=12px → 24rpx，bg=#ffffff */
+.checkin-stat {
+  flex: 1;
+  height: 168rpx;
+  border-radius: 24rpx;
+  background: #ffffff;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+}
+
+/* 设计稿：fontSize=14px → 28rpx，fontWeight=500，color=#1e293b */
+.checkin-stat__label {
+  color: #1e293b;
+  font-size: 28rpx;
+  line-height: 40rpx;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* 设计稿：数值背景矩形 width=58px, height=24px → 116rpx × 48rpx，cornerRadius=6px → 12rpx，渐变 #4EFFE2 → #CEF94C */
+.checkin-stat__value-tag {
+  height: 48rpx;
+  border-radius: 12rpx;
+  padding: 0 20rpx;
+  background: linear-gradient(90deg, #4effe2 0%, #cef94c 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 设计稿：数值 fontFamily=DIN, fontSize=14px → 28rpx, fontWeight=Bold */
+.checkin-stat__value {
+  color: #1e293b;
+  font-size: 28rpx;
+  line-height: 1;
+  font-weight: 700;
+  font-family: "DIN", "Source Han Sans CN", sans-serif;
+}
+
+/* 设计稿：单位 fontSize=12px → 24rpx, fontWeight=500 */
+.checkin-stat__unit {
+  color: #1e293b;
+  font-size: 24rpx;
+  line-height: 1;
+  font-weight: 500;
+}
+
+/* ===== 打卡计划列表 ===== */
+.checkin-plan-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+/* 设计稿：每行 height=73px → 146rpx，cornerRadius=12px → 24rpx，bg=rgba(244,247,250,0.7) */
+.checkin-plan-item {
+  height: 146rpx;
+  border-radius: 24rpx;
+  padding: 0 32rpx;
+  box-sizing: border-box;
+  background: rgba(244, 247, 250, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.checkin-plan-item__left {
+  display: flex;
+  align-items: center;
+}
+
+/* 设计稿：图标背景 width=32px, height=32px → 64rpx × 64rpx，cornerRadius=12px → 24rpx，渐变绿色 */
+.checkin-plan-item__icon-wrap {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(152deg, #7cee89 0%, #2bc383 100%);
+  flex-shrink: 0;
+}
+
+/* 设计稿：图标 16px → 32rpx */
+.checkin-plan-item__icon {
+  width: 32rpx;
+  height: 32rpx;
+}
+
+/* 设计稿：文字 fontSize=14px → 28rpx，fontWeight=700，color=#1e293b */
+.checkin-plan-item__name {
+  margin-left: 24rpx;
+  color: #1e293b;
+  font-size: 28rpx;
+  line-height: 40rpx;
+  font-weight: 700;
+}
+
+/* 设计稿：箭头 color=#94a3b8 */
+.checkin-plan-item__arrow {
+  color: #94a3b8;
+  font-size: 36rpx;
+  line-height: 1;
+}

@@ -1,0 +1,73 @@
+<view class="share-page">
+  <image class="share-page-bg" src="/assets/bg_img.png" mode="widthFix" />
+
+  <my-header title="打卡中心" show-back bindback="onBack" />
+  <view style="height: {{headerHeight}}px;"></view>
+
+  <view class="share-content">
+    <!-- 页面标题行 -->
+    <view class="share-head">
+      <view class="share-head__title-row">
+        <text class="share-head__title">内容分享</text>
+        <view class="share-head__tag">心得分享</view>
+      </view>
+    </view>
+
+    <!-- 内容卡片列表 -->
+    <view class="share-list">
+      <block wx:for="{{posts}}" wx:key="id">
+        <view class="share-card card-panel" data-id="{{item.id}}" bindtap="onItemTap">
+          <!-- 卡片头部：头像 + 用户名 + 时间 -->
+          <view class="share-card__header">
+            <view class="share-card__avatar-wrap">
+              <image
+                wx:if="{{item.avatarUrl}}"
+                class="share-card__avatar-img"
+                src="{{item.avatarUrl}}"
+                mode="aspectFill"
+              />
+              <image
+                wx:else
+                class="share-card__avatar-img"
+                src="/assets/checkin/checkin_user_icon.png"
+                mode="aspectFill"
+              />
+            </view>
+            <text class="share-card__username">{{item.username}}</text>
+            <text class="share-card__time">{{item.time}}</text>
+          </view>
+
+          <!-- 封面图：无图不显示 -->
+          <view wx:if="{{item.coverImageUrl}}" class="share-card__img-wrap">
+            <image class="share-card__img" src="{{item.coverImageUrl}}" mode="aspectFill" />
+          </view>
+
+          <!-- 标题行 + 点赞 -->
+          <view class="share-card__title-row">
+            <text class="share-card__title">{{item.title}}</text>
+            <view class="share-card__like" data-id="{{item.id}}" catchtap="onLikeTap">
+              <view class="share-card__like-icon {{item.liked ? 'share-card__like-icon--on' : ''}}"></view>
+              <text class="share-card__like-count {{item.liked ? 'share-card__like-count--on' : ''}}">{{item.likeCount}}</text>
+            </view>
+          </view>
+
+          <!-- 话题标签 -->
+          <view wx:if="{{item.tags.length}}" class="share-card__tags">
+            <block wx:for="{{item.tags}}" wx:key="*this" wx:for-item="tag">
+              <view class="share-card__tag">#{{tag}}</view>
+            </block>
+          </view>
+
+          <!-- 正文 -->
+          <text wx:if="{{item.content}}" class="share-card__content">{{item.content}}</text>
+        </view>
+      </block>
+
+      <!-- 底部状态 -->
+      <view class="share-footer">
+        <text wx:if="{{loading}}" class="share-footer__text">加载中...</text>
+        <text wx:elif="{{!hasMore && posts.length}}" class="share-footer__text">没有更多了</text>
+      </view>
+    </view>
+  </view>
+</view>

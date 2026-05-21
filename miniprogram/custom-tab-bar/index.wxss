@@ -55,6 +55,12 @@
   background: linear-gradient(180deg, #7cee89 0%, #2bc383 100%);
 }
 
+.tabbar-item__icon {
+  width: 88rpx;
+  height: 88rpx;
+  display: block;
+}
+
 .tabbar-item__text {
   position: relative;
   z-index: 1;

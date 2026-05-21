@@ -19,12 +19,12 @@
 
       <view class="tabbar-item tabbar-item--center" bindtap="openAiChat">
         <view class="tabbar-item__text-wrap">
-          <text class="tabbar-item__text">AI食养</text>
+          <image class="tabbar-item__icon" src="/assets/home/tab-ai.png" mode="aspectFit" />
         </view>
       </view>
 
       <block wx:for="{{tabs}}" wx:key="path" wx:for-item="tab" wx:for-index="index">
-        <block wx:if="{{index >= 2}}">
+        <block wx:if="{{index >= 2 && index <= 3}}">
           <view
             class="tabbar-item {{selected === index ? 'tabbar-item--active' : ''}}"
             data-path="{{tab.path}}"

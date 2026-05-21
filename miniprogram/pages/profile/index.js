@@ -1,8 +1,11 @@
 const { getLayoutMetrics } = require("../../utils/layout")
 const { navigateToReport } = require("../../utils/navigateReport")
 const { get, post } = require("../../utils/request")
+const { reportWechatPayResult } = require("../../utils/pay")
 const { fetchUserInfo, loadUserInfoFromStorage } = require("../../http/auth")
 const paths = require("../../http/paths")
+
+const FEATURE_KEY_MEMBER_UPGRADE = 'member-upgrade'
 
 const CURRENT_PLAN_CHIP_BG = "/assets/profile-pages/vip/current_img@2x.png"
 const RECOMMEND_PLAN_CHIP_BG = "/assets/profile-pages/vip/recommend_img@2x.png"
@@ -101,6 +104,46 @@ function cloneDeep(value) {
   return JSON.parse(JSON.stringify(value))
 }
 
+/**
+ * 浅比较两个值是否相等（用于 setData diff）
+ * 对象/数组走 JSON 序列化比较，基本类型直接 ===
+ */
+function isEqual(a, b) {
+  if (a === b) return true
+  if (a == null || b == null) return false
+  if (typeof a !== "object" && typeof b !== "object") return a === b
+  try {
+    return JSON.stringify(a) === JSON.stringify(b)
+  } catch (e) {
+    return false
+  }
+}
+
+/**
+ * 只把与当前 data 不同的字段传给 setData，减少不必要的视图更新。
+ * patch 支持点路径 key（如 "user.nickname"）和普通 key。
+ */
+function diffSetData(page, patch) {
+  const changed = {}
+  const keys = Object.keys(patch)
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i]
+    const newVal = patch[key]
+    // 解析点路径取当前值
+    const parts = key.split(".")
+    let cur = page.data
+    for (let j = 0; j < parts.length; j++) {
+      cur = cur && cur[parts[j]]
+    }
+    if (!isEqual(cur, newVal)) {
+      changed[key] = newVal
+    }
+  }
+  if (Object.keys(changed).length) {
+    page.setData(changed)
+  }
+}
+
 function unwrapResponseData(res) {
   if (res && Object.prototype.hasOwnProperty.call(res, "data") && res.data !== undefined && res.data !== null) {
     return res.data
@@ -113,6 +156,20 @@ function pickBizObject(data) {
   if (data.result && typeof data.result === "object") return data.result
   if (data.data && typeof data.data === "object") return data.data
   return data
+}
+
+function extractOrderId(data) {
+  const payload = pickBizObject(data)
+  const candidates = [payload.orderId, payload.id, payload.indentId]
+
+  for (let i = 0; i < candidates.length; i += 1) {
+    const candidate = candidates[i]
+    if (candidate != null && candidate !== "") {
+      return String(candidate)
+    }
+  }
+
+  return ""
 }
 
 function toWechatPayArgs(data) {
@@ -376,6 +433,7 @@ Page({
     showOpenMemberAction: false,
     openingMemberSubscription: false,
     upgradePageFetchSuccess: false,
+    showMemberUpgradeAction: false,
     memberFaqs: [
       {
         id: "f1",
@@ -396,11 +454,30 @@ Page({
   },
   onLoad() {
     this._hasLoadedProfileDataSuccessfully = false
+    this._lastRefreshTime = 0
     this.syncLayout()
     this.syncUserInfo({ fallbackToStorage: true })
+    this.syncMemberUpgradeSwitch()
+
+    const app = getApp()
+    if (app && typeof app.ensureFunctionMapLoaded === 'function') {
+      app.ensureFunctionMapLoaded().then(() => {
+        this.syncMemberUpgradeSwitch()
+      })
+    }
   },
   onShow() {
-    this.refreshProfileDataAndUI({ showLoading: !this._hasLoadedProfileDataSuccessfully })
+    const REFRESH_THROTTLE_MS = 30 * 1000
+    const now = Date.now()
+    const needsRefresh = !this._hasLoadedProfileDataSuccessfully ||
+      (now - (this._lastRefreshTime || 0)) > REFRESH_THROTTLE_MS
+
+    if (needsRefresh) {
+      this.refreshProfileDataAndUI({ showLoading: !this._hasLoadedProfileDataSuccessfully })
+    }
+
+    this.syncMemberUpgradeSwitch()
+
     if (typeof this.getTabBar === "function") {
       const tabBar = this.getTabBar()
       if (tabBar) {
@@ -451,6 +528,9 @@ Page({
         // 以积分中心数据为准，避免“我的”页显示旧积分
         return this.loadPointsCenterData().catch(() => {})
       })
+      .then(() => {
+        this._lastRefreshTime = Date.now()
+      })
       .finally(() => {
         this._profileRefreshPromise = null
         if (this._profileRefreshPending) {
@@ -485,21 +565,21 @@ Page({
       }
 
       if (Object.keys(patch).length) {
-        this.setData(patch)
+        diffSetData(this, patch)
       }
       return d
     })
   },
   syncLayout() {
     const { statusBarHeight } = getLayoutMetrics()
-    this.setData({
+    diffSetData(this, {
       topInset: Math.max(statusBarHeight + 12, 32)
     })
   },
   async loadPageData() {
     const payload = await fetchProfileData()
     this._hasLoadedProfileDataSuccessfully = true
-    this.setData(payload)
+    diffSetData(this, payload)
     this.syncUserInfo()
     if (this._upgradePagePayload) {
       this.applyUpgradePageData(this._upgradePagePayload)
@@ -537,7 +617,7 @@ Page({
       patch["user.nickname"] = nickName
     }
 
-    this.setData(patch)
+    diffSetData(this, patch)
   },
   loadUpgradePageData({ force = false, showLoading = false } = {}) {
     if (this._upgradePageRequestPromise) {
@@ -557,11 +637,11 @@ Page({
         const payload = (res && res.data) || {}
         this._upgradePagePayload = payload
         this.applyUpgradePageData(payload)
-        this.setData({ upgradePageFetchSuccess: true })
+        diffSetData(this, { upgradePageFetchSuccess: true })
         return payload
       })
       .catch((err) => {
-        this.setData({ upgradePageFetchSuccess: false })
+        diffSetData(this, { upgradePageFetchSuccess: false })
         return Promise.reject(err)
       })
       .finally(() => {
@@ -612,12 +692,16 @@ Page({
       patch["user.points"] = Number(totalPoints) || 0
     }
 
-    this.setData(patch)
+    diffSetData(this, patch)
   },
   openItem(e) {
     const { name } = e.currentTarget.dataset
     if (name === "会员升级") {
       this.openMemberSheet()
+      return
+    }
+
+    if (name === "会员签到") {
       return
     }
 
@@ -712,12 +796,15 @@ Page({
     })
       .then((res) => {
         const openPayload = unwrapResponseData(res)
+        const orderId = extractOrderId(openPayload)
+        if (orderId) {
+          resolvedOrderId = orderId
+        }
         const payArgs = toWechatPayArgs(openPayload)
         if (payArgs) {
           return requestWechatPayment(payArgs)
         }
 
-        const orderId = openPayload && openPayload.orderId != null ? String(openPayload.orderId) : ""
         const payRequired = !openPayload || openPayload.payRequired !== false
 
         if (!payRequired) {
@@ -743,10 +830,8 @@ Page({
           return requestWechatPayment(nextPayArgs)
         })
       })
+      .then(() => reportWechatPayResult(resolvedOrderId))
       .then(() => {
-        if (resolvedOrderId) {
-          get(paths.order.indentPayResult(resolvedOrderId)).catch(() => {})
-        }
         this.setData({ showMemberSheet: false })
         wx.showToast({
           title: "支付成功",
@@ -774,6 +859,12 @@ Page({
       .finally(() => {
         this.setData({ openingMemberSubscription: false })
       })
+  },
+  syncMemberUpgradeSwitch() {
+    const app = getApp()
+    const functionMap = app && app.globalData ? app.globalData.functionMap : null
+    const showMemberUpgradeAction = !!(functionMap && functionMap[FEATURE_KEY_MEMBER_UPGRADE])
+    diffSetData(this, { showMemberUpgradeAction })
   },
   noop() {}
 })

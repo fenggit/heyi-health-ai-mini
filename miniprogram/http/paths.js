@@ -8,6 +8,8 @@ const paths = {
     miniPhoneLogin: '/auth/mini/phone/login',
     // 当前登录用户信息
     currentUserProfile: '/auth/user/profile/current',
+    // 功能开关是否启用
+    featureEnabled: '/uc/app/profile/feature-enabled',
     // 修改昵称
     updateNickname: '/uc/app/profile/nickname',
     // 修改头像
@@ -100,6 +102,8 @@ const paths = {
   recipe: {
     // 首页聚合数据
     homeIndex: '/recipe/app/home/index',
+    // 当前食养计划
+    currentDietPlan: '/recipe/app/diet-plan/current',
     // 配方详情
     formulaDetail: (recipeId) => `/recipe/app/formula/${encodeURIComponent(recipeId)}/detail`,
     // AI 助手：创建会话
@@ -118,6 +122,32 @@ const paths = {
     // 取消收藏
     remove: (bizType, bizId) => `/uc/app/favorite?bizType=${encodeURIComponent(bizType)}&bizId=${encodeURIComponent(bizId)}`
   },
+  checkin: {
+    // 喝汁打卡聚合视图
+    juiceSummary: '/uc/app/juice-check-in/summary',
+    // 喝汁打卡选项（配方列表）
+    juiceOptions: '/uc/app/juice-check-in/options',
+    // 喝汁打卡提交
+    juiceCheckIn: '/uc/app/juice-check-in/check-in',
+    // 轻断食打卡聚合视图
+    fastingSummary: '/uc/app/fasting-check-in/summary',
+    // 轻断食打卡选项
+    fastingOptions: '/uc/app/fasting-check-in/options',
+    // 轻断食打卡提交
+    fastingCheckIn: '/uc/app/fasting-check-in/check-in',
+    // 内容分享列表（分页）
+    shareList: '/uc/app/health/share/my/list',
+    // 内容分享详情
+    shareDetail: (id) => `/uc/app/health/share/${encodeURIComponent(id)}`,
+    // 点赞
+    shareLike: (id) => `/uc/app/health/share/${encodeURIComponent(id)}/like`,
+    // 取消点赞
+    shareUnlike: (id) => `/uc/app/health/share/${encodeURIComponent(id)}/unlike`
+  },
+  resource: {
+    // 通用文件上传
+    uploadFile: '/resource/app/general/upload'
+  },
   assessment: {
     // 获取问卷详情
     questionnaireDetail: '/assessment/app/questionnaire/detail',
@@ -126,7 +156,15 @@ const paths = {
     // 提交问卷答案
     questionnaireSubmit: '/assessment/app/questionnaire/submit',
     // 获取测评结果详情
-    resultDetail: '/assessment/app/result/detail'
+    resultDetail: '/assessment/app/result/detail',
+    // AI 视觉分析：开始测评
+    aiStart: '/assessment/app/ai/start',
+    // AI 视觉分析：上传图片
+    aiStartWithImages: '/assessment/app/ai/start-with-images',
+    // AI 视觉分析：获取题目
+    aiInquiry: '/assessment/app/ai/inquiry',
+    // AI 视觉分析：提交答案
+    aiSubmit: '/assessment/app/ai/submit'
   }
 }
 

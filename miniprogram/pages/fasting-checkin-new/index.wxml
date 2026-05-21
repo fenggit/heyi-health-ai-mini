@@ -1,0 +1,137 @@
+<view class="new-page">
+  <image class="new-page-bg" src="/assets/bg_img.png" mode="widthFix" />
+
+  <my-header title="今日打卡" show-back bindback="onBack" />
+  <view style="height: {{headerHeight}}px;"></view>
+
+  <scroll-view class="new-content" scroll-y>
+
+    <!-- 打卡日期 -->
+    <view class="new-section new-section--date card-panel">
+      <text class="new-date__label">打卡日期</text>
+      <text class="new-date__value">{{currentDate}}</text>
+    </view>
+
+    <!-- 断食类型（必填） -->
+    <view class="new-section card-panel">
+      <view class="new-section__title-row">
+        <text class="new-section__title">断食类型</text>
+        <text class="new-section__required">*</text>
+      </view>
+      <view class="new-type-grid">
+        <block wx:for="{{fastingTypes}}" wx:key="code">
+          <view
+            class="new-type-item {{selectedTypeCode === item.code ? 'new-type-item--active' : ''}}"
+            data-code="{{item.code}}"
+            bindtap="onTypeSelect"
+          >
+            <text class="new-type-item__text">{{item.label}}</text>
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <!-- 断食时间（必填） -->
+    <view class="new-section card-panel">
+      <view class="new-section__title-row">
+        <text class="new-section__title">断食时间</text>
+        <text class="new-section__required">*</text>
+      </view>
+      <view class="new-time-row">
+        <picker mode="time" value="{{startTime}}" bindchange="onStartTimeChange">
+          <view class="new-time-picker">
+            <text class="new-time-picker__label">开始时间</text>
+            <text class="new-time-picker__value">{{startTime}}</text>
+          </view>
+        </picker>
+        <text class="new-time-arrow">→</text>
+        <picker mode="time" value="{{endTime}}" start="{{startTime}}" bindchange="onEndTimeChange">
+          <view class="new-time-picker">
+            <text class="new-time-picker__label">结束时间</text>
+            <text class="new-time-picker__value">{{endTime}}</text>
+          </view>
+        </picker>
+      </view>
+      <view class="new-duration" wx:if="{{durationHours > 0}}">
+        <text class="new-duration__text">断食时长：{{durationHours}} 小时</text>
+      </view>
+    </view>
+
+    <!-- 体重记录（选填） -->
+    <view class="new-section card-panel">
+      <text class="new-section__title">体重记录（选填）</text>
+      <view class="new-input-row">
+        <input
+          class="new-number-input"
+          type="digit"
+          placeholder="请输入体重"
+          placeholder-class="new-number-input__placeholder"
+          value="{{weight}}"
+          bindinput="onWeightInput"
+        />
+        <text class="new-input-unit">kg</text>
+      </view>
+    </view>
+
+    <!-- 体脂记录（选填） -->
+    <view class="new-section card-panel">
+      <text class="new-section__title">体脂记录（选填）</text>
+      <view class="new-input-row">
+        <input
+          class="new-number-input"
+          type="digit"
+          placeholder="请输入体脂率"
+          placeholder-class="new-number-input__placeholder"
+          value="{{bodyFat}}"
+          bindinput="onBodyFatInput"
+        />
+        <text class="new-input-unit">%</text>
+      </view>
+    </view>
+
+    <!-- 身体感受（选填） -->
+    <view class="new-section card-panel">
+      <text class="new-section__title">身体感受（选填）</text>
+      <view class="new-feeling-grid">
+        <block wx:for="{{feelings}}" wx:key="code">
+          <view
+            class="new-feeling-item {{item.checked ? 'new-feeling-item--active' : ''}}"
+            data-code="{{item.code}}"
+            bindtap="onFeelingToggle"
+          >
+            <text class="new-feeling-item__text">{{item.label}}</text>
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <!-- 打卡笔记（选填） -->
+    <view class="new-section card-panel">
+      <text class="new-section__title">打卡笔记（选填）</text>
+      <textarea
+        class="new-note-input"
+        placeholder="记录一下今天的感受吧~"
+        placeholder-class="new-note-input__placeholder"
+        maxlength="200"
+        value="{{note}}"
+        bindinput="onNoteInput"
+        auto-height
+      />
+      <text class="new-note-count">{{note.length}}/200</text>
+    </view>
+
+    <!-- 是否分享到内容 -->
+    <view class="new-section new-section--share-toggle card-panel" bindtap="onShareToggle">
+      <my-checkbox shape="square" checked="{{shareToContent}}" catchtap="onShareToggle" />
+      <text class="new-share-toggle__label">分享到内容</text>
+    </view>
+
+    <!-- 底部按钮 -->
+    <view class="new-footer">
+      <view class="new-btn new-btn--submit" bindtap="onSubmit">
+        <text class="new-btn__text">打卡</text>
+      </view>
+    </view>
+
+  </scroll-view>
+</view>

@@ -41,7 +41,7 @@
 
     <view class="analysis-quick-grid">
       <block wx:for="{{quickActions}}" wx:key="id">
-        <view class="analysis-quick-item" data-path="{{item.path}}" data-route-type="{{item.routeType}}" bindtap="tapQuickAction">
+        <view class="analysis-quick-item" data-path="{{item.path}}" data-route-type="{{item.routeType}}" data-requires-login="{{item.requiresLogin}}" bindtap="tapQuickAction">
           <view class="analysis-quick-item__hash">#</view>
           <text class="analysis-quick-item__text">{{item.label}}</text>
         </view>

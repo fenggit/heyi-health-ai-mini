@@ -64,7 +64,7 @@
       </view>
 
       <view class="analysis-btn analysis-btn--primary" bindtap="startQuiz">开始测评</view>
-      <view class="analysis-btn-link" bindtap="backHome">AI视觉分析</view>
+      <view wx:if="{{showAiAssessmentEntry}}" class="analysis-btn-link" bindtap="backHome">AI视觉分析</view>
     </view>
   </view>
 </view>

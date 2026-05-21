@@ -4,6 +4,7 @@
     "pages/login/index",
     "pages/home-banner-detail/index",
     "pages/mall/index",
+    "pages/checkin/index",
     "pages/mall-banner-detail/index",
     "pages/cart/index",
     "pages/diet/index",
@@ -29,10 +30,16 @@
     "pages/analysis-auth/index",
     "pages/analysis-upload/index",
     "pages/analysis-ai-image/index",
+    "pages/analysis-ai-image-quiz/index",
     "pages/product-detail/index",
     "pages/food-detail/index",
-    "pages/webview-page/index"
-
+    "pages/webview-page/index",
+    "pages/checkin-drink/index",
+    "pages/checkin-fasting/index",
+    "pages/checkin-list/index",
+    "pages/drink-checkin-new/index",
+    "pages/fasting-checkin-new/index",
+    "pages/checkin-detail/index"
   ],
   "window": {
     "backgroundColor": "#F4F5F8",
@@ -51,12 +58,16 @@
         "text": "商城"
       },
       {
-        "pagePath": "pages/diet/index",
-        "text": "食养"
+        "pagePath": "pages/checkin/index",
+        "text": "打卡"
       },
       {
         "pagePath": "pages/profile/index",
         "text": "我的"
+      },
+      {
+        "pagePath": "pages/diet/index",
+        "text": "食养"
       }
     ]
   },
