@@ -48,9 +48,9 @@ const SUMMARY_CARDS = [
 ]
 
 const REWARD_STEPS = [
-  { title: '好友注册成功', reward: '您获得 100 积分' },
-  { title: '体质类型', reward: '您获得 50 积分' },
-  { title: '用餐时间', reward: '新人优惠券' }
+  { title: '好友注册成功', reward: '好友获得100积分' },
+  { title: '推荐人奖励', reward: '您获得100积分' },
+  { title: '新人优惠券', reward: '3元无门槛优惠券' }
 ]
 
 function toDisplayText(value, fallback = '') {
@@ -356,16 +356,23 @@ Page({
   buildSharePayload() {
     const inviteCode = toDisplayText(this.data.inviteCode, '')
     const encodedInviteCode = inviteCode ? encodeURIComponent(inviteCode) : ''
-    const path = encodedInviteCode
+
+    // 微信好友分享（onShareAppMessage）：path 直接带 referralCode=CODE
+    const friendPath = encodedInviteCode
       ? `${SHARE_HOME_PATH}?referralCode=${encodedInviteCode}`
       : SHARE_HOME_PATH
+
+    // 朋友圈分享（onShareTimeline）：query 使用 referralCode=CODE 格式
+    const momentsQuery = encodedInviteCode
+      ? `referralCode=${encodedInviteCode}`
+      : ''
 
     return {
       title: inviteCode
         ? `我在天元食养，输入推荐码 ${inviteCode} 一起领取专属福利`
         : '我在天元食养，邀请你一起开启健康食养计划',
-      path,
-      query: encodedInviteCode ? `referralCode=${encodedInviteCode}` : ''
+      path: friendPath,
+      query: momentsQuery
     }
   },
 

@@ -1,0 +1,75 @@
+<view class="fasting-page">
+  <image class="fasting-page-bg" src="/assets/bg_img.png" mode="widthFix" />
+
+  <!-- my-header：自动处理状态栏 + 胶囊 -->
+  <my-header title="打卡中心" show-back bindback="onBack" />
+
+  <!-- 导航栏占位 -->
+  <view style="height: {{headerHeight}}px;"></view>
+
+  <view class="fasting-content">
+    <!-- 页面标题行 -->
+    <view class="fasting-head">
+      <view class="fasting-head__title-row">
+        <text class="fasting-head__title">轻断食打卡</text>
+        <view class="fasting-head__tag">每日打卡</view>
+      </view>
+    </view>
+
+    <!-- 统计卡片：4列（累计打卡、连续天数、平均时长、体重变化） -->
+    <view class="fasting-stats-card card-panel">
+      <view class="fasting-stats">
+        <view class="fasting-stat">
+          <text class="fasting-stat__value">{{totalCount}}</text>
+          <text class="fasting-stat__label">累计打卡</text>
+        </view>
+        <view class="fasting-stat__divider"></view>
+        <view class="fasting-stat">
+          <text class="fasting-stat__value">{{continuousDays}}</text>
+          <text class="fasting-stat__label">连续天数</text>
+        </view>
+        <view class="fasting-stat__divider"></view>
+        <view class="fasting-stat">
+          <text class="fasting-stat__value">{{avgHours}}</text>
+          <text class="fasting-stat__label">平均时长</text>
+        </view>
+        <view class="fasting-stat__divider"></view>
+        <view class="fasting-stat">
+          <text class="fasting-stat__value">{{weightChange}}</text>
+          <text class="fasting-stat__label">体重变化</text>
+        </view>
+      </view>
+
+      <!-- 今日打卡按钮 -->
+      <view class="fasting-checkin-btn" bindtap="onCheckin">
+        <text class="fasting-checkin-btn__text">今日打卡</text>
+      </view>
+    </view>
+
+    <!-- 打卡记录 -->
+    <view class="fasting-records">
+      <title-view text="打卡记录" />
+      <view class="fasting-record-list card-panel">
+        <block wx:for="{{records}}" wx:key="id">
+          <!-- 分割线（第一条不显示） -->
+          <view wx:if="{{index > 0}}" class="fasting-record-divider"></view>
+          <view class="fasting-record-item">
+            <view class="fasting-record-item__body">
+              <!-- 名称 + 时长标签 -->
+              <view class="fasting-record-item__title-row">
+                <text class="fasting-record-item__name">{{item.name}}</text>
+                <view wx:if="{{item.duration}}" class="fasting-record-item__duration-tag">{{item.duration}}</view>
+              </view>
+              <text class="fasting-record-item__time">{{item.time}}</text>
+              <text wx:if="{{item.detail}}" class="fasting-record-item__detail">{{item.detail}}</text>
+              <text wx:if="{{item.note}}" class="fasting-record-item__note">{{item.note}}</text>
+            </view>
+            <view class="fasting-record-item__check" catchtap="noop">
+              <my-checkbox checked="{{true}}" shape="circle" />
+            </view>
+          </view>
+        </block>
+      </view>
+    </view>
+  </view>
+</view>

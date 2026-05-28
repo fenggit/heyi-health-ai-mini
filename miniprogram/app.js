@@ -1,5 +1,47 @@
 const request = require('./utils/request')
-const { fetchUserInfo, loadUserInfoFromStorage } = require('./http/auth')
+const { fetchUserInfo, fetchFeatureEnabled, loadUserInfoFromStorage } = require('./http/auth')
+
+const FEATURE_KEY_AI_ASSESSMENT = 'ai-assessment'
+const FEATURE_KEY_MEMBER_UPGRADE = 'member-upgrade'
+
+/** 临时邀请码的 storage key，与 login 页保持一致 */
+const REFERRAL_CODE_STORAGE_KEY = 'pending_referral_code'
+
+/**
+ * 从启动参数中提取邀请码并临时存储
+ *
+ * 方式1 — 小程序分享点击：launchOptions.query.referralCode = "LNHIG4H1"
+ * 方式2 — 二维码扫码：launchOptions.scene = 1011/1047，
+ *          launchOptions.query.scene decode 后是 "source=qr&code=LNHIG4H1"，原样存储
+ */
+function saveLaunchReferralCode(launchOptions) {
+  try {
+    const query = launchOptions.query || {}
+    const scene = launchOptions.scene
+
+    let referralCode = ''
+
+    // 方式1：小程序分享点击，referralCode 直接在 query 上
+    if (query.referralCode) {
+      try { referralCode = decodeURIComponent(query.referralCode) } catch (e) { referralCode = query.referralCode }
+      referralCode = referralCode.trim()
+    }
+
+    // 方式2：二维码扫码（scene 1011=扫小程序码，1047=扫普通二维码）
+    // query.scene 是二维码携带的原始数据，decode 后原样存储
+    if (!referralCode && (scene === 1011 || scene === 1047) && query.scene) {
+      try { referralCode = decodeURIComponent(query.scene) } catch (e) { referralCode = query.scene }
+      referralCode = referralCode.trim()
+    }
+
+    if (referralCode) {
+      wx.setStorageSync(REFERRAL_CODE_STORAGE_KEY, referralCode)
+      console.log('[app] 临时存储邀请码:', referralCode)
+    }
+  } catch (e) {
+    console.warn('[app] 存储邀请码失败:', e)
+  }
+}
 
 App({
   /**
@@ -25,6 +67,13 @@ App({
    *     memberInfo.currentLevelId   {number} 当前会员等级 ID
    *     memberInfo.currentLevelName {string} 当前会员等级名称
    *     memberInfo.totalPoints      {number} 总积分
+   *   stat {object} 数据统计
+   *     stat.juiceCheckInTotalCount   {number} 喝汁累计打卡次数
+   *     stat.fastingCheckInTotalCount {number} 轻断食累计打卡次数
+   *     stat.favoriteRecipeCount      {number} 收藏食谱数
+   *     stat.historyOrderCount        {number} 历史订单数
+   *     stat.couponCount              {number} 优惠券数
+   *     stat.referralCount            {number} 邀请好友数
    *
    * guestSession — 游客 session 信息（来自 getGuestToken 响应 data）
    *   guestToken     {string}  游客令牌
@@ -41,14 +90,57 @@ App({
     },
     isLogin: false,
     userInfo: null,
-    guestSession: null
+      guestSession: null,
+      functionMap: {
+        [FEATURE_KEY_AI_ASSESSMENT]: false,
+        [FEATURE_KEY_MEMBER_UPGRADE]: false
+      }
   },
   onLaunch(launchOptions = {}) {
     request.initAuthToken()
     this.globalData.layout = this.computeLayout()
     this.globalData.userInfo = loadUserInfoFromStorage()
+    this.ensureFunctionMapLoaded()
+    saveLaunchReferralCode(launchOptions)
     this.checkLogin(launchOptions)
   },
+    ensureFunctionMapLoaded() {
+      if (this._functionMapPromise) return this._functionMapPromise
+
+      const loadOne = (key) => fetchFeatureEnabled(key)
+        .then((res) => {
+          const enabled = !!(res && res.data && res.data.enabled)
+          this.setFunctionEnabled(key, enabled)
+          console.log('[app] 功能开关加载成功:', key, enabled)
+        })
+        .catch((err) => {
+          this.setFunctionEnabled(key, false)
+          console.warn('[app] 功能开关加载失败:', key, err)
+        })
+
+      this._functionMapPromise = Promise.all([
+        loadOne(FEATURE_KEY_AI_ASSESSMENT),
+        loadOne(FEATURE_KEY_MEMBER_UPGRADE)
+      ])
+        .then(() => this.globalData.functionMap)
+        .finally(() => {
+          this._functionMapPromise = null
+        })
+
+      return this._functionMapPromise
+    },
+    setFunctionEnabled(featureKey, enabled) {
+      const nextFeatureKey = String(featureKey || '').trim()
+      if (!nextFeatureKey) return
+
+      const currentMap = this.globalData.functionMap && typeof this.globalData.functionMap === 'object'
+        ? this.globalData.functionMap
+        : {}
+
+      this.globalData.functionMap = Object.assign({}, currentMap, {
+        [nextFeatureKey]: !!enabled
+      })
+    },
   checkLogin(launchOptions = {}) {
     // 检查本地是否有 token，有则视为已登录
     const token = request.getAuthToken()

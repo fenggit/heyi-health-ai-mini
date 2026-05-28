@@ -1,0 +1,78 @@
+<view class="new-page">
+  <image class="new-page-bg" src="/assets/bg_img.png" mode="widthFix" />
+
+  <my-header title="今日打卡" show-back bindback="onBack" />
+  <view style="height: {{headerHeight}}px;"></view>
+
+  <scroll-view class="new-content" scroll-y>
+
+    <!-- 打卡时间 -->
+    <view class="new-section new-section--time card-panel">
+      <text class="new-time__label">打卡时间</text>
+      <text class="new-time__clock">{{currentTime}}</text>
+      <text class="new-time__date">{{currentDate}}</text>
+    </view>
+
+    <!-- 果蔬汁（必填） -->
+    <view class="new-section card-panel">
+      <view class="new-section__title-row">
+        <text class="new-section__title">果蔬汁</text>
+        <text class="new-section__required">*</text>
+      </view>
+      <view class="new-type-grid">
+        <block wx:for="{{juiceOptions}}" wx:key="key">
+          <view
+            class="new-type-item {{selectedOption && selectedOption.key === item.key ? 'new-type-item--active' : ''}}"
+            data-key="{{item.key}}"
+            bindtap="onTypeSelect"
+          >
+            <text class="new-type-item__text">{{item.label}}</text>
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <!-- 上传照片（选填） -->
+    <view class="new-section card-panel">
+      <text class="new-section__title">上传照片（选填）</text>
+      <view class="new-photo-area">
+        <view wx:if="{{!photoPath}}" class="new-photo-placeholder" bindtap="onChoosePhoto">
+          <text class="new-photo-placeholder__plus">+</text>
+        </view>
+        <view wx:else class="new-photo-preview" bindtap="onChoosePhoto">
+          <image class="new-photo-preview__img" src="{{photoPath}}" mode="aspectFill" />
+          <view class="new-photo-preview__remove" catchtap="onRemovePhoto">×</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 打卡笔记（选填） -->
+    <view class="new-section card-panel">
+      <text class="new-section__title">打卡笔记（选填）</text>
+      <textarea
+        class="new-note-input"
+        placeholder="记录一下今天的感受吧~"
+        placeholder-class="new-note-input__placeholder"
+        maxlength="200"
+        value="{{note}}"
+        bindinput="onNoteInput"
+        auto-height
+      />
+      <text class="new-note-count">{{note.length}}/200</text>
+    </view>
+
+    <!-- 是否分享到内容 -->
+    <view class="new-section new-section--share-toggle card-panel" bindtap="onShareToggle">
+      <my-checkbox shape="square" checked="{{shareToContent}}" catchtap="onShareToggle" />
+      <text class="new-share-toggle__label">分享到内容</text>
+    </view>
+
+    <!-- 底部按钮 -->
+    <view class="new-footer">
+      <view class="new-btn new-btn--submit" bindtap="onSubmit">
+        <text class="new-btn__text">打卡</text>
+      </view>
+    </view>
+
+  </scroll-view>
+</view>

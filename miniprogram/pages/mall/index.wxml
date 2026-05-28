@@ -30,14 +30,14 @@
   </view>
 
   <view class="mall-content">
-    <view class="mall-banner card-panel">
+    <view class="mall-banner card-panel" wx:if="{{activityBanners.length > 0}}">
       <swiper
         class="mall-banner-swiper"
-        current="{{bannerCurrent}}"
         circular
         autoplay
-        interval="4200"
-        duration="420"
+        interval="5000"
+        duration="300"
+        indicator-dots="{{false}}"
         bindchange="onBannerChange"
       >
         <block wx:for="{{activityBanners}}" wx:key="id">
@@ -48,7 +48,7 @@
               data-id="{{item.id}}"
               data-cover-image="{{item.coverImage || item.image}}"
             >
-              <image class="mall-banner-image" src="{{item.image}}" mode="aspectFill" />
+              <image class="mall-banner-image" src="{{item.image}}" mode="aspectFill" lazy-load />
             </view>
           </swiper-item>
         </block>

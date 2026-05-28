@@ -99,6 +99,7 @@
   height: 8rpx;
   border-radius: 999rpx;
   background: rgba(255, 255, 255, 0.45);
+  transition: width 0.3s ease, background 0.3s ease;
 }
 
 .activity-dot + .activity-dot {
